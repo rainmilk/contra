@@ -1,0 +1,1 @@
+{"model": "vgg16", "dataset": "flowers-102", "condition": "combined", "accuracy": 0.00980392156862745, "loss": 4.870179235935211}

@@ -1,0 +1,1 @@
+{"model": "vgg16", "dataset": "cifar-10", "condition": "original_data", "accuracy": 0.1, "loss": 2.3026249773183447}
