@@ -1,8 +1,21 @@
 # dataset
 data/
+dataset/
 
 # model
 models/
+models-bak/
+model/
+
+# log
+logs/
+log/
+
+# models
+*.pt
+
+# bak
+*bak
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
