@@ -141,12 +141,4 @@ def main():
 
 
 if __name__ == "__main__":
-
-    """
-    Cifar-10 Example
-    """
-    # python main.py --dataset cifar-10 --model resnet18 --condition remove_data --classes_remove 0 1 2 3 4 --remove_fraction 0.5 --gpu 0
-    # python main.py --dataset cifar-10 --model resnet18 --condition noisy_data --classes_remove 0 1 2 3 4 --classes_noise 5 6 7 8 9 --noise_type gaussian --noise_fraction 0.1 --gpu 0
-    # python main.py --dataset cifar-10 --model resnet18 --condition all_perturbations --classes_remove 0 1 2 3 4 --remove_fraction 0.5 --classes_noise 5 6 7 8 9 --noise_type salt_pepper --noise_fraction 0.2 --gpu 0
-
     main()
