@@ -3,12 +3,11 @@ import torchvision
 import torchvision.transforms as transforms
 import random
 from torch.utils.data import Subset
-
 from utils.dataset_animals_10 import get_animals_10_dataset
 from utils.dataset_flowers_102 import get_flowers_102_dataset
-
 import pandas as pd
 from tabulate import tabulate
+from PIL import Image
 
 
 # Custom loader for ImageFolder
@@ -75,10 +74,27 @@ class DatasetLoader:
             raise ValueError("Unsupported dataset: " + self.dataset_name)
         return train_dataset, test_dataset
 
+    # 扁平化类标签列表，处理嵌套列表
+    def flatten_class_list(self, class_list):
+        flattened = []
+        for item in class_list:
+            if isinstance(item, list):
+                flattened.extend(self.flatten_class_list(item))  # 递归展开列表
+            else:
+                flattened.append(int(item))
+        return flattened
+
     # 操作1：删除选定类别中的指定比例样本
     def remove_fraction_of_selected_classes(
         self, dataset, selected_classes, remove_fraction=0.5
     ):
+        # 将类标签展平为一维列表
+        selected_classes = self.flatten_class_list(selected_classes)
+
+        # 打印检查selected_classes是否正确
+        print(type(selected_classes))
+        print(selected_classes)
+
         class_indices = {i: [] for i in selected_classes}
 
         # 为每个选定的类别找到对应的样本索引
@@ -99,20 +115,50 @@ class DatasetLoader:
 
     # 操作2：为选定类别添加噪声
     def add_noise_to_selected_classes(
-        self, dataset, selected_classes, noise_fraction=0.1
+        self, dataset, selected_classes, noise_fraction=0.8, noise_type="gaussian"
     ):
+        # 扁平化类标签
+        selected_classes = self.flatten_class_list(selected_classes)
+
         noisy_data = []
         noisy_labels = []
 
         for idx, (image, label) in enumerate(dataset):
             if label in selected_classes and random.random() < noise_fraction:
-                noise = torch.randn_like(image) * 0.1  # 添加噪声
-                image = image + noise
-                image = torch.clamp(image, -1, 1)  # 确保图像仍在合法范围内
+                if noise_type == "gaussian":
+                    noise = torch.randn_like(image) * 0.1  # 高斯噪声
+                    image = image + noise
+                    image = torch.clamp(image, -1, 1)  # 确保图像仍在合法范围内
+                elif noise_type == "salt_pepper":
+                    image = self.add_salt_and_pepper_noise(image)
+                else:
+                    raise ValueError(f"Unsupported noise type: {noise_type}")
             noisy_data.append(image)
             noisy_labels.append(label)
 
         return list(zip(noisy_data, noisy_labels))
+
+    # 椒盐噪声的辅助函数
+    def add_salt_and_pepper_noise(self, image, amount=0.05, salt_vs_pepper=0.5):
+        """
+        椒盐噪声
+        :param image: 输入的图像张量
+        :param amount: 噪声量的比例
+        :param salt_vs_pepper: 盐和胡椒的比例
+        """
+        noisy_image = image.clone()
+        num_salt = int(amount * image.numel() * salt_vs_pepper)
+        num_pepper = int(amount * image.numel() * (1.0 - salt_vs_pepper))
+
+        # 添加盐噪声
+        coords = [torch.randint(0, i, (num_salt,)) for i in image.shape]
+        noisy_image[coords] = 1
+
+        # 添加胡椒噪声
+        coords = [torch.randint(0, i, (num_pepper,)) for i in image.shape]
+        noisy_image[coords] = 0
+
+        return noisy_image
 
     # 组合操作：同时删除样本并注入噪声
     def modify_dataset(
@@ -122,6 +168,7 @@ class DatasetLoader:
         selected_classes_noise,
         remove_fraction=0.5,
         noise_fraction=0.1,
+        noise_type="gaussian",
     ):
         """
         同时执行删除样本和注入噪声的操作
@@ -130,6 +177,7 @@ class DatasetLoader:
         :param selected_classes_noise: 要注入噪声的类别列表
         :param remove_fraction: 删除样本的比例
         :param noise_fraction: 注入噪声的比例
+        :param noise_type: 噪声类型（高斯或椒盐）
         """
         # 操作1：删除选定类别中的指定比例样本
         dataset_after_removal = self.remove_fraction_of_selected_classes(
@@ -138,7 +186,7 @@ class DatasetLoader:
 
         # 操作2：为剩余类别添加噪声
         noisy_dataset = self.add_noise_to_selected_classes(
-            dataset_after_removal, selected_classes_noise, noise_fraction
+            dataset_after_removal, selected_classes_noise, noise_fraction, noise_type
         )
 
         return noisy_dataset
@@ -193,7 +241,8 @@ if __name__ == "__main__":
         selected_classes_remove=[0, 1, 2, 3, 4],  # 删除类别 0 到 4
         selected_classes_noise=[5, 6, 7, 8, 9],  # 对类别 5 到 9 注入噪声
         remove_fraction=0.5,  # 删除 50% 的样本
-        noise_fraction=0.1,  # 注入 10% 的噪声
+        noise_fraction=0.5,  # 注入 50% 的噪声
+        noise_type="salt_pepper",  # 使用椒盐噪声
     )
 
     # 计算并显示修改前后的数据分布
