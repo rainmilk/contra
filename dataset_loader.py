@@ -25,42 +25,66 @@ class DatasetLoader:
 
     def get_dataset(self):
         if self.dataset_name == "cifar-10":
-            transform = transforms.Compose(
+            transform_train = transforms.Compose(
+                [
+                    transforms.RandomCrop(32, padding=4),
+                    transforms.RandomHorizontalFlip(),
+                    transforms.ToTensor(),
+                    transforms.Normalize(
+                        (0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616)
+                    ),
+                ]
+            )
+            transform_test = transforms.Compose(
                 [
                     transforms.ToTensor(),
-                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                    transforms.Normalize(
+                        (0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616)
+                    ),
                 ]
             )
             train_dataset = torchvision.datasets.CIFAR10(
                 root=self.dataset_paths[self.dataset_name],
                 train=True,
                 download=True,
-                transform=transform,
+                transform=transform_train,
             )
             test_dataset = torchvision.datasets.CIFAR10(
                 root=self.dataset_paths[self.dataset_name],
                 train=False,
                 download=True,
-                transform=transform,
+                transform=transform_test,
             )
         elif self.dataset_name == "cifar-100":
-            transform = transforms.Compose(
+            transform_train = transforms.Compose(
+                [
+                    transforms.RandomCrop(32, padding=4),
+                    transforms.RandomHorizontalFlip(),
+                    transforms.ToTensor(),
+                    transforms.Normalize(
+                        (0.5071, 0.4866, 0.4409), (0.2673, 0.2564, 0.2762)
+                    ),
+                ]
+            )
+            transform_test = transforms.Compose(
                 [
                     transforms.ToTensor(),
-                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                    transforms.Normalize(
+                        (0.5071, 0.4866, 0.4409), (0.2673, 0.2564, 0.2762)
+                    ),
                 ]
             )
             train_dataset = torchvision.datasets.CIFAR100(
                 root=self.dataset_paths[self.dataset_name],
                 train=True,
                 download=True,
-                transform=transform,
+                transform=transform_train,
             )
             test_dataset = torchvision.datasets.CIFAR100(
                 root=self.dataset_paths[self.dataset_name],
                 train=False,
                 download=True,
-                transform=transform,
+                transform=transform_test,
             )
         elif self.dataset_name == "animals-10":
             train_dataset, test_dataset = get_animals_10_dataset(

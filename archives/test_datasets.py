@@ -38,7 +38,7 @@ def test_dataset(dataset_name):
     )
 
     # 创建 ResNet 模型
-    model = ModelUtils.create_resnet_model(num_classes=num_classes_dict[dataset_name])
+    model = ModelUtils.create_model(num_classes=num_classes_dict[dataset_name])
 
     # 损失函数和优化器
     criterion = torch.nn.CrossEntropyLoss()

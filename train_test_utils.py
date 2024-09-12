@@ -31,23 +31,36 @@ class TrainTestUtils:
         model.train()
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         running_loss = 0.0
+        correct = 0
+        total = 0
 
         # 用 tqdm 显示训练进度条
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for i, (inputs, labels) in enumerate(train_loader):
                 inputs, labels = inputs.to(device), labels.to(device)
-                optimizer.zero_grad()
+                optimizer.zero_grad()  # 清除上一步的梯度
                 outputs = model(inputs)
+                
                 loss = criterion(outputs, labels)
-                loss.backward()
-                optimizer.step()
+                loss.backward()  # 反向传播
+                optimizer.step()  # 更新参数
+
                 running_loss += loss.item()
 
-                # 更新进度条
-                pbar.set_postfix({"Loss": loss.item()})
+                # 计算准确率
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+                # 更新进度条显示每个 mini-batch 的损失
+                pbar.set_postfix({"Loss": f"{loss.item():.4f}"})
                 pbar.update(1)
 
-        print(f"Epoch [{epoch + 1}], Loss: {running_loss / len(train_loader)}")
+        avg_loss = running_loss / len(train_loader)  # 计算平均损失
+        accuracy = correct / total  # 计算训练集的准确率
+        print(
+            f"Epoch [{epoch + 1}/{num_epochs}], Training Loss: {avg_loss:.4f}, Training Accuracy: {accuracy * 100:.2f}%"
+        )
 
         # 仅在最后一次保存模型，避免每个 epoch 都保存
         if not save_final_model_only or epoch == (num_epochs - 1):
@@ -68,6 +81,7 @@ class TrainTestUtils:
         running_loss = 0.0
         criterion = torch.nn.CrossEntropyLoss()  # 定义损失函数
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model.to(device)  # 确保模型移动到 GPU
 
         # 用于 early stopping 机制的测试
         with torch.no_grad():
@@ -76,6 +90,7 @@ class TrainTestUtils:
                 outputs = model(images)
                 loss = criterion(outputs, labels)  # 计算损失
                 running_loss += loss.item()  # 累加损失
+
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()

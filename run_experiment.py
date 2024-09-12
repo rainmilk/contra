@@ -86,7 +86,7 @@ def run_experiment(
     # 创建模型
     print(f"Creating model: {model_name}")
     model_utils = ModelUtils(model_name, num_classes_dict[dataset_name])
-    model = model_utils.create_resnet_model()
+    model = model_utils.create_model()
 
     # 损失函数和优化器
     criterion, optimizer = model_utils.get_criterion_and_optimizer(model)
