@@ -16,6 +16,12 @@ def run_experiment(
     noise_type,
     noise_fraction,
     use_early_stopping,
+    batch_size=64,  # 默认batch_size
+    learning_rate=0.001,  # 默认学习率
+    num_epochs=200,  # 默认epoch数量
+    early_stopping_patience=10,  # 早停的耐心值
+    early_stopping_accuracy_threshold=0.95,  # 提前停止的准确率阈值
+    **kwargs,  # 捕获额外的参数
 ):
     # 数据集路径和类别数量
     dataset_paths = {
@@ -44,7 +50,7 @@ def run_experiment(
         # 处理不同实验条件的 DataLoader
         if condition == "original_data":
             train_loader = DataLoader(
-                train_dataset, batch_size=64, shuffle=True, num_workers=2
+                train_dataset, batch_size=batch_size, shuffle=True, num_workers=2
             )
         elif condition == "remove_data":
             # 仅执行删除操作
@@ -52,7 +58,10 @@ def run_experiment(
                 train_dataset, selected_classes_remove, remove_fraction=remove_fraction
             )
             train_loader = DataLoader(
-                train_dataset_shifted, batch_size=64, shuffle=True, num_workers=2
+                train_dataset_shifted,
+                batch_size=batch_size,
+                shuffle=True,
+                num_workers=2,
             )
         elif condition == "noisy_data":
             # 仅执行噪声注入操作
@@ -63,7 +72,10 @@ def run_experiment(
                 noise_fraction=noise_fraction,
             )
             train_loader = DataLoader(
-                train_dataset_shifted, batch_size=64, shuffle=True, num_workers=2
+                train_dataset_shifted,
+                batch_size=batch_size,
+                shuffle=True,
+                num_workers=2,
             )
         elif condition == "all_perturbations":
             # 同时删除样本并注入噪声
@@ -76,7 +88,7 @@ def run_experiment(
                 noise_fraction=noise_fraction,
             )
             train_loader = DataLoader(
-                modified_dataset, batch_size=64, shuffle=True, num_workers=2
+                modified_dataset, batch_size=batch_size, shuffle=True, num_workers=2
             )
         else:
             raise ValueError("Unsupported condition: " + condition)
@@ -88,19 +100,20 @@ def run_experiment(
     model_utils = ModelUtils(model_name, num_classes_dict[dataset_name])
     model = model_utils.create_model()
 
-    # 获取损失函数和优化器
-    criterion, optimizer = model_utils.get_criterion_and_optimizer(model)
+    criterion, optimizer = model_utils.get_criterion_and_optimizer(
+        model,
+        lr=learning_rate,
+        optimizer="sgd",  # 使用 SGD 优化器
+        momentum=0.9,  # 设置 momentum 参数
+        weight_decay=1e-4,  # 设置 weight decay
+    )
 
     # 训练和测试工具
     train_test_utils = TrainTestUtils(model_name, dataset_name)
     save_path = train_test_utils.create_save_path(condition)
 
-    # Early stopping 参数
-    early_stopping_patience = 10  # 连续 N 次性能下降则停止
-    early_stopping_accuracy_threshold = 0.95  # 如果准确率达到 95%，提前停止
     best_accuracy = 0
     patience_counter = 0
-    num_epochs = 200  # 最多训练 N 个 epoch
 
     # 训练模型并显示进度
     print(f"Training model on {dataset_name} with condition: {condition}")
@@ -114,11 +127,13 @@ def run_experiment(
             epoch=epoch,
             num_epochs=num_epochs,
             save_final_model_only=True,
+            # alpha=alpha,  # 传递 alpha 参数
+            # beta=beta,  # 传递 beta 参数
         )
 
         # 在验证集上评估模型性能
         val_loader = DataLoader(
-            val_dataset, batch_size=64, shuffle=False, num_workers=2
+            val_dataset, batch_size=batch_size, shuffle=False, num_workers=2
         )
         accuracy = train_test_utils.test(model, val_loader, condition)
 
@@ -153,61 +168,3 @@ def run_experiment(
                 break
         else:
             print(f"Epoch [{epoch + 1}/{num_epochs}] completed without early stopping.")
-
-
-# 执行实验
-if __name__ == "__main__":
-    datasets_to_test = ["cifar-10", "cifar-100"]
-
-    for dataset in datasets_to_test:
-        print(f"开始 {dataset} 的原始数据集训练")
-        run_experiment(
-            dataset,
-            "resnet18",
-            [0, 1, 2, 3, 4],
-            [5, 6, 7, 8, 9],
-            "original_data",
-            remove_fraction=0.5,
-            noise_type="gaussian",
-            noise_fraction=0.1,
-            use_early_stopping=False,
-        )
-
-        print(f"\n开始 {dataset} 的移除 50% 数据的训练")
-        run_experiment(
-            dataset,
-            "resnet18",
-            [0, 1, 2, 3, 4],
-            [5, 6, 7, 8, 9],
-            "remove_data",
-            remove_fraction=0.5,
-            noise_type="gaussian",
-            noise_fraction=0.1,
-            use_early_stopping=True,
-        )
-
-        print(f"\n开始 {dataset} 的添加噪声数据的训练")
-        run_experiment(
-            dataset,
-            "resnet18",
-            [0, 1, 2, 3, 4],
-            [5, 6, 7, 8, 9],
-            "noisy_data",
-            remove_fraction=0.5,
-            noise_type="gaussian",
-            noise_fraction=0.1,
-            use_early_stopping=True,
-        )
-
-        print(f"\n开始 {dataset} 的组合操作（删除样本+噪声注入）的训练")
-        run_experiment(
-            dataset,
-            "resnet18",
-            [0, 1, 2, 3, 4],
-            [5, 6, 7, 8, 9],
-            "all_perturbations",
-            remove_fraction=0.5,
-            noise_type="salt_pepper",
-            noise_fraction=0.2,
-            use_early_stopping=False,
-        )

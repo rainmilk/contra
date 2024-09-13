@@ -3,6 +3,19 @@ import argparse
 from run_experiment import run_experiment
 
 
+# 自定义检查函数
+def check_positive(value):
+    ivalue = float(value)
+    if ivalue <= 0:
+        raise argparse.ArgumentTypeError(f"{value} is an invalid positive float value")
+    return ivalue
+
+def check_fraction(value):
+    fvalue = float(value)
+    if not (0.0 <= fvalue <= 1.0):
+        raise argparse.ArgumentTypeError(f"{value} is an invalid fraction (0.0 - 1.0)")
+    return fvalue
+
 # 解析 classes 参数（支持 0-9 形式）
 def parse_class_range(value):
     if "-" in value:
@@ -23,18 +36,21 @@ def parse_args():
         "--dataset",
         type=str,
         required=True,
+        choices=["cifar-10", "cifar-100", "flowers-102", "tiny-imagenet-200"],
         help="Dataset name, choose from: cifar-10, cifar-100, flowers-102, tiny-imagenet-200",
     )
     parser.add_argument(
         "--model",
         type=str,
         required=True,
+        choices=["resnet18", "vgg16"],
         help="Model name, choose from: resnet18, vgg16",
     )
     parser.add_argument(
         "--condition",
         type=str,
         required=True,
+        choices=["original_data", "remove_data", "noisy_data", "all_perturbations"],
         help="Condition for the experiment: original_data, remove_data, noisy_data, all_perturbations",
     )
 
@@ -49,7 +65,8 @@ def parse_args():
     # 添加 remove_fraction 参数，用于指定删除样本的比例
     parser.add_argument(
         "--remove_fraction",
-        type=float,
+        # type=float,
+        type=check_fraction,  # 使用自定义函数
         default=0.5,
         help="Fraction of samples to remove from the selected classes, e.g., --remove_fraction 0.5 for 50%% removal (default: 0.5)",
     )
@@ -83,6 +100,47 @@ def parse_args():
         type=str,
         default="0",
         help="Specify the GPU(s) to use, e.g., --gpu 0,1 for multi-GPU or --gpu 0 for single GPU",
+    )
+
+    # 添加 batch_size 参数
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=64,
+        help="Batch size for training (default: 64)",
+    )
+
+    # 添加 learning_rate 参数
+    parser.add_argument(
+        "--learning_rate",
+        # type=float,
+        type=check_positive,  # 使用自定义函数
+        default=0.001,
+        help="Learning rate for the optimizer (default: 0.001)",
+    )
+
+    # 添加 num_epochs 参数
+    parser.add_argument(
+        "--num_epochs",
+        type=int,
+        default=200,
+        help="Number of epochs to train the model (default: 200)",
+    )
+
+    # 添加 early_stopping_patience 参数
+    parser.add_argument(
+        "--early_stopping_patience",
+        type=int,
+        default=10,
+        help="Patience for early stopping (default: 10)",
+    )
+
+    # 添加 early_stopping_accuracy_threshold 参数
+    parser.add_argument(
+        "--early_stopping_accuracy_threshold",
+        type=float,
+        default=0.95,
+        help="Accuracy threshold for early stopping (default: 0.95)",
     )
 
     # 添加早停开关参数
@@ -129,19 +187,32 @@ def main():
         print(f"  Classes to Add Noise To: {args.classes_noise}")
         print(f"  Noise Type: {args.noise_type}")
         print(f"  Noise Fraction: {args.noise_fraction}")
+    print(f"  Batch Size: {args.batch_size}")
+    print(f"  Learning Rate: {args.learning_rate}")
+    print(f"  Number of Epochs: {args.num_epochs}")
     print(f"  Use Early Stopping: {args.use_early_stopping}")
+    if args.use_early_stopping:
+        print(f"  Early Stopping Patience: {args.early_stopping_patience}")
+        print(
+            f"  Early Stopping Accuracy Threshold: {args.early_stopping_accuracy_threshold}"
+        )
 
     # 运行实验
     run_experiment(
-        args.dataset,
-        args.model,
-        args.classes_remove,
-        args.classes_noise,
-        args.condition,
-        args.remove_fraction,
-        args.noise_type,
-        args.noise_fraction,
-        args.use_early_stopping,
+        dataset_name=args.dataset,
+        model_name=args.model,
+        selected_classes_remove=args.classes_remove,
+        selected_classes_noise=args.classes_noise,
+        condition=args.condition,
+        remove_fraction=args.remove_fraction,
+        noise_type=args.noise_type,
+        noise_fraction=args.noise_fraction,
+        use_early_stopping=args.use_early_stopping,
+        batch_size=args.batch_size,
+        learning_rate=args.learning_rate,
+        num_epochs=args.num_epochs,
+        early_stopping_patience=args.early_stopping_patience,
+        early_stopping_accuracy_threshold=args.early_stopping_accuracy_threshold,
     )
 
 

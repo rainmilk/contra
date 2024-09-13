@@ -23,6 +23,7 @@ class TrainTestUtils:
         epoch,
         num_epochs,
         save_final_model_only=True,
+        **kwargs  # 捕获额外的训练参数
     ):
         """
         :param save_final_model_only: If True, only save the model after the final epoch.
@@ -34,7 +35,11 @@ class TrainTestUtils:
         running_loss = 0.0
         correct = 0
         total = 0
-
+        
+        # 提取 kwargs 中可能传递的 alpha 或其他参数
+        alpha = kwargs.get('alpha', 1.0)  # 默认值为 1.0
+        beta = kwargs.get('beta', 0.5)  # 同样处理 beta 参数
+        
         # 用 tqdm 显示训练进度条
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for i, (inputs, labels) in enumerate(train_loader):
@@ -44,7 +49,7 @@ class TrainTestUtils:
                 optimizer.zero_grad()  # 清除上一步的梯度
                 outputs = model(inputs)
 
-                loss = criterion(outputs, labels)
+                loss = criterion(outputs, labels) * alpha  # 使用 alpha 参数调整损失函数
                 loss.backward()  # 反向传播
                 optimizer.step()  # 更新参数
 
