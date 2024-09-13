@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
-from dataset_loader import DatasetLoader
+from dataset_utils import DatasetUtils
 from model_utils import ModelUtils
 from train_test_utils import TrainTestUtils
 from tqdm import tqdm
@@ -17,28 +17,28 @@ def run_experiment(
     noise_fraction,
     use_early_stopping,
 ):
-    # 数据集加载
+    # 数据集路径和类别数量
     dataset_paths = {
         "cifar-10": "./data/cifar-10",
         "cifar-100": "./data/cifar-100",
-        "animals-10": "./data/animals-10",
         "flowers-102": "./data/flowers-102",
+        "tiny-imagenet-200": "./data/tiny-imagenet-200",
     }
 
     num_classes_dict = {
         "cifar-10": 10,
         "cifar-100": 100,
-        "animals-10": 10,
         "flowers-102": 102,
+        "tiny-imagenet-200": 200,
     }
 
-    # 显示数据集加载进度
+    # 加载数据集
     print(f"Loading dataset: {dataset_name}")
-    dataset_loader = DatasetLoader(dataset_name, dataset_paths, num_classes_dict)
+    dataset_utils = DatasetUtils(dataset_name, dataset_paths, num_classes_dict)
 
-    # 添加数据加载进度条
+    # 显示数据加载进度
     with tqdm(total=2, desc="Dataset Loading") as pbar:
-        train_dataset, test_dataset = dataset_loader.get_dataset()
+        train_dataset, val_dataset, test_dataset = dataset_utils.get_dataset()
         pbar.update(1)
 
         # 处理不同实验条件的 DataLoader
@@ -48,7 +48,7 @@ def run_experiment(
             )
         elif condition == "remove_data":
             # 仅执行删除操作
-            train_dataset_shifted = dataset_loader.remove_fraction_of_selected_classes(
+            train_dataset_shifted = dataset_utils.remove_fraction_of_selected_classes(
                 train_dataset, selected_classes_remove, remove_fraction=remove_fraction
             )
             train_loader = DataLoader(
@@ -56,7 +56,7 @@ def run_experiment(
             )
         elif condition == "noisy_data":
             # 仅执行噪声注入操作
-            train_dataset_shifted = dataset_loader.add_noise_to_selected_classes(
+            train_dataset_shifted = dataset_utils.add_noise_to_selected_classes(
                 train_dataset,
                 selected_classes_noise,
                 noise_type=noise_type,
@@ -67,7 +67,7 @@ def run_experiment(
             )
         elif condition == "all_perturbations":
             # 同时删除样本并注入噪声
-            modified_dataset = dataset_loader.modify_dataset(
+            modified_dataset = dataset_utils.modify_dataset(
                 dataset=train_dataset,
                 selected_classes_remove=selected_classes_remove,
                 selected_classes_noise=selected_classes_noise,
@@ -88,19 +88,19 @@ def run_experiment(
     model_utils = ModelUtils(model_name, num_classes_dict[dataset_name])
     model = model_utils.create_model()
 
-    # 损失函数和优化器
+    # 获取损失函数和优化器
     criterion, optimizer = model_utils.get_criterion_and_optimizer(model)
 
     # 训练和测试工具
     train_test_utils = TrainTestUtils(model_name, dataset_name)
     save_path = train_test_utils.create_save_path(condition)
 
-    # Early stopping 条件
+    # Early stopping 参数
     early_stopping_patience = 10  # 连续 N 次性能下降则停止
     early_stopping_accuracy_threshold = 0.95  # 如果准确率达到 95%，提前停止
     best_accuracy = 0
     patience_counter = 0
-    num_epochs = 200  # 最多训练 N 个epoch
+    num_epochs = 200  # 最多训练 N 个 epoch
 
     # 训练模型并显示进度
     print(f"Training model on {dataset_name} with condition: {condition}")
@@ -117,12 +117,12 @@ def run_experiment(
         )
 
         # 在验证集上评估模型性能
-        test_loader = DataLoader(
-            test_dataset, batch_size=64, shuffle=False, num_workers=2
+        val_loader = DataLoader(
+            val_dataset, batch_size=64, shuffle=False, num_workers=2
         )
-        accuracy = train_test_utils.test(model, test_loader, condition)
+        accuracy = train_test_utils.test(model, val_loader, condition)
 
-        # 如果使用了early stopping
+        # 如果使用了 early stopping
         if use_early_stopping:
             # 检查是否达到了早停的条件
             if accuracy >= early_stopping_accuracy_threshold:
@@ -133,19 +133,19 @@ def run_experiment(
 
             # 检查性能是否下降
             if accuracy < best_accuracy:
-                patience_counter += 1  # 如果性能下降，计数器加1
+                patience_counter += 1  # 如果性能下降，计数器加 1
                 print(
                     f"Performance dropped. Patience counter: {patience_counter}/{early_stopping_patience}"
                 )
             elif accuracy > best_accuracy:
-                # 如果准确率提高，更新best_accuracy并重置patience_counter
+                # 如果准确率提高，更新 best_accuracy 并重置 patience_counter
                 best_accuracy = accuracy
                 patience_counter = 0
             else:
                 # 性能持平时也重置计数器（持平不算下降）
                 patience_counter = 0
 
-            # 如果连续下降次数达到早停条件，则提前停止训练
+            # 如果连续下降次数达到 early stopping 条件，则提前停止训练
             if patience_counter >= early_stopping_patience:
                 print(
                     f"Performance dropped for {early_stopping_patience} consecutive epochs. Stopping early."
@@ -157,7 +157,9 @@ def run_experiment(
 
 # 执行实验
 if __name__ == "__main__":
-    for dataset in ["cifar-10", "cifar-100"]:
+    datasets_to_test = ["cifar-10", "cifar-100"]
+
+    for dataset in datasets_to_test:
         print(f"开始 {dataset} 的原始数据集训练")
         run_experiment(
             dataset,

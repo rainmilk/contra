@@ -17,7 +17,7 @@ import torch
 from torchvision import transforms
 
 from dataset import *
-from dataset import TinyImageNet
+from dataset import TinyImageNetDataset
 from imagenet import prepare_data
 from models import *
 
@@ -151,15 +151,59 @@ def setup_model_dataset(args):
         print(model)
         return model, train_full_loader, val_loader, test_loader, marked_loader
     # TODO ADD FashionMNIST
+    elif args.dataset == "fashionMNIST":
+        classes = 10
+        normalization = NormalizeByChannelMeanStd(
+            mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]
+        )
+        train_full_loader, val_loader, _ = fashionMNIST_dataloaders(
+            batch_size=args.batch_size, data_dir=args.data, num_workers=args.workers
+        )
+        marked_loader, _, test_loader = fashionMNIST_dataloaders(
+            batch_size=args.batch_size,
+            data_dir=args.data,
+            num_workers=args.workers,
+            class_to_replace=args.class_to_replace,
+            num_indexes_to_replace=args.num_indexes_to_replace,
+            indexes_to_replace=args.indexes_to_replace,
+            seed=args.seed,
+            only_mark=True,
+            shuffle=args.shuffle,
+            no_aug=args.no_aug,
+        )
+
+        if args.train_seed is None:
+            args.train_seed = args.seed
+        setup_seed(args.train_seed)
+
+        if args.imagenet_arch:
+            model = model_dict[args.arch](num_classes=classes, imagenet=True)
+        elif args.arch == "swin_t":
+            model = swin_t(
+                window_size=4, num_classes=10, downscaling_factors=(2, 2, 2, 1)
+            )
+        else:
+            if args.arch == "resnet18":
+                model = model_dict[args.arch](num_classes=classes, img_channels=1)
+            else:
+                model = model_dict[args.arch](num_classes=classes)
+
+        setup_seed(args.train_seed)
+
+        model.normalize = normalization
+        print(model)
+        return model, train_full_loader, val_loader, test_loader, marked_loader
+
+    # todo add flowers102
     elif args.dataset == "flowers102":
         classes = 102
         normalization = NormalizeByChannelMeanStd(
             mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]
         )
-        train_full_loader, val_loader, _ = Flowers102_dataloaders(
+        train_full_loader, val_loader, _ = flowers102_dataloaders(
             batch_size=args.batch_size, data_dir=args.data, num_workers=args.workers
         )
-        marked_loader, _, test_loader = Flowers102_dataloaders(
+        marked_loader, _, test_loader = flowers102_dataloaders(
             batch_size=args.batch_size,
             data_dir=args.data,
             num_workers=args.workers,
@@ -191,6 +235,33 @@ def setup_model_dataset(args):
         print(model)
         return model, train_full_loader, val_loader, test_loader, marked_loader
 
+    elif args.dataset == "svhn":
+        classes = 10
+        normalization = NormalizeByChannelMeanStd(
+            mean=[0.4377, 0.4438, 0.4728], std=[0.1980, 0.2010, 0.1970]
+        )
+        train_full_loader, val_loader, _ = svhn_dataloaders(
+            batch_size=args.batch_size, data_dir=args.data, num_workers=args.workers
+        )
+        marked_loader, _, test_loader = svhn_dataloaders(
+            batch_size=args.batch_size,
+            data_dir=args.data,
+            num_workers=args.workers,
+            class_to_replace=args.class_to_replace,
+            num_indexes_to_replace=args.num_indexes_to_replace,
+            indexes_to_replace=args.indexes_to_replace,
+            seed=args.seed,
+            only_mark=True,
+            shuffle=args.shuffle,
+        )
+        if args.imagenet_arch:
+            model = model_dict[args.arch](num_classes=classes, imagenet=True)
+        else:
+            model = model_dict[args.arch](num_classes=classes)
+
+        model.normalize = normalization
+        print(model)
+        return model, train_full_loader, val_loader, test_loader, marked_loader
     elif args.dataset == "cifar100":
         classes = 100
         normalization = NormalizeByChannelMeanStd(
@@ -223,11 +294,11 @@ def setup_model_dataset(args):
         normalization = NormalizeByChannelMeanStd(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )
-        train_full_loader, val_loader, test_loader = TinyImageNet(args).data_loaders(
+        train_full_loader, val_loader, test_loader = TinyImageNetDataset(args).tinyImageNet_dataloaders(
             batch_size=args.batch_size, data_dir=args.data, num_workers=args.workers
         )
         # train_full_loader, val_loader, test_loader =None, None,None
-        marked_loader, _, _ = TinyImageNet(args).data_loaders(
+        marked_loader, _, _ = TinyImageNetDataset(args).tinyImageNet_dataloaders(
             batch_size=args.batch_size,
             data_dir=args.data,
             num_workers=args.workers,
@@ -377,3 +448,86 @@ def accuracy_predicts(output, target, topk=(1,)):
         res.append(correct_k.mul_(100.0 / batch_size))
     return res, predicts
 
+
+def run_commands(gpus, commands, call=False, dir="commands", shuffle=True, delay=0.5):
+    if len(commands) == 0:
+        return
+    if os.path.exists(dir):
+        shutil.rmtree(dir)
+    if shuffle:
+        random.shuffle(commands)
+        random.shuffle(gpus)
+    os.makedirs(dir, exist_ok=True)
+
+    fout = open("stop_{}.sh".format(dir), "w")
+    print("kill $(ps aux|grep 'bash " + dir + "'|awk '{print $2}')", file=fout)
+    fout.close()
+
+    n_gpu = len(gpus)
+    for i, gpu in enumerate(gpus):
+        i_commands = commands[i::n_gpu]
+        if len(i_commands) == 0:
+            continue
+        prefix = "CUDA_VISIBLE_DEVICES={} ".format(gpu)
+
+        sh_path = os.path.join(dir, "run{}.sh".format(i))
+        fout = open(sh_path, "w")
+        for com in i_commands:
+            print(prefix + com, file=fout)
+        fout.close()
+        if call:
+            os.system("bash {}&".format(sh_path))
+            time.sleep(delay)
+
+
+def get_loader_from_dataset(dataset, batch_size, seed=1, shuffle=True):
+    return torch.utils.data.DataLoader(
+        dataset, batch_size=batch_size, num_workers=0, pin_memory=True, shuffle=shuffle
+    )
+
+
+def get_unlearn_loader(marked_loader, args):
+    forget_dataset = copy.deepcopy(marked_loader.dataset)
+    marked = forget_dataset.targets < 0
+    forget_dataset.data = forget_dataset.data[marked]
+    forget_dataset.targets = -forget_dataset.targets[marked] - 1
+    forget_loader = get_loader_from_dataset(
+        forget_dataset, batch_size=args.batch_size, seed=args.seed, shuffle=True
+    )
+    retain_dataset = copy.deepcopy(marked_loader.dataset)
+    marked = retain_dataset.targets >= 0
+    retain_dataset.data = retain_dataset.data[marked]
+    retain_dataset.targets = retain_dataset.targets[marked]
+    retain_loader = get_loader_from_dataset(
+        retain_dataset, batch_size=args.batch_size, seed=args.seed, shuffle=True
+    )
+    print("datasets length: ", len(forget_dataset), len(retain_dataset))
+    return forget_loader, retain_loader
+
+
+def get_poisoned_loader(poison_loader, unpoison_loader, test_loader, poison_func, args):
+    poison_dataset = copy.deepcopy(poison_loader.dataset)
+    poison_test_dataset = copy.deepcopy(test_loader.dataset)
+
+    poison_dataset.data, poison_dataset.targets = poison_func(
+        poison_dataset.data, poison_dataset.targets
+    )
+    poison_test_dataset.data, poison_test_dataset.targets = poison_func(
+        poison_test_dataset.data, poison_test_dataset.targets
+    )
+
+    full_dataset = torch.utils.data.ConcatDataset(
+        [unpoison_loader.dataset, poison_dataset]
+    )
+
+    poisoned_loader = get_loader_from_dataset(
+        poison_dataset, batch_size=args.batch_size, seed=args.seed, shuffle=False
+    )
+    poisoned_full_loader = get_loader_from_dataset(
+        full_dataset, batch_size=args.batch_size, seed=args.seed, shuffle=True
+    )
+    poisoned_test_loader = get_loader_from_dataset(
+        poison_test_dataset, batch_size=args.batch_size, seed=args.seed, shuffle=False
+    )
+
+    return poisoned_loader, unpoison_loader, poisoned_full_loader, poisoned_test_loader

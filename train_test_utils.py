@@ -3,7 +3,6 @@ import os
 from tqdm import tqdm
 import json
 
-
 class TrainTestUtils:
     def __init__(self, model_name, dataset_name):
         self.model_name = model_name
@@ -28,8 +27,10 @@ class TrainTestUtils:
         """
         :param save_final_model_only: If True, only save the model after the final epoch.
         """
-        model.train()
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model = model.to(device)  # 确保模型移动到正确的设备
+        model.train()
+
         running_loss = 0.0
         correct = 0
         total = 0
@@ -37,10 +38,12 @@ class TrainTestUtils:
         # 用 tqdm 显示训练进度条
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for i, (inputs, labels) in enumerate(train_loader):
-                inputs, labels = inputs.to(device), labels.to(device)
+                inputs, labels = inputs.to(device), labels.to(
+                    device
+                )  # 移动数据到正确设备
                 optimizer.zero_grad()  # 清除上一步的梯度
                 outputs = model(inputs)
-                
+
                 loss = criterion(outputs, labels)
                 loss.backward()  # 反向传播
                 optimizer.step()  # 更新参数
@@ -76,17 +79,20 @@ class TrainTestUtils:
 
     def test(self, model, test_loader, condition, progress_bar=None):
         model.eval()
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model = model.to(device)  # 确保模型移动到正确设备
+
         correct = 0
         total = 0
         running_loss = 0.0
         criterion = torch.nn.CrossEntropyLoss()  # 定义损失函数
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model.to(device)  # 确保模型移动到 GPU
 
         # 用于 early stopping 机制的测试
         with torch.no_grad():
             for images, labels in test_loader:
-                images, labels = images.to(device), labels.to(device)
+                images, labels = images.to(device), labels.to(
+                    device
+                )  # 移动数据到正确设备
                 outputs = model(images)
                 loss = criterion(outputs, labels)  # 计算损失
                 running_loss += loss.item()  # 累加损失

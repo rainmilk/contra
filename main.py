@@ -23,7 +23,7 @@ def parse_args():
         "--dataset",
         type=str,
         required=True,
-        help="Dataset name, choose from: cifar-10, cifar-100, animals-10, flowers-102",
+        help="Dataset name, choose from: cifar-10, cifar-100, flowers-102, tiny-imagenet-200",
     )
     parser.add_argument(
         "--model",
@@ -104,6 +104,11 @@ def main():
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
     print(f"Using GPU(s): {args.gpu}")
 
+    # 设置默认值为空列表，避免传递 None
+    if args.classes_remove is None:
+        args.classes_remove = []
+    if args.classes_noise is None:
+        args.classes_noise = []
 
     # 检查组合操作的条件
     if args.condition == "all_perturbations":
