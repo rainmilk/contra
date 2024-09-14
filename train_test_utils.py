@@ -3,6 +3,7 @@ import os
 from tqdm import tqdm
 import json
 
+
 class TrainTestUtils:
     def __init__(self, model_name, dataset_name):
         self.model_name = model_name
@@ -12,6 +13,12 @@ class TrainTestUtils:
         save_dir = os.path.join("models", self.model_name, self.dataset_name, condition)
         os.makedirs(save_dir, exist_ok=True)
         return save_dir
+
+    def l1_regularization(self, model):
+        params_vec = []
+        for param in model.parameters():
+            params_vec.append(param.view(-1))
+        return torch.linalg.norm(torch.cat(params_vec), ord=1)
 
     def train_and_save(
         self,
@@ -23,7 +30,7 @@ class TrainTestUtils:
         epoch,
         num_epochs,
         save_final_model_only=True,
-        **kwargs  # 捕获额外的训练参数
+        **kwargs,  # 捕获额外的训练参数
     ):
         """
         :param save_final_model_only: If True, only save the model after the final epoch.
@@ -35,11 +42,11 @@ class TrainTestUtils:
         running_loss = 0.0
         correct = 0
         total = 0
-        
+
         # 提取 kwargs 中可能传递的 alpha 或其他参数
-        alpha = kwargs.get('alpha', 1.0)  # 默认值为 1.0
-        beta = kwargs.get('beta', 0.5)  # 同样处理 beta 参数
-        
+        alpha = kwargs.get("alpha", 1.0)  # 默认值为 1.0
+        beta = kwargs.get("beta", 0.5)  # 同样处理 beta 参数
+
         # 用 tqdm 显示训练进度条
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for i, (inputs, labels) in enumerate(train_loader):

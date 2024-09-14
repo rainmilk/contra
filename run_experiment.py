@@ -9,18 +9,22 @@ from tqdm import tqdm
 def run_experiment(
     dataset_name,
     model_name,
-    selected_classes_remove,
-    selected_classes_noise,
     condition,
     remove_fraction,
     noise_type,
     noise_fraction,
     use_early_stopping,
+    selected_classes_remove=None,  # 设置默认值为 None
+    selected_classes_noise=None,  # 设置默认值为 None
     batch_size=64,  # 默认batch_size
     learning_rate=0.001,  # 默认学习率
+    optimizer="adam",
+    momentum=0.9,  # 默认 momentum 值（用于SGD）
+    weight_decay=1e-4,  # 默认 weight decay 值
     num_epochs=200,  # 默认epoch数量
-    early_stopping_patience=10,  # 早停的耐心值
+    early_stopping_patience=10,  # 早停耐心值
     early_stopping_accuracy_threshold=0.95,  # 提前停止的准确率阈值
+    pretrained=False,  # 增加pretrained参数
     **kwargs,  # 捕获额外的参数
 ):
     # 数据集路径和类别数量
@@ -53,6 +57,8 @@ def run_experiment(
                 train_dataset, batch_size=batch_size, shuffle=True, num_workers=2
             )
         elif condition == "remove_data":
+            if selected_classes_remove is None:
+                raise ValueError("For 'remove_data', 'selected_classes_remove' must be provided.")
             # 仅执行删除操作
             train_dataset_shifted = dataset_utils.remove_fraction_of_selected_classes(
                 train_dataset, selected_classes_remove, remove_fraction=remove_fraction
@@ -64,6 +70,8 @@ def run_experiment(
                 num_workers=2,
             )
         elif condition == "noisy_data":
+            if selected_classes_noise is None:
+                raise ValueError("For 'noisy_data', 'selected_classes_noise' must be provided.")
             # 仅执行噪声注入操作
             train_dataset_shifted = dataset_utils.add_noise_to_selected_classes(
                 train_dataset,
@@ -97,16 +105,29 @@ def run_experiment(
 
     # 创建模型
     print(f"Creating model: {model_name}")
-    model_utils = ModelUtils(model_name, num_classes_dict[dataset_name])
+    model_utils = ModelUtils(
+        model_name, num_classes_dict[dataset_name], pretrained=pretrained
+    )
     model = model_utils.create_model()
 
-    criterion, optimizer = model_utils.get_criterion_and_optimizer(
-        model,
-        lr=learning_rate,
-        optimizer="sgd",  # 使用 SGD 优化器
-        momentum=0.9,  # 设置 momentum 参数
-        weight_decay=1e-4,  # 设置 weight decay
-    )
+    # 选择优化器类型并设置相应的参数
+    if optimizer == "sgd":
+        criterion, optimizer = model_utils.get_criterion_and_optimizer(
+            model,
+            learning_rate=learning_rate,
+            optimizer="sgd",
+            momentum=momentum,  # 使用传递的 momentum 参数
+            weight_decay=weight_decay,  # 使用传递的 weight decay 参数
+        )
+    elif optimizer == "adam":
+        criterion, optimizer = model_utils.get_criterion_and_optimizer(
+            model,
+            learning_rate=learning_rate,
+            optimizer="adam",
+            weight_decay=weight_decay,  # 即使在 Adam 中也可以使用 weight decay
+        )
+    else:
+        raise ValueError(f"Unsupported optimizer: {optimizer}")
 
     # 训练和测试工具
     train_test_utils = TrainTestUtils(model_name, dataset_name)
@@ -115,8 +136,11 @@ def run_experiment(
     best_accuracy = 0
     patience_counter = 0
 
+    alpha, beta = kwargs.get("alpha", 1), kwargs.get("beta", 0.1)
+
     # 训练模型并显示进度
     print(f"Training model on {dataset_name} with condition: {condition}")
+    
     for epoch in tqdm(range(num_epochs), desc="Training Progress"):
         train_test_utils.train_and_save(
             model,
@@ -127,8 +151,8 @@ def run_experiment(
             epoch=epoch,
             num_epochs=num_epochs,
             save_final_model_only=True,
-            # alpha=alpha,  # 传递 alpha 参数
-            # beta=beta,  # 传递 beta 参数
+            alpha=alpha,  # 传递 alpha 参数
+            beta=beta,  # 传递 beta 参数
         )
 
         # 在验证集上评估模型性能

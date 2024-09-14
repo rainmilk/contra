@@ -10,11 +10,13 @@ def check_positive(value):
         raise argparse.ArgumentTypeError(f"{value} is an invalid positive float value")
     return ivalue
 
+
 def check_fraction(value):
     fvalue = float(value)
     if not (0.0 <= fvalue <= 1.0):
         raise argparse.ArgumentTypeError(f"{value} is an invalid fraction (0.0 - 1.0)")
     return fvalue
+
 
 # 解析 classes 参数（支持 0-9 形式）
 def parse_class_range(value):
@@ -23,6 +25,20 @@ def parse_class_range(value):
         return list(range(start, end + 1))
     else:
         return [int(value)]
+
+
+def parse_kwargs(kwargs):
+    """
+    将 --kwargs 中的 key=value 形式的输入解析为字典。
+    """
+    parsed_kwargs = {}
+    if kwargs:
+        for kwarg in kwargs:
+            key, value = kwarg.split("=")
+            parsed_kwargs[key] = (
+                float(value) if "." in value else int(value)
+            )  # 根据输入类型转换
+    return parsed_kwargs
 
 
 # 命令行解析
@@ -36,20 +52,33 @@ def parse_args():
         "--dataset",
         type=str,
         required=True,
+        default="cifar-10",
         choices=["cifar-10", "cifar-100", "flowers-102", "tiny-imagenet-200"],
         help="Dataset name, choose from: cifar-10, cifar-100, flowers-102, tiny-imagenet-200",
     )
+
     parser.add_argument(
         "--model",
         type=str,
         required=True,
+        default="resnet18",
         choices=["resnet18", "vgg16"],
         help="Model name, choose from: resnet18, vgg16",
     )
+
+    # 在 parse_args 函数中添加 --pretrained 参数
+    parser.add_argument(
+        "--pretrained",
+        action="store_true",
+        default=False,
+        help="If specified, use pretrained weights for the model",
+    )
+
     parser.add_argument(
         "--condition",
         type=str,
         required=True,
+        default="original_data",
         choices=["original_data", "remove_data", "noisy_data", "all_perturbations"],
         help="Condition for the experiment: original_data, remove_data, noisy_data, all_perturbations",
     )
@@ -65,7 +94,6 @@ def parse_args():
     # 添加 remove_fraction 参数，用于指定删除样本的比例
     parser.add_argument(
         "--remove_fraction",
-        # type=float,
         type=check_fraction,  # 使用自定义函数
         default=0.5,
         help="Fraction of samples to remove from the selected classes, e.g., --remove_fraction 0.5 for 50%% removal (default: 0.5)",
@@ -113,10 +141,34 @@ def parse_args():
     # 添加 learning_rate 参数
     parser.add_argument(
         "--learning_rate",
-        # type=float,
         type=check_positive,  # 使用自定义函数
         default=0.001,
         help="Learning rate for the optimizer (default: 0.001)",
+    )
+
+    # 添加 optimizer 参数
+    parser.add_argument(
+        "--optimizer",
+        type=str,
+        choices=["sgd", "adam"],
+        default="adam",
+        help="Optimizer for training weights",
+    )
+
+    # 添加 momentum 参数，用于指定 SGD 优化器的动量
+    parser.add_argument(
+        "--momentum",
+        type=check_positive,
+        default=0.9,
+        help="Momentum for SGD optimizer (default: 0.9). Only used if optimizer is 'sgd'.",
+    )
+
+    # 添加 weight_decay 参数，用于指定权重衰减
+    parser.add_argument(
+        "--weight_decay",
+        type=check_positive,
+        default=0.0001,
+        help="Weight decay for the optimizer (default: 0.0001).",
     )
 
     # 添加 num_epochs 参数
@@ -150,6 +202,11 @@ def parse_args():
         help="Enable early stopping if specified, otherwise train for the full number of epochs",
     )
 
+    # 捕获其他 kwargs
+    parser.add_argument(
+        "--kwargs", nargs="*", help="Additional key=value arguments for hyperparameters"
+    )
+    
     # 返回解析的参数
     return parser.parse_args()
 
@@ -175,10 +232,14 @@ def main():
                 "For 'all_perturbations' condition, both --classes_remove and --classes_noise must be provided."
             )
 
+    # 解析 kwargs 参数
+    kwargs = parse_kwargs(args.kwargs)
+
     # 打印用户输入的配置信息
     print(f"Running experiment with the following configuration:")
     print(f"  Dataset: {args.dataset}")
     print(f"  Model: {args.model}")
+    print(f"  Pretrained: {args.pretrained}")
     print(f"  Condition: {args.condition}")
     if args.classes_remove:
         print(f"  Classes to Remove Samples From: {args.classes_remove}")
@@ -189,6 +250,10 @@ def main():
         print(f"  Noise Fraction: {args.noise_fraction}")
     print(f"  Batch Size: {args.batch_size}")
     print(f"  Learning Rate: {args.learning_rate}")
+    print(f"  Optimizer: {args.optimizer}")
+    if args.optimizer == "sgd":
+        print(f"  Momentum: {args.momentum}")
+    print(f"  Weight Decay: {args.weight_decay}")
     print(f"  Number of Epochs: {args.num_epochs}")
     print(f"  Use Early Stopping: {args.use_early_stopping}")
     if args.use_early_stopping:
@@ -197,22 +262,27 @@ def main():
             f"  Early Stopping Accuracy Threshold: {args.early_stopping_accuracy_threshold}"
         )
 
-    # 运行实验
+    print(f"Additional kwargs: {kwargs}")
+
     run_experiment(
         dataset_name=args.dataset,
         model_name=args.model,
-        selected_classes_remove=args.classes_remove,
-        selected_classes_noise=args.classes_noise,
         condition=args.condition,
         remove_fraction=args.remove_fraction,
         noise_type=args.noise_type,
         noise_fraction=args.noise_fraction,
         use_early_stopping=args.use_early_stopping,
+        selected_classes_remove=args.classes_remove,
+        selected_classes_noise=args.classes_noise,
         batch_size=args.batch_size,
         learning_rate=args.learning_rate,
+        optimizer=args.optimizer,
+        momentum=args.momentum,
+        weight_decay=args.weight_decay,
         num_epochs=args.num_epochs,
         early_stopping_patience=args.early_stopping_patience,
         early_stopping_accuracy_threshold=args.early_stopping_accuracy_threshold,
+        **kwargs
     )
 
 
