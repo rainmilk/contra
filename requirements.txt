@@ -1,0 +1,12 @@
+# numpy
+numpy==1.24.1
+opencv-python
+# opencv-python-headless==4.7.0.72
+Pillow
+tensorboardX
+torch>=2.0
+# torch
+torchnet
+# torchvision
+torchvision>=0.10
+tqdm
