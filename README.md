@@ -4,13 +4,16 @@
 
 ### Download datasets
 
-Currently supported datasets are:
+Currently supported datasets(*9/19 pm*) are:
 
 1. **CIFAR-10**
 2. **CIFAR-100**
 3. The other datasets are under development.
 
 ```bash
+
+$ mkdir -p data
+
 $ ll data/
 cifar-10
 cifar-100
