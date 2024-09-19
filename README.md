@@ -8,7 +8,7 @@ Currently supported datasets(*9/19 pm*) are:
 
 1. **CIFAR-10**
 2. **CIFAR-100**
-3. The other datasets are under development.
+3. The other datasets (**TinyImageNet**, **WebVision**, **Clothing1M**) are under development.
 
 ```bash
 
