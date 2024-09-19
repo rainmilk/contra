@@ -104,7 +104,7 @@ python Train_cifar.py --dataset cifar-100 --num_class 100 --data_path ./data/cif
 
 This will throw an error as downloaded files will not be in the proper folder. That is why they must be manually moved to the "data_path".
 
-## Commands Run on TinyImageNet
+## TODO Commands Run on TinyImageNet
 
 ### Usage
 
@@ -114,7 +114,7 @@ This will throw an error as downloaded files will not be in the proper folder. T
 python Train_TinyImageNet.py --ratio 0.5
 ```
 
-## Commands Run on MiniWebVision
+## TODO Commands Run on MiniWebVision
 
 ### Usage
 
@@ -124,7 +124,7 @@ $ python Train_webvision.py --help
 
 ### Example Run (MiniWebVision with 50% symmetric noise)
 
-## Commands Run on Clothing1M
+## TODO Commands Run on Clothing1M
 
 ### Usage
 
