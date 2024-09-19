@@ -124,6 +124,10 @@ $ python Train_webvision.py --help
 
 ### Example Run (MiniWebVision with 50% symmetric noise)
 
+```bash
+# todo
+```
+
 ## TODO Commands Run on Clothing1M
 
 ### Usage
@@ -133,3 +137,15 @@ $ python Train_clothing1M.py --help
 ```
 
 ### Example Run (Clothing1M with 50% symmetric noise)
+
+```bash
+# todo
+```
+
+## Acknowledgements
+
+- https://github.com/nazmul-karim170/UNICON-Noisy-Label
+- https://github.com/LiJunnan1992/DivideMix
+- https://github.com/sangamesh-kodge/LabelNoiseRobustness
+- https://github.com/sangamesh-kodge/Mini-WebVision
+- https://github.com/sangamesh-kodge/Clothing1M
