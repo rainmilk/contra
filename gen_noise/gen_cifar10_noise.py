@@ -132,16 +132,23 @@ class IncrementalLearningModel(nn.Module):
 
 
 def train_incremental_model(
-    D_tr_data, D_tr_labels, model, num_epochs=10, batch_size=64, lr=0.001
+    D_tr_data,
+    D_tr_labels,
+    model,
+    num_epochs=10,
+    batch_size=64,
+    lr=0.001,
+    save_path="model.pth",
 ):
     """
-    训练增量学习模型 M_p(D_tr)。
+    训练增量学习模型 M_p(D_tr) 并保存模型。
     :param D_tr_data: 增量数据集 D_tr 的输入数据
     :param D_tr_labels: 增量数据集 D_tr 的标签
     :param model: 增量学习模型
     :param num_epochs: 训练的迭代次数
     :param batch_size: 每个batch的样本数
     :param lr: 学习率
+    :param save_path: 训练结束后保存模型的路径
     """
     # 定义损失函数和优化器
     criterion = nn.CrossEntropyLoss()
@@ -167,7 +174,10 @@ def train_incremental_model(
             running_loss += loss.item()
         print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {running_loss / len(dataloader)}")
 
-    print("Incremental model training complete.")
+    # 保存训练后的模型
+    torch.save(model.state_dict(), save_path)
+    print(f"Model saved to {save_path}")
+
     return model
 
 
@@ -234,6 +244,8 @@ if __name__ == "__main__":
         train_data_Dinc, train_labels_Dinc, forget_classes
     )
 
-    # Step 4: 定义并训练增量学习模型
+    # Step 4: 定义并训练增量学习模型，并保存模型
     incremental_model = IncrementalLearningModel(num_classes=10)
-    trained_model = train_incremental_model(D_tr_data, D_tr_labels, incremental_model)
+    trained_model = train_incremental_model(
+        D_tr_data, D_tr_labels, incremental_model, save_path="incremental_model.pth"
+    )
