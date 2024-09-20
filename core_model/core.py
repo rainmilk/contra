@@ -9,7 +9,12 @@ from main import parse_args, parse_kwargs
 from nets.VGG_LTH import vgg16_bn_lth
 from lip_teacher import SimpleLipNet
 from dataset import CustomDataset, get_dataset_loader
-from train_test import model_train, model_test, working_model_forward, teacher_model_forward
+from train_test import (
+    model_train,
+    model_test,
+    working_model_forward,
+    teacher_model_forward,
+)
 
 
 # todo 数据集路径和类别数量
@@ -29,9 +34,23 @@ num_classes_dict = {
 }
 
 
-def iterate_repair_model(working_model, working_opt, working_criterion, working_model_save_path,
-                         teacher_model, teacher_opt, teacher_criterion, teacher_model_save_path,
-                         alpha, inc_dataset, inc_dataloader, aux_dataset, aux_dataloader, num_classes, args):
+def iterate_repair_model(
+    working_model,
+    working_opt,
+    working_criterion,
+    working_model_save_path,
+    teacher_model,
+    teacher_opt,
+    teacher_criterion,
+    teacher_model_save_path,
+    alpha,
+    inc_dataset,
+    inc_dataloader,
+    aux_dataset,
+    aux_dataloader,
+    num_classes,
+    args,
+):
     # 1. 通过 Mt 获取 D_mix=Da+Ds+Dc,  Train Pp=Mp(X_mix), Loss=CrossEntropy(Pp, Y_mix)
     # (1) 获取Ds: 通过 Yp=Mt(Xtr) 预测分类标签，得到Ds, 其中Yp=Ytr
     inc_embeddings, inc_predicts = teacher_model_forward(teacher_model, inc_dataloader)
@@ -50,11 +69,16 @@ def iterate_repair_model(working_model, working_opt, working_criterion, working_
 
         inc_class_embeddings = inc_embeddings[inc_labels == label]
         inc_class_data, inc_class_label = inc_dataset[inc_labels == label]
-        distances = np.linalg.norm(inc_class_embeddings - auc_class_embedding_centroid, axis=-1)
+        distances = np.linalg.norm(
+            inc_class_embeddings - auc_class_embedding_centroid, axis=-1
+        )
         selected_topk_num = int(len(inc_class_label) * 0.2)
         top_idx = np.argpartition(distances, -selected_topk_num)[-selected_topk_num:]
 
-        centroid_class_data, centroid_class_label = inc_class_data[top_idx], inc_class_label[top_idx]
+        centroid_class_data, centroid_class_label = (
+            inc_class_data[top_idx],
+            inc_class_label[top_idx],
+        )
         centroid_data.extend(centroid_class_data)
         centroid_labels.extend(centroid_class_label)
 
@@ -65,10 +89,19 @@ def iterate_repair_model(working_model, working_opt, working_criterion, working_
     mix_labels = np.concatenate([aux_labels, selected_labels, centroid_labels], axis=0)
     mix_labels_onehot = np.eye(num_classes)[mix_labels]
     mix_dataset = CustomDataset(mix_data, mix_labels_onehot)
-    mix_dataloader_shuffled = DataLoader(mix_dataset, batch_size=args.batch_size, drop_last=True, shuffle=True)
+    mix_dataloader_shuffled = DataLoader(
+        mix_dataset, batch_size=args.batch_size, drop_last=True, shuffle=True
+    )
 
-    model_train(mix_dataloader_shuffled, working_model, working_opt, working_criterion, alpha, args,
-                save_path=working_model_save_path)
+    model_train(
+        mix_dataloader_shuffled,
+        working_model,
+        working_opt,
+        working_criterion,
+        alpha,
+        args,
+        save_path=working_model_save_path,
+    )
 
     # 2. 通过 Mp 获取 D_conf={X_conf, P_conf}, Train Pt=Mt(Xconf), Loss=CrossEntropy(Pt, Pconf)
     # (1) 获取Dconf: 通过 Ptr=Mp(Xtr)，根据 confidence(N*C概率矩阵)，sample每个类20%数据Dconf={Xconf, Pconf}
@@ -78,44 +111,90 @@ def iterate_repair_model(working_model, working_opt, working_criterion, working_
 
     for label in list(set(inc_labels)):
         inc_class_probs = inc_probs[:, label]
-        top_class_idx = np.argpartition(inc_class_probs, -conf_topk_num)[-conf_topk_num:]
+        top_class_idx = np.argpartition(inc_class_probs, -conf_topk_num)[
+            -conf_topk_num:
+        ]
 
         top_idx.extend(top_class_idx)
 
     conf_data, conf_probs = inc_data[top_idx], inc_probs[top_idx]
     conf_dataset = CustomDataset(conf_data, conf_probs)
-    conf_dataloader_shuffled = DataLoader(conf_dataset, batch_size=args.batch_size, drop_last=True, shuffle=True)
+    conf_dataloader_shuffled = DataLoader(
+        conf_dataset, batch_size=args.batch_size, drop_last=True, shuffle=True
+    )
 
     # (2) train Mt:  Pt=Mt(Xconf)，Loss=CrossEntropy(Pt, Pconf)
-    model_train(conf_dataloader_shuffled, teacher_model, teacher_opt, teacher_criterion, alpha, args,
-                teacher_model_save_path, teacher_model=True)
+    model_train(
+        conf_dataloader_shuffled,
+        teacher_model,
+        teacher_opt,
+        teacher_criterion,
+        alpha,
+        args,
+        teacher_model_save_path,
+        teacher_model=True,
+    )
     return conf_dataset
 
 
-def iterate_adapt_model(working_model, working_opt, working_criterion, working_model_save_path,
-                        teacher_model, teacher_opt, teacher_criterion, teacher_model_save_path,
-                        alpha, aug_data, aug_probs, inc_dataset, inc_dataloader, args):
+def iterate_adapt_model(
+    working_model,
+    working_opt,
+    working_criterion,
+    working_model_save_path,
+    teacher_model,
+    teacher_opt,
+    teacher_criterion,
+    teacher_model_save_path,
+    alpha,
+    aug_data,
+    aug_probs,
+    inc_dataset,
+    inc_dataloader,
+    args,
+):
     # 1. 构造Dts融合数据集 Dp_mix: (Dts, D_aug), 进行mix up
     # (1) 构造 Dp: Dp={Xts, Pp}, Pp = Mp(Xts)
     inc_data, inc_labels = inc_dataset.data, inc_dataset.label
     inc_probs, inc_predicts = working_model_forward(inc_dataloader, working_model)
 
     # (2) 构造 Dp_mix: Dp_mix = mix_up(Dp, D_aug), Xp_mix = {a*Xp+(1-a)*X_aug}, Yp_mix = {a*Yp+(1-a)*Y_aug}
-    ts_mixed_dataloader_shuffled = get_ts_mixed_data(aug_data, aug_probs, inc_data, inc_probs, args.batch_size)
+    ts_mixed_dataloader_shuffled = get_ts_mixed_data(
+        aug_data, aug_probs, inc_data, inc_probs, args.batch_size
+    )
 
     # 2. train Mt: Pt=Mt(Xp_max), Update Mt: Loss=CrossEntropy(Pt, Yp_mix)
-    model_train(ts_mixed_dataloader_shuffled, teacher_model, teacher_opt, teacher_criterion, alpha, args,
-                save_path=teacher_model_save_path, teacher_model=True)
+    model_train(
+        ts_mixed_dataloader_shuffled,
+        teacher_model,
+        teacher_opt,
+        teacher_criterion,
+        alpha,
+        args,
+        save_path=teacher_model_save_path,
+        teacher_model=True,
+    )
 
     # 3. 重新构造 Dts融合数据集 Dp_mix
     # (1) 构造 Dp: Dp={Xts, Pp}, Pp = Mp(Xts)
-    inc_probs_new, inc_predicts_new = working_model_forward(inc_dataloader, working_model)
+    inc_probs_new, inc_predicts_new = working_model_forward(
+        inc_dataloader, working_model
+    )
     # (2) 构造 Dp_mix: Dp_mix = mix_up(Dp, D_aug), Xp_mix = {a*Xp+(1-a)*X_aug}, Yp_mix = {a*Yp+(1-a)*Y_aug}
-    ts_mixed_dataloader_shuffled_new = get_ts_mixed_data(aug_data, aug_probs, inc_data, inc_probs_new, args.batch_size)
+    ts_mixed_dataloader_shuffled_new = get_ts_mixed_data(
+        aug_data, aug_probs, inc_data, inc_probs_new, args.batch_size
+    )
 
     # 4. train Mp: Pp=Mp(Xp_max), Update Mp: Loss=CrossEntropy(Pp, Yp_mix)
-    model_train(ts_mixed_dataloader_shuffled_new, working_model, working_opt, working_criterion,
-                alpha, args, save_path=working_model_save_path)
+    model_train(
+        ts_mixed_dataloader_shuffled_new,
+        working_model,
+        working_opt,
+        working_criterion,
+        alpha,
+        args,
+        save_path=working_model_save_path,
+    )
 
 
 def get_ts_mixed_data(aug_data, aug_probs, inc_data, inc_probs, batch_size, alpha=0.75):
@@ -126,15 +205,24 @@ def get_ts_mixed_data(aug_data, aug_probs, inc_data, inc_probs, batch_size, alph
 
     lambda_from_beta = np.random.beta(alpha, alpha, size=inc_size)
 
-    compare_data = np.concatenate([lambda_from_beta[:, np.newaxis], (1 - lambda_from_beta)[:, np.newaxis]], axis=-1)
+    compare_data = np.concatenate(
+        [lambda_from_beta[:, np.newaxis], (1 - lambda_from_beta)[:, np.newaxis]],
+        axis=-1,
+    )
     lambda_from_beta = np.max(compare_data, axis=-1)
     lambda_for_data = lambda_from_beta[:, np.newaxis, np.newaxis, np.newaxis]
     lambda_for_probs = lambda_from_beta[:, np.newaxis]
 
-    ts_mixed_data = lambda_for_data * inc_data + (1 - lambda_for_data) * aug_data_sampling
-    ts_mixed_probs = lambda_for_probs * inc_probs + (1 - lambda_for_probs) * aug_probs_sampling
+    ts_mixed_data = (
+        lambda_for_data * inc_data + (1 - lambda_for_data) * aug_data_sampling
+    )
+    ts_mixed_probs = (
+        lambda_for_probs * inc_probs + (1 - lambda_for_probs) * aug_probs_sampling
+    )
     ts_mixed_dataset = CustomDataset(ts_mixed_data, ts_mixed_probs)
-    ts_mixed_dataloader_shuffled = DataLoader(ts_mixed_dataset, batch_size, drop_last=True, shuffle=True)
+    ts_mixed_dataloader_shuffled = DataLoader(
+        ts_mixed_dataset, batch_size, drop_last=True, shuffle=True
+    )
     return ts_mixed_dataloader_shuffled
 
 
@@ -150,12 +238,24 @@ def execute(args):
     repair_iter_num = 2
     adapt_iter_num = 2
 
-    working_model_path = r'E:\projects\Project_mr\github_code\ckpt\cifar-10\pretrain_checkpoint.pth.tar'
-    working_model_repair_save_path = r'E:\projects\Project_mr\github_code\ckpt\cifar-10\working_model_repair'
-    working_model_adapt_save_path = r'E:\projects\Project_mr\github_code\ckpt\cifar-10\working_model_adapt'
-    lip_teacher_model_path = r'E:\projects\Project_mr\github_code\ckpt\cifar-10\lip_checkpoint.pth.tar'
-    teacher_model_repair_save_path = r'E:\projects\Project_mr\github_code\ckpt\cifar-10\teacher_model_repair'
-    teacher_model_adapt_save_path = r'E:\projects\Project_mr\github_code\ckpt\cifar-10\teacher_model_adapt'
+    working_model_path = (
+        r"E:\projects\Project_mr\github_code\ckpt\cifar-10\pretrain_checkpoint.pth.tar"
+    )
+    working_model_repair_save_path = (
+        r"E:\projects\Project_mr\github_code\ckpt\cifar-10\working_model_repair"
+    )
+    working_model_adapt_save_path = (
+        r"E:\projects\Project_mr\github_code\ckpt\cifar-10\working_model_adapt"
+    )
+    lip_teacher_model_path = (
+        r"E:\projects\Project_mr\github_code\ckpt\cifar-10\lip_checkpoint.pth.tar"
+    )
+    teacher_model_repair_save_path = (
+        r"E:\projects\Project_mr\github_code\ckpt\cifar-10\teacher_model_repair"
+    )
+    teacher_model_adapt_save_path = (
+        r"E:\projects\Project_mr\github_code\ckpt\cifar-10\teacher_model_adapt"
+    )
 
     working_model, lip_teacher_model = None, None
 
@@ -166,7 +266,9 @@ def execute(args):
     elif args.model == "vgg16":
         working_model = vgg16_bn_lth(num_classes=num_classes)
 
-    working_opt = optim.Adam(working_model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+    working_opt = optim.Adam(
+        working_model.parameters(), lr=learning_rate, weight_decay=weight_decay
+    )
     working_criterion = nn.CrossEntropyLoss()
 
     checkpoint = torch.load(working_model_path)
@@ -177,7 +279,9 @@ def execute(args):
     resnet = models.resnet18(pretrained=False, num_classes=512)
     resnet = nn.Sequential(*list(resnet.children())[:-1])
     lip_teacher_model = SimpleLipNet(resnet, 512, num_classes)
-    teacher_opt = optim.Adam(lip_teacher_model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+    teacher_opt = optim.Adam(
+        lip_teacher_model.parameters(), lr=learning_rate, weight_decay=weight_decay
+    )
     teacher_criterion = nn.CrossEntropyLoss()
 
     checkpoint = torch.load(lip_teacher_model_path)
@@ -187,9 +291,15 @@ def execute(args):
     # 3. 迭代修复过程
     # (1) 构造修复过程数据集: Dtr、 Da、Dts
     data_dir = dataset_paths[args.dataset]
-    inc_dataset, inc_dataloader = get_dataset_loader('inc', data_dir, args.batch_size, shuffle=False)
-    aux_dataset, aux_dataloader = get_dataset_loader('aux', data_dir, args.batch_size, shuffle=False)
-    test_dataset, test_dataloader = get_dataset_loader('test', data_dir, args.batch_size, shuffle=False)
+    inc_dataset, inc_dataloader = get_dataset_loader(
+        "inc", data_dir, args.batch_size, shuffle=False
+    )
+    aux_dataset, aux_dataloader = get_dataset_loader(
+        "aux", data_dir, args.batch_size, shuffle=False
+    )
+    test_dataset, test_dataloader = get_dataset_loader(
+        "test", data_dir, args.batch_size, shuffle=False
+    )
 
     # (2) 测试修复前 Dts 在 Mp 的表现
     test_result_before = model_test(test_dataset, test_dataloader, working_model)
@@ -197,10 +307,23 @@ def execute(args):
     # (3) 迭代修复过程：根据 Dtr 迭代 Mp 、 Mt
     conf_dataset = None
     for i in range(repair_iter_num):
-        conf_dataset = iterate_repair_model(working_model, working_opt, working_criterion, working_model_repair_save_path,
-                                            lip_teacher_model, teacher_opt, teacher_criterion, teacher_model_repair_save_path,
-                                            alpha, inc_dataset, inc_dataloader, aux_dataset, aux_dataloader,
-                                            num_classes, args)
+        conf_dataset = iterate_repair_model(
+            working_model,
+            working_opt,
+            working_criterion,
+            working_model_repair_save_path,
+            lip_teacher_model,
+            teacher_opt,
+            teacher_criterion,
+            teacher_model_repair_save_path,
+            alpha,
+            inc_dataset,
+            inc_dataloader,
+            aux_dataset,
+            aux_dataloader,
+            num_classes,
+            args,
+        )
 
     # 4. 测试修复后 Dts 在 Mp 的表现
     test_result_after_repair = model_test(test_dataset, test_dataloader, working_model)
@@ -216,18 +339,31 @@ def execute(args):
 
     # (2) 迭代测试数据适应过程：根据 混合的Dts 迭代 Mp 和 Mt
     for i in range(adapt_iter_num):
-        iterate_adapt_model(working_model, working_opt, working_criterion, working_model_adapt_save_path,
-                            lip_teacher_model, teacher_opt, teacher_criterion, teacher_model_adapt_save_path,
-                            alpha, aug_data, aug_probs, test_dataset, test_dataloader, args)
+        iterate_adapt_model(
+            working_model,
+            working_opt,
+            working_criterion,
+            working_model_adapt_save_path,
+            lip_teacher_model,
+            teacher_opt,
+            teacher_criterion,
+            teacher_model_adapt_save_path,
+            alpha,
+            aug_data,
+            aug_probs,
+            test_dataset,
+            test_dataloader,
+            args,
+        )
 
     # 6. 测试适应后 Dts 在 Mp 的表现
     test_result_after_adapt = model_test(test_dataset, test_dataloader, working_model)
 
-    print('---------------------test before------------------------------')
+    print("---------------------test before------------------------------")
     print(test_result_before)
-    print('---------------------test after repair------------------------------')
+    print("---------------------test after repair------------------------------")
     print(test_result_after_repair)
-    print('---------------------test after adapt-------------------------------')
+    print("---------------------test after adapt-------------------------------")
     print(test_result_after_adapt)
 
 

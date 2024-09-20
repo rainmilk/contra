@@ -28,17 +28,19 @@ class CustomDataset(Dataset):
         return self.data[index], self.label[index]
 
 
-def get_dataset_loader(loader_name, data_dir, batch_size, drop_last=False, shuffle=False):
+def get_dataset_loader(
+    loader_name, data_dir, batch_size, drop_last=False, shuffle=False
+):
     # todo 待确定路径以及文件名称
-    data_name, label_name = '', ''
-    if loader_name == 'inc':
-        data_name, label_name = 'inc_data.npy', 'inc_label.npy'
+    data_name, label_name = "", ""
+    if loader_name == "inc":
+        data_name, label_name = "inc_data.npy", "inc_label.npy"
 
-    elif loader_name == 'aux':
-        data_name, label_name = 'aux_data.npy', 'aux_label.npy'
+    elif loader_name == "aux":
+        data_name, label_name = "aux_data.npy", "aux_label.npy"
 
-    elif loader_name == 'test':
-        data_name, label_name = 'test_data.npy', 'test_label.npy'
+    elif loader_name == "test":
+        data_name, label_name = "test_data.npy", "test_label.npy"
 
     data_path = os.path.join(data_dir, data_name)
     label_path = os.path.join(data_dir, label_name)
@@ -46,6 +48,8 @@ def get_dataset_loader(loader_name, data_dir, batch_size, drop_last=False, shuff
     label = np.load(label_path)
 
     dataset = CustomDataset(data, label)
-    data_loader = DataLoader(dataset, batch_size=batch_size, drop_last=drop_last, shuffle=shuffle)
+    data_loader = DataLoader(
+        dataset, batch_size=batch_size, drop_last=drop_last, shuffle=shuffle
+    )
 
     return dataset, data_loader

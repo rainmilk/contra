@@ -5,7 +5,16 @@ import torch
 import torch.nn as nn
 
 
-def model_train(train_loader, model, optimizer, criterion, alpha, args, save_path='', teacher_model=False):
+def model_train(
+    train_loader,
+    model,
+    optimizer,
+    criterion,
+    alpha,
+    args,
+    save_path="",
+    teacher_model=False,
+):
     # todo opt重置
     # 训练模型并显示进度
     print(f"Training model on {args.dataset}")
@@ -57,9 +66,7 @@ def model_train(train_loader, model, optimizer, criterion, alpha, args, save_pat
         if epoch == args.num_epochs - 1:
             torch.save(
                 model.state_dict(),
-                os.path.join(
-                    save_path, f"{args.model}_{args.dataset}_final.pth"
-                ),
+                os.path.join(save_path, f"{args.model}_{args.dataset}_final.pth"),
             )
             print(
                 f"Final model saved to {os.path.join(save_path, f'{args.model}_{args.dataset}_final.pth')}"
@@ -78,7 +85,7 @@ def model_test(dataset, data_loader, model, teacher_model=False):
     # global acc
     global_acc = np.mean(predicts == labels)
     print("test_acc: %.2f" % (global_acc * 100))
-    eval_results['global'] = global_acc.item()
+    eval_results["global"] = global_acc.item()
 
     # class acc
     label_list = sorted(list(set(labels)))
@@ -86,7 +93,7 @@ def model_test(dataset, data_loader, model, teacher_model=False):
         cls_index = labels == label
         class_acc = np.mean(predicts[cls_index] == labels[cls_index])
         print("label: %s, acc: %.2f" % (label, class_acc * 100))
-        eval_results['label_'+str(label.item())] = class_acc.item()
+        eval_results["label_" + str(label.item())] = class_acc.item()
 
     return eval_results
 
@@ -125,6 +132,3 @@ def teacher_model_forward(model, test_loader):
         outputs.append(output)
 
     return np.concatenate(embed_outs, axis=0), np.concatenate(outputs, axis=0)
-
-
-
