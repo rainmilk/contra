@@ -38,11 +38,11 @@ def get_dataset_loader(
     data_name, label_name = "", ""
 
     if loader_name == "inc":
-        data_name, label_name = "inc_data.npy", "inc_label.npy"
+        data_name, label_name = "cifar10_inc_data.npy", "cifar10_inc_labels.npy"
     elif loader_name == "aux":
-        data_name, label_name = "aux_data.npy", "aux_label.npy"
+        data_name, label_name = "cifar10_aux_data.npy", "cifar10_aux_labels.npy"
     elif loader_name == "test":
-        data_name, label_name = "test_data.npy", "test_label.npy"
+        data_name, label_name = "cifar10_test_data.npy", "cifar10_test_labels.npy"
     else:
         raise ValueError(
             f"Invalid loader_name {loader_name}. Choose from 'inc', 'aux', or 'test'."
@@ -70,7 +70,7 @@ def get_dataset_loader(
 
 if __name__ == "__main__":
     # 假设你的 CIFAR-10 数据存储在这个目录
-    data_dir = "../data/cifar-10/noise/"
+    data_dir = "./data/cifar-10/noise/"
     # data_dir = "../data/cifar-100/noise/"
     # data_dir = "../data/tiny-imagenet-200/noise/"
     # data_dir = "../data/flowers-102/noise/"
