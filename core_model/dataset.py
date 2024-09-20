@@ -31,25 +31,77 @@ class CustomDataset(Dataset):
 def get_dataset_loader(
     loader_name, data_dir, batch_size, drop_last=False, shuffle=False
 ):
+    """
+    根据 loader_name 加载相应的数据集：支持增量训练 (inc)、辅助数据 (aux) 和测试数据 (test)。
+    """
     # todo 待确定路径以及文件名称
     data_name, label_name = "", ""
+
     if loader_name == "inc":
         data_name, label_name = "inc_data.npy", "inc_label.npy"
-
     elif loader_name == "aux":
         data_name, label_name = "aux_data.npy", "aux_label.npy"
-
     elif loader_name == "test":
         data_name, label_name = "test_data.npy", "test_label.npy"
+    else:
+        raise ValueError(
+            f"Invalid loader_name {loader_name}. Choose from 'inc', 'aux', or 'test'."
+        )
 
     data_path = os.path.join(data_dir, data_name)
     label_path = os.path.join(data_dir, label_name)
+
+    # 检查文件是否存在
+    if not os.path.exists(data_path) or not os.path.exists(label_path):
+        raise FileNotFoundError(f"{data_name} or {label_name} not found in {data_dir}")
+
     data = np.load(data_path)
     label = np.load(label_path)
 
+    # 构建自定义数据集
     dataset = CustomDataset(data, label)
+
     data_loader = DataLoader(
         dataset, batch_size=batch_size, drop_last=drop_last, shuffle=shuffle
     )
 
     return dataset, data_loader
+
+
+if __name__ == "__main__":
+    # 假设你的 CIFAR-10 数据存储在这个目录
+    data_dir = "../data/cifar-10/noise/"
+    # data_dir = "../data/cifar-100/noise/"
+    # data_dir = "../data/tiny-imagenet-200/noise/"
+    # data_dir = "../data/flowers-102/noise/"
+    batch_size = 32
+
+    # 测试加载增量数据集
+    print("Loading Incremental Training Dataset (inc)")
+    inc_dataset, inc_loader = get_dataset_loader("inc", data_dir, batch_size)
+    print(f"Incremental Dataset Size: {len(inc_dataset)}")
+
+    # 遍历一批增量数据并查看形状
+    for images, labels in inc_loader:
+        print(f"Batch Image Shape: {images.shape}, Batch Label Shape: {labels.shape}")
+        break  # 只打印第一批
+
+    # 测试加载辅助数据集
+    print("\nLoading Auxiliary Dataset (aux)")
+    aux_dataset, aux_loader = get_dataset_loader("aux", data_dir, batch_size)
+    print(f"Auxiliary Dataset Size: {len(aux_dataset)}")
+
+    # 遍历一批辅助数据并查看形状
+    for images, labels in aux_loader:
+        print(f"Batch Image Shape: {images.shape}, Batch Label Shape: {labels.shape}")
+        break
+
+    # 测试加载测试数据集
+    print("\nLoading Test Dataset (test)")
+    test_dataset, test_loader = get_dataset_loader("test", data_dir, batch_size)
+    print(f"Test Dataset Size: {len(test_dataset)}")
+
+    # 遍历一批测试数据并查看形状
+    for images, labels in test_loader:
+        print(f"Batch Image Shape: {images.shape}, Batch Label Shape: {labels.shape}")
+        break

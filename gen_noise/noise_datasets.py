@@ -5,7 +5,7 @@
 
 import numpy as np
 import torchvision
-from PIL import Images
+from PIL import Image
 import torch
 
 # from .cifar import CIFAR10, CIFAR100
@@ -150,8 +150,8 @@ class NoiseCIFAR10(CIFAR10, NoiseDataset):
         self,
         root: str,
         train: bool = True,
-        transform=None,
-        target_transform=None,
+        # transform=None,
+        # target_transform=None,
         download=True,
         mode: str = None,
         noise_type: str = "none",
@@ -205,7 +205,8 @@ class NoiseCIFAR10(CIFAR10, NoiseDataset):
         }
 
         CIFAR10.__init__(
-            self, root=root, train=train, transform=transform, download=download
+            # self, root=root, train=train, transform=transform, download=download
+            self, root=root, train=train, download=download
         )
         NoiseDataset.__init__(
             self, noise_type=noise_type, asym_trans=asym_trans, percent=percent
