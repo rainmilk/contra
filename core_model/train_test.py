@@ -15,13 +15,14 @@ def model_train(
     save_path="",
     teacher_model=False,
 ):
-    # todo opt重置
+    # todo opt 重置
     # 训练模型并显示进度
     print(f"Training model on {args.dataset}")
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = model.to(device)  # 确保模型移动到正确的设备
+
     for epoch in tqdm(range(args.num_epochs), desc="Training Progress"):
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model = model.to(device)  # 确保模型移动到正确的设备
         model.train()
 
         running_loss = 0.0
@@ -31,9 +32,7 @@ def model_train(
         # 用 tqdm 显示训练进度条
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for i, (inputs, labels) in enumerate(train_loader):
-                inputs, labels = inputs.to(device), labels.to(
-                    device
-                )  # 移动数据到正确设备
+                inputs, labels = inputs.to(device), labels.to(device)
                 optimizer.zero_grad()  # 清除上一步的梯度
                 if teacher_model:
                     _, outputs = model(inputs)
@@ -99,12 +98,15 @@ def model_test(dataset, data_loader, model, teacher_model=False):
 
 
 def working_model_forward(data_loader, model):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = model.to(device)
+
     model.eval()
     output_probs, output_predicts = [], []
 
     for i, (image, target) in enumerate(data_loader):
-        image = image.cuda()
-
+        # image = image.cuda()
+        image = image.to(device)
         logics = model(image)
 
         probs = nn.functional.softmax(logics, dim=-1)
@@ -118,11 +120,15 @@ def working_model_forward(data_loader, model):
 
 
 def teacher_model_forward(model, test_loader):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = model.to(device)
+
     model.eval()
     embed_outs, outputs = [], []
 
     for i, (image, target) in enumerate(test_loader):
-        image = image.cuda()
+        # image = image.cuda()
+        image = image.to(device)  # 数据移动到设备
 
         embed_out, output = model(image)  # embedding out [batch, 512]
 

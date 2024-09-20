@@ -22,6 +22,9 @@ results/
 
 # models
 ckpts
+ckpt
+checkpoint
+checkpoints
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

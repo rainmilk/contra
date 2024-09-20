@@ -202,11 +202,27 @@ def parse_args():
         help="Enable early stopping if specified, otherwise train for the full number of epochs",
     )
 
+    # 修复训练的次数
+    parser.add_argument(
+        "--repair_iter_num",
+        type=int,
+        default=2,
+        help="The number of iterations to train the model",
+    )
+
+    # 适应性训练的次数
+    parser.add_argument(
+        "--adapt_iter_num",
+        type=int,
+        default=2,
+        help="The number of iterations to adapt the model",
+    )
+
     # 捕获其他 kwargs
     parser.add_argument(
         "--kwargs", nargs="*", help="Additional key=value arguments for hyperparameters"
     )
-    
+
     # 返回解析的参数
     return parser.parse_args()
 
@@ -261,6 +277,8 @@ def main():
         print(
             f"  Early Stopping Accuracy Threshold: {args.early_stopping_accuracy_threshold}"
         )
+    print(f"  Repair Iterations: {args.repair_iter_num}")
+    print(f"  Adaptation Iterations: {args.adapt_iter_num}")
 
     print(f"Additional kwargs: {kwargs}")
 
@@ -282,7 +300,7 @@ def main():
         num_epochs=args.num_epochs,
         early_stopping_patience=args.early_stopping_patience,
         early_stopping_accuracy_threshold=args.early_stopping_accuracy_threshold,
-        **kwargs
+        **kwargs,
     )
 
 

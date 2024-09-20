@@ -1,3 +1,6 @@
+import os
+import logging
+
 import torch
 import torch.nn as nn
 from torch import optim
@@ -226,6 +229,26 @@ def get_ts_mixed_data(aug_data, aug_probs, inc_data, inc_probs, batch_size, alph
     return ts_mixed_dataloader_shuffled
 
 
+def get_model_paths(args, dataset):
+    """Generate and return model paths dynamically."""
+    curr_dir = os.path.dirname(os.path.abspath(__file__))
+    par_dir = os.path.dirname(curr_dir)
+    ckpt_dir = os.path.join(par_dir, "ckpt", dataset)
+
+    return {
+        "working_model_path": os.path.join(ckpt_dir, "pretrain_checkpoint.pth.tar"),
+        "working_model_repair_save_path": os.path.join(
+            ckpt_dir, "working_model_repair"
+        ),
+        "working_model_adapt_save_path": os.path.join(ckpt_dir, "working_model_adapt"),
+        "lip_teacher_model_path": os.path.join(ckpt_dir, "lip_checkpoint.pth.tar"),
+        "teacher_model_repair_save_path": os.path.join(
+            ckpt_dir, "teacher_model_repair"
+        ),
+        "teacher_model_adapt_save_path": os.path.join(ckpt_dir, "teacher_model_adapt"),
+    }
+
+
 def execute(args):
     # 1. 获取公共参数
     num_classes = num_classes_dict[args.dataset]
@@ -233,31 +256,28 @@ def execute(args):
     alpha, beta = kwargs.get("alpha", 1), kwargs.get("beta", 0.1)
 
     # todo 可加入参数中
-    learning_rate = 0.001
-    weight_decay = 1e-4
-    repair_iter_num = 2
-    adapt_iter_num = 2
+    # learning_rate = 0.001
+    # weight_decay = 1e-4
+    # repair_iter_num = 2
+    # adapt_iter_num = 2
 
-    working_model_path = (
-        r"E:\projects\Project_mr\github_code\ckpt\cifar-10\pretrain_checkpoint.pth.tar"
-    )
-    working_model_repair_save_path = (
-        r"E:\projects\Project_mr\github_code\ckpt\cifar-10\working_model_repair"
-    )
-    working_model_adapt_save_path = (
-        r"E:\projects\Project_mr\github_code\ckpt\cifar-10\working_model_adapt"
-    )
-    lip_teacher_model_path = (
-        r"E:\projects\Project_mr\github_code\ckpt\cifar-10\lip_checkpoint.pth.tar"
-    )
-    teacher_model_repair_save_path = (
-        r"E:\projects\Project_mr\github_code\ckpt\cifar-10\teacher_model_repair"
-    )
-    teacher_model_adapt_save_path = (
-        r"E:\projects\Project_mr\github_code\ckpt\cifar-10\teacher_model_adapt"
-    )
+    learning_rate = getattr(args, "learning_rate", 0.001)
+    weight_decay = getattr(args, "weight_decay", 1e-4)
+    repair_iter_num = getattr(args, "repair_iter_num", 2)
+    adapt_iter_num = getattr(args, "adapt_iter_num", 2)
+
+    model_paths = get_model_paths(args, args.dataset)
+
+    working_model_path = model_paths["working_model_path"]
+    working_model_repair_save_path = model_paths["working_model_repair_save_path"]
+    working_model_adapt_save_path = model_paths["working_model_adapt_save_path"]
+    lip_teacher_model_path = model_paths["lip_teacher_model_path"]
+    teacher_model_repair_save_path = model_paths["teacher_model_repair_save_path"]
+    teacher_model_adapt_save_path = model_paths["teacher_model_adapt_save_path"]
 
     working_model, lip_teacher_model = None, None
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # 2. load model
     # (1) load working model
@@ -265,6 +285,8 @@ def execute(args):
         working_model = models.resnet18(pretrained=False, num_classes=num_classes)
     elif args.model == "vgg16":
         working_model = vgg16_bn_lth(num_classes=num_classes)
+
+    working_model.to(device)
 
     working_opt = optim.Adam(
         working_model.parameters(), lr=learning_rate, weight_decay=weight_decay
@@ -366,7 +388,17 @@ def execute(args):
     print("---------------------test after adapt-------------------------------")
     print(test_result_after_adapt)
 
+    logging.basicConfig(filename="../logs/core_execution.log", level=logging.INFO)
+    logging.info(f"Test results before repair: {test_result_before}")
+    logging.info(f"Test results after repair: {test_result_after_repair}")
+    logging.info(f"Test results after adaptation: {test_result_after_adapt}")
+
 
 if __name__ == "__main__":
-    parse_args = parse_args()
+    # parse_args = parse_args()
+    try:
+        parse_args = parse_args()
+    except argparse.ArgumentError as e:
+        print(f"Error parsing arguments: {e}")
+        sys.exit(1)
     execute(parse_args)

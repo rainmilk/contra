@@ -17,10 +17,12 @@ class SimpleLipNet(nn.Module):
         self.fc = nn.Linear(input_sz, output_sz)
         self.apply(self._spectral_init)
 
+    # 使用谱归一化 (spectral_norm) 来规范化线性层和卷积层的权重
     def add_spectral_norm_(self, m):
         if isinstance(m, (nn.Linear, nn.Conv2d)):
             torch.nn.utils.spectral_norm(m)
 
+    # 为线性层和卷积层进行 Xavier 初始化，使用 SVD 对权重进行缩放处理。
     def _spectral_init(self, m):
         if isinstance(m, nn.Linear):
             # torch.nn.init.orthogonal_(m.weight, gain=1)
