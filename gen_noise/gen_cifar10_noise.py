@@ -157,63 +157,91 @@ class IncrementalLearningModel(nn.Module):
         return self.model(x)
 
 
-def train_incremental_model(
+def train_models(
     D_tr_data,
     D_tr_labels,
+    original_train_data,
+    original_train_labels,
     test_data,
     test_labels,
-    model,
+    incremental_model,
+    original_model,
     num_epochs=100,
     batch_size=64,
     lr=0.001,
-    save_path="model.pth",
+    incremental_save_path="incremental_model.pth",
+    original_save_path="original_model.pth",
 ):
     """
-    训练增量学习模型 M_p(D_tr) 并保存模型。
-    :param D_tr_data: 增量数据集 D_tr 的输入数据
-    :param D_tr_labels: 增量数据集 D_tr 的标签
-    :param test_data: 测试集数据
-    :param test_labels: 测试集标签
-    :param model: 增量学习模型
-    :param num_epochs: 训练的迭代次数
-    :param batch_size: 每个batch的样本数
-    :param lr: 学习率
-    :param save_path: 训练结束后保存模型的路径
+    同时训练两个模型：一个在增量数据集上，一个在原始CIFAR-10数据集上。
     """
     # 定义损失函数和优化器
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    optimizer_incremental = optim.Adam(incremental_model.parameters(), lr=lr)
+    optimizer_original = optim.Adam(original_model.parameters(), lr=lr)
 
     # 创建数据加载器
-    dataset = torch.utils.data.TensorDataset(D_tr_data, D_tr_labels)
-    dataloader = torch.utils.data.DataLoader(
-        dataset, batch_size=batch_size, shuffle=True
+    incremental_dataset = torch.utils.data.TensorDataset(D_tr_data, D_tr_labels)
+    original_dataset = torch.utils.data.TensorDataset(
+        original_train_data, original_train_labels
+    )
+
+    incremental_loader = torch.utils.data.DataLoader(
+        incremental_dataset, batch_size=batch_size, shuffle=True
+    )
+    original_loader = torch.utils.data.DataLoader(
+        original_dataset, batch_size=batch_size, shuffle=True
     )
 
     # 训练模型
     for epoch in range(num_epochs):
-        model.train()  # 将模型设置为训练模式
-        running_loss = 0.0
-        for inputs, labels in dataloader:
-            optimizer.zero_grad()
+        incremental_model.train()  # 将增量模型设置为训练模式
+        original_model.train()  # 将原始模型设置为训练模式
 
-            outputs = model(inputs)
+        incremental_loss = 0.0
+        original_loss = 0.0
+
+        # 训练增量学习模型
+        for inputs, labels in incremental_loader:
+            optimizer_incremental.zero_grad()
+            outputs = incremental_model(inputs)
             loss = criterion(outputs, labels)
             loss.backward()
-            optimizer.step()
+            optimizer_incremental.step()
+            incremental_loss += loss.item()
 
-            running_loss += loss.item()
+        # 训练原始CIFAR-10模型
+        for inputs, labels in original_loader:
+            optimizer_original.zero_grad()
+            outputs = original_model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer_original.step()
+            original_loss += loss.item()
 
-        # 在测试集上评估模型性能
-        test_accuracy = test_model(model, test_data, test_labels, batch_size)
+        # 在测试集上评估两者性能
+        incremental_test_accuracy = test_model(
+            incremental_model, test_data, test_labels, batch_size
+        )
+        original_test_accuracy = test_model(
+            original_model, test_data, test_labels, batch_size
+        )
 
-        print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {running_loss / len(dataloader)}, Test Accuracy: {test_accuracy}")
+        print(f"Epoch {epoch + 1}/{num_epochs}")
+        print(
+            f"Incremental Model - Loss: {incremental_loss / len(incremental_loader)}, Test Accuracy: {incremental_test_accuracy}"
+        )
+        print(
+            f"Original Model - Loss: {original_loss / len(original_loader)}, Test Accuracy: {original_test_accuracy}"
+        )
 
     # 保存训练后的模型
-    torch.save(model.state_dict(), save_path)
-    print(f"Model saved to {save_path}")
+    torch.save(incremental_model.state_dict(), incremental_save_path)
+    torch.save(original_model.state_dict(), original_save_path)
+    print(f"Incremental Model saved to {incremental_save_path}")
+    print(f"Original Model saved to {original_save_path}")
 
-    return model
+    return incremental_model, original_model
 
 
 def validate_npy_files(noise_dir):
@@ -268,7 +296,9 @@ if __name__ == "__main__":
     noise_dir = os.path.join(data_dir, "noise")  # 存储带噪声数据集的路径
 
     # Step 1: 创建 D_0, D_inc 和 测试集数据
-    train_data_Dinc, train_labels_Dinc, test_data, test_labels = create_cifar10_npy_files(data_dir, noise_dir)
+    train_data_Dinc, train_labels_Dinc, test_data, test_labels = (
+        create_cifar10_npy_files(data_dir, noise_dir)
+    )
 
     # Step 2: 校验生成的npy文件
     validate_npy_files(noise_dir)
@@ -279,8 +309,27 @@ if __name__ == "__main__":
         train_data_Dinc, train_labels_Dinc, forget_classes
     )
 
-    # Step 4: 定义并训练增量学习模型，并保存模型
+    # 使用原始的完整CIFAR-10数据集进行训练（无增量、无噪声）
+    original_train_data = torch.stack(
+        [train_data_Dinc[i] for i in range(len(train_data_Dinc))]
+    )
+    original_train_labels = torch.tensor(
+        [train_labels_Dinc[i] for i in range(len(train_labels_Dinc))]
+    )
+
+    # Step 4: 定义并训练两个模型：一个基于增量数据集，一个基于原始CIFAR-10数据集
     incremental_model = IncrementalLearningModel(num_classes=10)
-    trained_model = train_incremental_model(
-        D_tr_data, D_tr_labels, test_data, test_labels, incremental_model, save_path="incremental_model.pth"
+    original_model = IncrementalLearningModel(num_classes=10)
+
+    trained_incremental_model, trained_original_model = train_models(
+        D_tr_data,
+        D_tr_labels,
+        original_train_data,
+        original_train_labels,
+        test_data,
+        test_labels,
+        incremental_model,
+        original_model,
+        incremental_save_path="incremental_model.pth",
+        original_save_path="original_model.pth",
     )
