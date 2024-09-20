@@ -75,7 +75,7 @@ def create_cifar10_npy_files(
     return train_data_Dinc, train_labels_Dinc, test_data, test_labels
 
 
-def test_model(model, test_data, test_labels, batch_size=64):
+def test_model(model, test_data, test_labels, batch_size=64, device="cpu"):
     """
     在测试集上评估模型的准确率。
     :param model: 已训练的模型
@@ -92,6 +92,7 @@ def test_model(model, test_data, test_labels, batch_size=64):
 
     with torch.no_grad():
         for inputs, labels in test_loader:
+            inputs, labels = inputs.to(device), labels.to(device)  # 将数据移到GPU上
             outputs = model(inputs)
             _, predicted = torch.max(outputs, 1)
             total += labels.size(0)
@@ -171,10 +172,15 @@ def train_models(
     lr=0.001,
     incremental_save_path="incremental_model.pth",
     original_save_path="original_model.pth",
+    device="cpu",
 ):
     """
     同时训练两个模型：一个在增量数据集上，一个在原始CIFAR-10数据集上。
     """
+    # 将模型移到设备上
+    incremental_model = incremental_model.to(device)
+    original_model = original_model.to(device)
+
     # 定义损失函数和优化器
     criterion = nn.CrossEntropyLoss()
     optimizer_incremental = optim.Adam(incremental_model.parameters(), lr=lr)
@@ -203,6 +209,7 @@ def train_models(
 
         # 训练增量学习模型
         for inputs, labels in incremental_loader:
+            inputs, labels = inputs.to(device), labels.to(device)  # 将数据移到GPU上
             optimizer_incremental.zero_grad()
             outputs = incremental_model(inputs)
             loss = criterion(outputs, labels)
@@ -212,6 +219,7 @@ def train_models(
 
         # 训练原始CIFAR-10模型
         for inputs, labels in original_loader:
+            inputs, labels = inputs.to(device), labels.to(device)  # 将数据移到GPU上
             optimizer_original.zero_grad()
             outputs = original_model(inputs)
             loss = criterion(outputs, labels)
@@ -221,10 +229,10 @@ def train_models(
 
         # 在测试集上评估两者性能
         incremental_test_accuracy = test_model(
-            incremental_model, test_data, test_labels, batch_size
+            incremental_model, test_data, test_labels, batch_size, device
         )
         original_test_accuracy = test_model(
-            original_model, test_data, test_labels, batch_size
+            original_model, test_data, test_labels, batch_size, device
         )
 
         print(f"Epoch {epoch + 1}/{num_epochs}")
@@ -292,6 +300,9 @@ def validate_npy_files(noise_dir):
 
 
 if __name__ == "__main__":
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
+
     data_dir = "./data/cifar-10"  # CIFAR-10 原始数据集的路径
     noise_dir = os.path.join(data_dir, "noise")  # 存储带噪声数据集的路径
 
@@ -330,6 +341,7 @@ if __name__ == "__main__":
         test_labels,
         incremental_model,
         original_model,
+        device=device,
         incremental_save_path="incremental_model.pth",
         original_save_path="original_model.pth",
     )
