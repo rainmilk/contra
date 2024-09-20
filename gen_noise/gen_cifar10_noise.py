@@ -1,10 +1,9 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torchvision import transforms
+from torchvision import datasets, transforms
 import numpy as np
 import os
-from noise_datasets import NoiseCIFAR10  # 导入 noise_dataset 中的噪声处理
 
 
 # Step 1: 生成增量数据集D_tr的代码
@@ -19,22 +18,25 @@ def create_cifar10_npy_files(
     :param forget_class_ratio: 遗忘类的比例
     """
 
+    # 定义CIFAR-10的图像转换
+    transform = transforms.Compose([transforms.ToTensor()])
+
     # 加载CIFAR-10训练和测试数据集
-    train_dataset = NoiseCIFAR10(
-        root=data_dir, train=True, download=True, noise_type="sym", percent=noise_ratio
+    train_dataset = datasets.CIFAR10(
+        root=data_dir, train=True, download=True, transform=transform
     )
-    test_dataset = NoiseCIFAR10(
-        root=data_dir, train=False, download=True, noise_type="none"
+    test_dataset = datasets.CIFAR10(
+        root=data_dir, train=False, download=True, transform=transform
     )
 
     # 提取训练集和测试集数据与标签
-    train_data = torch.tensor(train_dataset.data).permute(
-        0, 3, 1, 2
-    )  # 转换为通道优先格式
-    train_labels = torch.tensor(train_dataset.targets)
+    train_data = torch.stack([train_dataset[i][0] for i in range(len(train_dataset))])
+    train_labels = torch.tensor(
+        [train_dataset[i][1] for i in range(len(train_dataset))]
+    )
 
-    test_data = torch.tensor(test_dataset.data).permute(0, 3, 1, 2)
-    test_labels = torch.tensor(test_dataset.targets)
+    test_data = torch.stack([test_dataset[i][0] for i in range(len(test_dataset))])
+    test_labels = torch.tensor([test_dataset[i][1] for i in range(len(test_dataset))])
 
     # Step 1: 从 50000 样本中随机划分 50% 样本为 D_0（25000 样本），剩余 50% 样本为 D_inc（25000 样本）
     total_indices = torch.randperm(len(train_data))
@@ -104,17 +106,15 @@ def create_incremental_data(
     sampled_other_class_labels = other_class_labels[other_sample_indices]
 
     # 对采样的非遗忘类数据中的20%进行标签噪声处理
-    # 使用 NoiseCIFAR10 类进行处理
-    noise_dataset = NoiseCIFAR10(
-        root=".", train=True, noise_type="sym", percent=noise_ratio
-    )
-    noisy_labels = torch.tensor(noise_dataset.targets)
+    noisy_labels = sampled_other_class_labels.clone()
+    noise_indices = torch.randperm(len(noisy_labels))[
+        : int(noise_ratio * len(noisy_labels))
+    ]
+    noisy_labels[noise_indices] = torch.randint(0, 10, size=(len(noise_indices),))
 
     # 构建增量训练数据 D_tr
     D_tr_data = torch.cat([forget_class_data, sampled_other_class_data], dim=0)
-    D_tr_labels = torch.cat(
-        [forget_class_labels, noisy_labels[: len(sampled_other_class_labels)]], dim=0
-    )
+    D_tr_labels = torch.cat([forget_class_labels, noisy_labels], dim=0)
 
     return D_tr_data, D_tr_labels
 
