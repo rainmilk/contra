@@ -72,7 +72,33 @@ def create_cifar10_npy_files(
     np.save(f"{noise_dir}/cifar10_test_data.npy", test_data.numpy())
     np.save(f"{noise_dir}/cifar10_test_labels.npy", test_labels.numpy())
 
-    return train_data_Dinc, train_labels_Dinc
+    return train_data_Dinc, train_labels_Dinc, test_data, test_labels
+
+
+def test_model(model, test_data, test_labels, batch_size=64):
+    """
+    在测试集上评估模型的准确率。
+    :param model: 已训练的模型
+    :param test_data: 测试集数据
+    :param test_labels: 测试集标签
+    :param batch_size: 每个 batch 的大小
+    :return: 测试集准确率
+    """
+    model.eval()  # 将模型设置为评估模式
+    correct = 0
+    total = 0
+    test_dataset = torch.utils.data.TensorDataset(test_data, test_labels)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size)
+
+    with torch.no_grad():
+        for inputs, labels in test_loader:
+            outputs = model(inputs)
+            _, predicted = torch.max(outputs, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+
+    accuracy = correct / total
+    return accuracy
 
 
 # Step 2: 训练增量学习模型
@@ -134,8 +160,10 @@ class IncrementalLearningModel(nn.Module):
 def train_incremental_model(
     D_tr_data,
     D_tr_labels,
+    test_data,
+    test_labels,
     model,
-    num_epochs=10,
+    num_epochs=100,
     batch_size=64,
     lr=0.001,
     save_path="model.pth",
@@ -144,6 +172,8 @@ def train_incremental_model(
     训练增量学习模型 M_p(D_tr) 并保存模型。
     :param D_tr_data: 增量数据集 D_tr 的输入数据
     :param D_tr_labels: 增量数据集 D_tr 的标签
+    :param test_data: 测试集数据
+    :param test_labels: 测试集标签
     :param model: 增量学习模型
     :param num_epochs: 训练的迭代次数
     :param batch_size: 每个batch的样本数
@@ -162,6 +192,7 @@ def train_incremental_model(
 
     # 训练模型
     for epoch in range(num_epochs):
+        model.train()  # 将模型设置为训练模式
         running_loss = 0.0
         for inputs, labels in dataloader:
             optimizer.zero_grad()
@@ -172,7 +203,11 @@ def train_incremental_model(
             optimizer.step()
 
             running_loss += loss.item()
-        print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {running_loss / len(dataloader)}")
+
+        # 在测试集上评估模型性能
+        test_accuracy = test_model(model, test_data, test_labels, batch_size)
+
+        print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {running_loss / len(dataloader)}, Test Accuracy: {test_accuracy}")
 
     # 保存训练后的模型
     torch.save(model.state_dict(), save_path)
@@ -233,7 +268,7 @@ if __name__ == "__main__":
     noise_dir = os.path.join(data_dir, "noise")  # 存储带噪声数据集的路径
 
     # Step 1: 创建 D_0, D_inc 和 测试集数据
-    train_data_Dinc, train_labels_Dinc = create_cifar10_npy_files(data_dir, noise_dir)
+    train_data_Dinc, train_labels_Dinc, test_data, test_labels = create_cifar10_npy_files(data_dir, noise_dir)
 
     # Step 2: 校验生成的npy文件
     validate_npy_files(noise_dir)
@@ -247,5 +282,5 @@ if __name__ == "__main__":
     # Step 4: 定义并训练增量学习模型，并保存模型
     incremental_model = IncrementalLearningModel(num_classes=10)
     trained_model = train_incremental_model(
-        D_tr_data, D_tr_labels, incremental_model, save_path="incremental_model.pth"
+        D_tr_data, D_tr_labels, test_data, test_labels, incremental_model, save_path="incremental_model.pth"
     )
