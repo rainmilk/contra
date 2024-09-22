@@ -1,3 +1,11 @@
+# directory for export
+export_dir/
+
+# zipped files
+*.gz
+*.zip
+*.rar
+
 # dataset
 data/
 dataset/

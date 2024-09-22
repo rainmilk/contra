@@ -152,7 +152,7 @@ class IncrementalLearningModel(nn.Module):
     def __init__(self, num_classes=100):
         super(IncrementalLearningModel, self).__init__()
         self.model = torch.hub.load(
-            "pytorch/vision:v0.10.0", "resnet18", pretrained=False
+            "pytorch/vision:v0.10.0", "resnet18", pretrained=True,
         )
         self.model.fc = nn.Linear(self.model.fc.in_features, num_classes)
 
