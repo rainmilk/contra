@@ -1,5 +1,41 @@
 # TTA-MR
 
+## Data and model
+
+For later experiment, we should firstly prepare the datasets and models.
+
+```bash
+# under base directory
+ $ cd gen_noise/
+ $ python gen_cifar10_noise.py
+```
+
+This will generate the following data and model files.
+
+```bash
+
+$ tree export_dir
+export_dir
+└── cifar-10
+    ├── models
+    │   ├── incremental_model-cifar10.pth
+    │   └── original_model-cifar10.pth
+    └── noise
+        ├── cifar10_aux_data.npy
+        ├── cifar10_aux_labels.npy
+        ├── cifar10_forget_class_data.npy
+        ├── cifar10_forget_class_labels.npy
+        ├── cifar10_inc_data.npy
+        ├── cifar10_inc_labels.npy
+        ├── cifar10_noisy_other_class_labels.npy
+        ├── cifar10_other_class_data.npy
+        ├── cifar10_other_class_labels.npy
+        ├── cifar10_test_data.npy
+        ├── cifar10_test_labels.npy
+        ├── cifar10_train_data.npy
+        └── cifar10_train_labels.npy
+```
+
 ## Preparation
 
 ### Download datasets
