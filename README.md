@@ -2,7 +2,53 @@
 
 ## Data and model
 
-For later experiment, we should firstly prepare the datasets and models.
+For later experiment, we should firstly prepare the datasets and models. The logic of generating dataset is as follows:
+
+[ $D_{train}$ ]  
+&nbsp;&nbsp;&nbsp;&nbsp;|  
+&nbsp;&nbsp;&nbsp;&nbsp;+-- Split into $D_0$, $D_{inc}$
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-- $D_0$ --> Initial training of base model (25000 samples)  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-- Sample $D_a$ from $D_0$ (10% of $D_0$, 2500 samples)  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  
+&nbsp;&nbsp;&nbsp;&nbsp;+-- $D_{inc}$ --> Construct $D_{tr}$ (Incremental training data)  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-- Forgetting classes: Sample 10% per class  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-- Non-forgetting classes: Sample 50% per class  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-- Add noise to 20% of non-forgetting samples  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-- Train $M_p$ on $D_{tr}$  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-- $M_p(D_{tr})$  
+[ $D_{test}$ ] (10000 samples)  
+
+### 数据集构造逻辑
+
+#### 1. **数据集划分**：
+从原始的 CIFAR-10 训练集（50000 张图像）中，随机划分为两个子集：
+- **D_0**：包含 50% 的训练数据，共 25000 个样本。
+- **D_inc**：包含剩余 50% 的训练数据，也为 25000 个样本。
+
+#### 2. **Replay 数据集 D_a 的构建**：
+从 **D_0** 中随机抽取 10% 的样本（即 2500 个样本），作为 Replay 数据集 **D_a**，此数据集用于未来的增量训练过程以缓解遗忘效应。
+
+#### 3. **测试集 D_ts 的使用**：
+测试集 **D_ts** 使用 CIFAR-10 原始测试数据集（10000 张图像）进行评估模型的泛化性能。
+
+#### 4. **增量训练数据集 D_tr 的构建**：
+从 **D_inc** 中构造增量训练数据集 **D_tr**，具体步骤如下：
+- **遗忘类样本**：对于指定的遗忘类（假设选择类 1、3、5、7、9），仅从 **D_inc** 中抽取 10% 的样本加入 **D_tr**。
+- **非遗忘类样本**：对于其余非遗忘类，从 **D_inc** 中抽取 50% 的样本加入 **D_tr**。
+- **噪声样本添加**：对 **D_tr** 中非遗忘类的 50% 样本中的 20% 进行标签噪声处理，具体是将这些样本的标签随机替换为其他类的标签。
+
+#### 5. **数据集保存**：
+生成的数据集被保存为 `.npy` 格式文件，以供后续训练和验证使用，具体为：
+- `cifar10_train_data.npy` 和 `cifar10_train_labels.npy`：保存 **D_0** 的数据和标签。
+- `cifar10_aux_data.npy` 和 `cifar10_aux_labels.npy`：保存 **D_a** 的数据和标签。
+- `cifar10_test_data.npy` 和 `cifar10_test_labels.npy`：保存 **D_ts** 的测试数据和标签。
+
+An incremental training dataset $D_{tr}$ with noise is constructed, and part of the original training dataset is retained for Replay. Finally, the model training process based on incremental learning is realized. This construction method can simulate real-world scenarios in machine learning where the model gradually forgets old knowledge, introduces new data, and deals with noise.
+
+### 数据集构造操作
 
 ```bash
 # under base directory
@@ -18,22 +64,23 @@ $ tree export_dir
 export_dir
 └── cifar-10
     ├── models
-    │   ├── incremental_model-cifar10.pth
-    │   └── original_model-cifar10.pth
+    │   ├── incremental_model-cifar10.pth # 增量学习模型的训练权重，基于带有噪声的增量数据集 D_tr 训练
+    │   └── original_model-cifar10.pth # 原始CIFAR-10模型的训练权重，基于完整的 CIFAR-10 数据集训练
     └── noise
-        ├── cifar10_aux_data.npy
-        ├── cifar10_aux_labels.npy
-        ├── cifar10_forget_class_data.npy
-        ├── cifar10_forget_class_labels.npy
-        ├── cifar10_inc_data.npy
-        ├── cifar10_inc_labels.npy
-        ├── cifar10_noisy_other_class_labels.npy
-        ├── cifar10_other_class_data.npy
-        ├── cifar10_other_class_labels.npy
-        ├── cifar10_test_data.npy
-        ├── cifar10_test_labels.npy
-        ├── cifar10_train_data.npy
-        └── cifar10_train_labels.npy
+        ├── cifar10_aux_data.npy # Replay 数据集 D_a 的图像数据，包含从 D_0 中抽取的 2500 个样本, 62M
+        ├── cifar10_aux_labels.npy # Replay 数据集 D_a 的标签，包含 2500 个样本的类别标签, 20K
+        ├── cifar10_forget_class_data.npy # 遗忘类的数据，包含从 D_inc 中抽取的 10% 的遗忘类样本, 15M
+        ├── cifar10_forget_class_labels.npy # 遗忘类的标签，包含对应遗忘类数据的类别标签, 12K
+        ├── cifar10_inc_data.npy # 增量数据集 D_tr 的图像数据，包含遗忘类和非遗忘类样本, 805M
+        ├── cifar10_inc_labels.npy # 增量数据集 D_tr 的标签，包含遗忘类和非遗忘类的类别标签, 196K
+        ├── cifar10_noisy_other_class_labels.npy # 经过 20% 标签噪声处理的非遗忘类标签, 52K
+        ├── cifar10_other_class_data.npy # 非遗忘类的数据，包含从 D_inc 中抽取的 50% 非遗忘类样本, 201M
+        ├── cifar10_other_class_labels.npy # 非遗忘类的标签，包含非遗忘类数据的类别标签, 52K
+        ├── cifar10_test_data.npy # 测试集 D_ts 的图像数据，包含 10000 个样本, 246M
+        ├── cifar10_test_labels.npy # 测试集 D_ts 的标签，包含 10000 个类别标签, 80K
+        ├── cifar10_train_data.npy # 训练集 D_0 的图像数据，包含 25000 个样本, 805M
+        └── cifar10_train_labels.npy # 训练集 D_0 的标签，包含 25000 个类别标签, 196K
+
 ```
 
 You can download the above files from baidu net disk.
