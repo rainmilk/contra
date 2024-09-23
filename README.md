@@ -2,7 +2,7 @@
 
 ## Data and model
 
-todo 1. 保存每个 stage 的 $D_{tr}$ 的 image 和 label 。
+TODO 1. 保存每个 stage 的 $D_{tr}$ 的 image 和 label 。
  $D_{tr}$ npy 补充上传到网盘。
         ├── cifar10_noisy_other_class_labels.npy # 经过 20% 标签噪声处理的非遗忘类标签, 52K
         <!-- ├── cifar10_other_class_data.npy # 非遗忘类的数据，包含从 D_inc 中抽取的 50% 非遗忘类样本, 201M
@@ -10,12 +10,12 @@ todo 1. 保存每个 stage 的 $D_{tr}$ 的 image 和 label 。
         ├── cifar10_forget_class_data.npy # 遗忘类的数据，包含从 D_inc 中抽取的 10% 的遗忘类样本, 15M
         ├── cifar10_forget_class_labels.npy # 遗忘类的标签，包含对应遗忘类数据的类别标签, 12K
 
-todo 2. stage-1的模型保存。
+TODO 2. stage-1的模型保存。
 TODO 3. 数据分 stage 保存。
-todo 4. run 3 轮。
-todo 5. input image: 10 images，5 rows 10 cols
-todo 6. recall-precision figures, line plot
-todo 7. www 完成 method.
+TODO 4. run 3 轮。
+TODO 5. input image: 10 images，5 rows 10 cols
+TODO 6. recall-precision figures, line plot
+TODO 7. www 完成 method.
 
 1. 院士
    1. 1-2，调通
