@@ -13,6 +13,9 @@ todo 1. 保存每个 stage 的 $D_{tr}$ 的 image 和 label 。
 todo 2. stage-1的模型保存。
 TODO 3. 数据分 stage 保存。
 todo 4. run 3 轮。
+todo 5. input image: 10 images，5 rows 10 cols
+todo 6. recall-precision figures, line plot
+todo 7. www 完成 method.
 
 1. 院士
    1. 1-2，调通
@@ -20,7 +23,7 @@ todo 4. run 3 轮。
    3. 同步记录 ablation study 的结果。
 2. 1-6, dataset / base model
    1. 3 种噪声, sy, asy, pair-flipping。
-   2. 至少 3 个数据集, CIFAR-10 CIFAR-100 TINY-200。（animal-10 备选）
+   2. 至少 3 个数据集, CIFAR-10 CIFAR-100 TINY-200。（Animal-10 备选）从 pytorch 内置。
    3. 1 个模型。
 3. 国庆期间，所有结果 ready。
 4. 分析代码和论文的图表可以在国庆期间同步实现。
