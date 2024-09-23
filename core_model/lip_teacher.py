@@ -47,6 +47,8 @@ class SimpleLipNet(nn.Module):
         x = self.backbone(inputs)
         embedding = torch.flatten(x, 1)
         out = self.fc(embedding)
+        if self.training:
+            return out
         return embedding, out
 
 

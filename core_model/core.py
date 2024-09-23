@@ -8,6 +8,7 @@ from torch import optim
 from torchvision import models
 from torch.utils.data import DataLoader
 import numpy as np
+import sys
 
 from main import parse_args, parse_kwargs
 from nets.VGG_LTH import vgg16_bn_lth
@@ -135,8 +136,7 @@ def iterate_repair_model(
         teacher_criterion,
         alpha,
         args,
-        teacher_model_save_path,
-        teacher_model=True,
+        save_path=teacher_model_save_path
     )
     return conf_dataset
 
@@ -175,8 +175,7 @@ def iterate_adapt_model(
         teacher_criterion,
         alpha,
         args,
-        save_path=teacher_model_save_path,
-        teacher_model=True,
+        save_path=teacher_model_save_path
     )
 
     # 3. 重新构造 Dts融合数据集 Dp_mix

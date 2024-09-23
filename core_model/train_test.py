@@ -13,7 +13,6 @@ def model_train(
     alpha,
     args,
     save_path="",
-    teacher_model=False,
 ):
     # todo opt 重置
     # 训练模型并显示进度
@@ -34,10 +33,8 @@ def model_train(
             for i, (inputs, labels) in enumerate(train_loader):
                 inputs, labels = inputs.to(device), labels.to(device)
                 optimizer.zero_grad()  # 清除上一步的梯度
-                if teacher_model:
-                    _, outputs = model(inputs)
-                else:
-                    outputs = model(inputs)
+
+                outputs = model(inputs)
 
                 loss = criterion(outputs, labels) * alpha  # 使用 alpha 参数调整损失函数
                 loss.backward()  # 反向传播
