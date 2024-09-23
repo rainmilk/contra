@@ -2,6 +2,31 @@
 
 ## Data and model
 
+todo 1. 保存每个 stage 的 $D_{tr}$ 的 image 和 label 。
+ $D_{tr}$ npy 补充上传到网盘。
+        ├── cifar10_noisy_other_class_labels.npy # 经过 20% 标签噪声处理的非遗忘类标签, 52K
+        ├── cifar10_other_class_data.npy # 非遗忘类的数据，包含从 D_inc 中抽取的 50% 非遗忘类样本, 201M
+        ├── cifar10_other_class_labels.npy # 非遗忘类的标签，包含非遗忘类数据的类别标签, 52K
+        ├── cifar10_forget_class_data.npy # 遗忘类的数据，包含从 D_inc 中抽取的 10% 的遗忘类样本, 15M
+        ├── cifar10_forget_class_labels.npy # 遗忘类的标签，包含对应遗忘类数据的类别标签, 12K
+
+todo 2. stage-1的模型保存。
+TODO 3. 数据分 stage 保存。
+
+1. 院士
+   1. 1-2，调通
+   2. 3-6, baseline
+   3. 同步记录 ablation study 的结果。
+2. 1-6, dataset / base model
+   1. 3 种噪声, sy, asy, pair-flipping。
+   2. 至少 3 个数据集, CIFAR-10 CIFAR-100 TINY-200。（animal-10 备选）
+   3. 1 个模型。
+3. 国庆期间，所有结果 ready。
+4. 分析代码和论文的图表可以在国庆期间同步实现。
+5. 国庆期间 abstract ddl 。
+6. 国庆期间，full paper 完成。
+7. 国庆后第一周，full paper 修改完成。
+
 For later experiment, we should firstly prepare the datasets and models. The logic of generating dataset is as follows:
 
 [ $D_{train}$ ]  
