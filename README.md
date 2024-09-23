@@ -24,27 +24,27 @@ For later experiment, we should firstly prepare the datasets and models. The log
 ### 数据集构造逻辑
 
 #### 1. **数据集划分**：
-从原始的 CIFAR-10 训练集（50000 张图像）中，随机划分为两个子集：
-- **D_0**：包含 50% 的训练数据，共 25000 个样本。
-- **D_inc**：包含剩余 50% 的训练数据，也为 25000 个样本。
+从原始的 `CIFAR-10` 训练集（50000 张图像）中，随机划分为两个子集：
+- **$D_0$**：包含 50% 的训练数据，共 25000 个样本。
+- **$D_{inc}$**：包含剩余 50% 的训练数据，也为 25000 个样本。
 
-#### 2. **Replay 数据集 D_a 的构建**：
-从 **D_0** 中随机抽取 10% 的样本（即 2500 个样本），作为 Replay 数据集 **D_a**，此数据集用于未来的增量训练过程以缓解遗忘效应。
+#### 2. **Replay 数据集 $D_a$ 的构建**：
+从 **$D_0$** 中随机抽取 10% 的样本（即 2500 个样本），作为 Replay 数据集 **$D_a$**，此数据集用于未来的增量训练过程以缓解遗忘效应。
 
-#### 3. **测试集 D_ts 的使用**：
-测试集 **D_ts** 使用 CIFAR-10 原始测试数据集（10000 张图像）进行评估模型的泛化性能。
+#### 3. **测试集 $D_{ts}$ 的使用**：
+测试集 **$D_{ts}$** 使用 CIFAR-10 原始测试数据集（10000 张图像）进行评估模型的泛化性能。
 
-#### 4. **增量训练数据集 D_tr 的构建**：
-从 **D_inc** 中构造增量训练数据集 **D_tr**，具体步骤如下：
-- **遗忘类样本**：对于指定的遗忘类（假设选择类 1、3、5、7、9），仅从 **D_inc** 中抽取 10% 的样本加入 **D_tr**。
-- **非遗忘类样本**：对于其余非遗忘类，从 **D_inc** 中抽取 50% 的样本加入 **D_tr**。
-- **噪声样本添加**：对 **D_tr** 中非遗忘类的 50% 样本中的 20% 进行标签噪声处理，具体是将这些样本的标签随机替换为其他类的标签。
+#### 4. **增量训练数据集 $D_{tr}$ 的构建**：
+从 **$D_{inc}$** 中构造增量训练数据集 **$D_{tr}$**，具体步骤如下：
+- **遗忘类样本**：对于指定的遗忘类（假设选择类 1、3、5、7、9），仅从 **$D_{inc}$** 中抽取 10% 的样本加入 **$D_{tr}$**。
+- **非遗忘类样本**：对于其余非遗忘类，从 **$D_{inc}$** 中抽取 50% 的样本加入 **$D_{tr}$**。
+- **噪声样本添加**：对 **$D_{tr}$** 中非遗忘类的 50% 样本中的 20% 进行标签噪声处理，具体是将这些样本的标签随机替换为其他类的标签。
 
 #### 5. **数据集保存**：
 生成的数据集被保存为 `.npy` 格式文件，以供后续训练和验证使用，具体为：
-- `cifar10_train_data.npy` 和 `cifar10_train_labels.npy`：保存 **D_0** 的数据和标签。
-- `cifar10_aux_data.npy` 和 `cifar10_aux_labels.npy`：保存 **D_a** 的数据和标签。
-- `cifar10_test_data.npy` 和 `cifar10_test_labels.npy`：保存 **D_ts** 的测试数据和标签。
+- `cifar10_train_data.npy` 和 `cifar10_train_labels.npy`：保存 **$D_0$** 的数据和标签。
+- `cifar10_aux_data.npy` 和 `cifar10_aux_labels.npy`：保存 **$D_a$** 的数据和标签。
+- `cifar10_test_data.npy` 和 `cifar10_test_labels.npy`：保存 **$D_{ts}$** 的测试数据和标签。
 
 An incremental training dataset $D_{tr}$ with noise is constructed, and part of the original training dataset is retained for Replay. Finally, the model training process based on incremental learning is realized. This construction method can simulate real-world scenarios in machine learning where the model gradually forgets old knowledge, introduces new data, and deals with noise.
 
