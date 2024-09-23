@@ -1,6 +1,9 @@
 # directory for export
 export_dir/
 
+# directory for backup
+backup/
+
 # zipped files
 *.gz
 *.zip

@@ -17,8 +17,6 @@ def create_cifar10_npy_files(
     :param noise_ratio: 增量数据集中的噪声比例
     :param forget_class_ratio: 遗忘类的比例
     """
-
-    # 定义CIFAR-10的图像转换
     transform = transforms.Compose([transforms.ToTensor()])
 
     # 加载CIFAR-10训练和测试数据集
@@ -53,9 +51,6 @@ def create_cifar10_npy_files(
     aux_size = 2500
     aux_indices = torch.randperm(len(train_data_D0))[:aux_size]
     aux_data, aux_labels = train_data_D0[aux_indices], train_labels_D0[aux_indices]
-
-    # **注意：D_0 保持不变，不应移除 aux 数据**
-    # 不再需要删除 `aux_indices`，`train_data_D0` 应该保持完整的 25000 样本。
 
     # 保存生成的数据到noise目录
     os.makedirs(noise_dir, exist_ok=True)
@@ -104,7 +99,7 @@ def test_model(model, test_data, test_labels, batch_size=64, device="cpu"):
 
 # Step 2: 训练增量学习模型
 def create_incremental_data(
-    train_data_Dinc, train_labels_Dinc, forget_classes, noise_ratio=0.2
+    train_data_Dinc, train_labels_Dinc, forget_classes, noise_ratio=0.2, save_dir=None
 ):
     """
     从 D_inc 中构造增量训练数据 D_tr。
@@ -143,7 +138,36 @@ def create_incremental_data(
     D_tr_data = torch.cat([forget_class_data, sampled_other_class_data], dim=0)
     D_tr_labels = torch.cat([forget_class_labels, noisy_labels], dim=0)
 
+    # 保存增量数据 D_tr
+    if save_dir:
+        os.makedirs(save_dir, exist_ok=True)
+        np.save(f"{save_dir}/cifar10_D_tr_data.npy", D_tr_data.numpy())
+        np.save(f"{save_dir}/cifar10_D_tr_labels.npy", D_tr_labels.numpy())
+        print(f"D_tr 数据已保存到 {save_dir}")
+
     return D_tr_data, D_tr_labels
+
+
+def validate_d_tr(save_dir):
+    """
+    校验生成的 D_tr 数据集文件是否正确。
+    """
+    D_tr_data = np.load(f"{save_dir}/cifar10_D_tr_data.npy")
+    D_tr_labels = np.load(f"{save_dir}/cifar10_D_tr_labels.npy")
+
+    # 检查加载的数据形状是否合理
+    print(f"D_tr_data shape: {D_tr_data.shape}")
+    print(f"D_tr_labels shape: {D_tr_labels.shape}")
+    assert D_tr_data.shape[1:] == (
+        3,
+        32,
+        32,
+    ), f"D_tr_data shape mismatch: {D_tr_data.shape}"
+    assert (
+        len(D_tr_labels.shape) == 1
+    ), f"D_tr_labels shape mismatch: {D_tr_labels.shape}"
+
+    print("D_tr 数据校验通过！")
 
 
 class IncrementalLearningModel(nn.Module):
@@ -252,86 +276,52 @@ def train_models(
     return incremental_model, original_model
 
 
-def validate_npy_files(noise_dir):
-    """
-    校验生成的npy文件是否正确，主要检查文件的形状。
-    :param noise_dir: 噪声数据集的保存路径
-    """
-    # 加载生成的 npy 文件
-    train_data = np.load(f"{noise_dir}/cifar10_train_data.npy")
-    train_labels = np.load(f"{noise_dir}/cifar10_train_labels.npy")
-
-    aux_data = np.load(f"{noise_dir}/cifar10_aux_data.npy")
-    aux_labels = np.load(f"{noise_dir}/cifar10_aux_labels.npy")
-
-    test_data = np.load(f"{noise_dir}/cifar10_test_data.npy")
-    test_labels = np.load(f"{noise_dir}/cifar10_test_labels.npy")
-
-    # 检查加载的数据形状是否与预期一致
-    assert train_data.shape == (
-        25000,
-        3,
-        32,
-        32,
-    ), f"Train data shape mismatch: {train_data.shape}"
-    assert train_labels.shape == (
-        25000,
-    ), f"Train labels shape mismatch: {train_labels.shape}"
-
-    assert aux_data.shape == (
-        2500,
-        3,
-        32,
-        32,
-    ), f"Aux data shape mismatch: {aux_data.shape}"
-    assert aux_labels.shape == (2500,), f"Aux labels shape mismatch: {aux_labels.shape}"
-
-    assert test_data.shape == (
-        10000,
-        3,
-        32,
-        32,
-    ), f"Test data shape mismatch: {test_data.shape}"
-    assert test_labels.shape == (
-        10000,
-    ), f"Test labels shape mismatch: {test_labels.shape}"
-
-    print("All .npy files are correctly generated and validated.")
-
-
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
     data_dir = "./data/cifar-10"  # CIFAR-10 原始数据集的路径
-    noise_dir = os.path.join(data_dir, "noise")  # 存储带噪声数据集的路径
+    noise_data_dir = os.path.join(data_dir, "noise")  # 存储带噪声数据集的路径
+
+    model_dir = "./ckpt/cifar-10"  # CIFAR-10 模型保存的路径
+    noise_model_dir = os.path.join(model_dir, "noise")  # 存储带噪声模型的路径
+    normal_model_dir = os.path.join(model_dir, "normal")  # 存储正常模型的路径
 
     # Step 1: 创建 D_0, D_inc 和 测试集数据
     train_data_Dinc, train_labels_Dinc, test_data, test_labels = (
-        create_cifar10_npy_files(data_dir, noise_dir)
+        create_cifar10_npy_files(data_dir, noise_data_dir)
     )
 
     # Step 2: 校验生成的npy文件
-    validate_npy_files(noise_dir)
+    validate_npy_files(noise_data_dir)
 
-    # Step 3: 构建增量数据集 D_tr
+    # Step 3: 构建增量数据集 D_tr 并保存
     forget_classes = torch.tensor([1, 3, 5, 7, 9])  # 假设选择这5个类作为遗忘类
     D_tr_data, D_tr_labels = create_incremental_data(
-        train_data_Dinc, train_labels_Dinc, forget_classes
+        train_data_Dinc, train_labels_Dinc, forget_classes, save_dir=noise_data_dir
     )
 
+    # 校验 D_tr 数据集是否正确
+    validate_d_tr(noise_data_dir)
+
     # 使用原始的完整CIFAR-10数据集进行训练（无增量、无噪声）
-    original_train_data = torch.stack(
-        [train_data_Dinc[i] for i in range(len(train_data_Dinc))]
-    )
-    original_train_labels = torch.tensor(
-        [train_labels_Dinc[i] for i in range(len(train_labels_Dinc))]
-    )
+    original_train_data, original_train_labels = train_data_Dinc, train_labels_Dinc
 
     # Step 4: 定义并训练两个模型：一个基于增量数据集，一个基于原始CIFAR-10数据集
     incremental_model = IncrementalLearningModel(num_classes=10)
     original_model = IncrementalLearningModel(num_classes=10)
 
+    # 确保存储模型的目录存在
+    os.makedirs(noise_model_dir, exist_ok=True)
+    os.makedirs(normal_model_dir, exist_ok=True)
+
+    # 设置模型保存路径
+    incremental_model_path = os.path.join(
+        noise_model_dir, "incremental_model-cifar10.pth"
+    )
+    original_model_path = os.path.join(normal_model_dir, "original_model-cifar10.pth")
+
+    # 训练两个模型并保存
     trained_incremental_model, trained_original_model = train_models(
         D_tr_data,
         D_tr_labels,
@@ -342,6 +332,6 @@ if __name__ == "__main__":
         incremental_model,
         original_model,
         device=device,
-        incremental_save_path="incremental_model.pth",
-        original_save_path="original_model.pth",
+        incremental_save_path=incremental_model_path,
+        original_save_path=original_model_path,
     )
