@@ -80,35 +80,60 @@ An incremental training dataset $D_{tr}$ with noise is constructed, and part of 
 ### 数据集构造操作
 
 ```bash
-# under base directory
- $ cd gen_noise/
- $ python gen_cifar10_noise.py
+# 生成对称噪声数据集
+python gen_noise/gen_cifar10_noise.py --noise_type symmetric --noise_ratio 0.2 --num_versions 3 --retention_ratios 0.5 0.3 0.1
+
+# 训练初始模型 Mp0
+python run_experiment.py --step 0 --noise_ratio 0.2 --noise_type symmetric
+
+# 训练增量模型 Mp1
+python run_experiment.py --step 1 --noise_ratio 0.2 --noise_type symmetric
+
+# 训练迭代增量模型 Mp2
+python run_experiment.py --step 2 --noise_ratio 0.2 --noise_type symmetric
 ```
 
-This will generate the following data and model files.
+```bash
+# 生成非对称噪声数据集
+python gen_noise/gen_cifar10_noise.py --noise_type asymmetric --noise_ratio 0.2 --num_versions 3 --retention_ratios 0.5 0.3 0.1
+
+# 训练初始模型 Mp0
+python run_experiment.py --step 0 --noise_ratio 0.2 --noise_type asymmetric
+
+# 训练增量模型 Mp1
+python run_experiment.py --step 1 --noise_ratio 0.2 --noise_type asymmetric
+
+# 训练迭代增量模型 Mp2
+python run_experiment.py --step 2 --noise_ratio 0.2 --noise_type asymmetric
+
+# OR 可以执行模型路径
+python run_experiment.py --step 2 --noise_ratio 0.2 --noise_type asymmetric --load_model ./ckpt/nr_0.2_nt_asymmetric/model_p1.pth
+
+```
+
+**验证训练效果。**
 
 ```bash
 
-$ tree export_dir
-export_dir
-└── cifar-10
-    ├── models
-    │   ├── incremental_model-cifar10.pth # 增量学习模型的训练权重，基于带有噪声的增量数据集 D_tr 训练
-    │   └── original_model-cifar10.pth # 原始CIFAR-10模型的训练权重，基于完整的 CIFAR-10 数据集训练
-    └── noise
-        ├── cifar10_aux_data.npy # Replay 数据集 D_a 的图像数据，包含从 D_0 中抽取的 2500 个样本, 62M
-        ├── cifar10_aux_labels.npy # Replay 数据集 D_a 的标签，包含 2500 个样本的类别标签, 20K
-        ├── cifar10_forget_class_data.npy # 遗忘类的数据，包含从 D_inc 中抽取的 10% 的遗忘类样本, 15M
-        ├── cifar10_forget_class_labels.npy # 遗忘类的标签，包含对应遗忘类数据的类别标签, 12K
-        ├── cifar10_inc_data.npy # 增量数据集 D_tr 的图像数据，包含遗忘类和非遗忘类样本, 805M
-        ├── cifar10_inc_labels.npy # 增量数据集 D_tr 的标签，包含遗忘类和非遗忘类的类别标签, 196K
-        ├── cifar10_noisy_other_class_labels.npy # 经过 20% 标签噪声处理的非遗忘类标签, 52K
-        ├── cifar10_other_class_data.npy # 非遗忘类的数据，包含从 D_inc 中抽取的 50% 非遗忘类样本, 201M
-        ├── cifar10_other_class_labels.npy # 非遗忘类的标签，包含非遗忘类数据的类别标签, 52K
-        ├── cifar10_test_data.npy # 测试集 D_ts 的图像数据，包含 10000 个样本, 246M
-        ├── cifar10_test_labels.npy # 测试集 D_ts 的标签，包含 10000 个类别标签, 80K
-        ├── cifar10_train_data.npy # 训练集 D_0 的图像数据，包含 25000 个样本, 805M
-        └── cifar10_train_labels.npy # 训练集 D_0 的标签，包含 25000 个类别标签, 196K
+python test_model.py \
+    --model_path ./ckpt/nr_0.2_nt_asymmetric/model_p0.pth \
+    --data_dir ./data/cifar-10/noise/nr_0.2_nt_asymmetric \
+    --batch_size 64 \
+    --seed 42
+
+python test_model.py \
+    --model_path ./ckpt/nr_0.2_nt_asymmetric/model_p1.pth \
+    --data_dir ./data/cifar-10/noise/nr_0.2_nt_asymmetric \
+    --batch_size 64 \
+    --seed 42
+
+
+python test_model.py \
+    --model_path ./ckpt/nr_0.2_nt_asymmetric/model_p2.pth \
+    --data_dir ./data/cifar-10/noise/nr_0.2_nt_asymmetric \
+    --batch_size 64 \
+    --seed 42
+
 
 ```
 
