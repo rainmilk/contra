@@ -1,194 +1,96 @@
+import os
+import numpy as np
+import argparse
 import torch
+import torch.nn as nn
+import torch.optim as optim
+import torchvision.models as models
 from torch.utils.data import DataLoader
-from dataset_utils import DatasetUtils
-from model_utils import ModelUtils
-from train_test_utils import TrainTestUtils
-from tqdm import tqdm
 
 
-def run_experiment(
-    dataset_name,
-    model_name,
-    condition,
-    remove_fraction,
-    noise_type,
-    noise_fraction,
-    use_early_stopping,
-    selected_classes_remove=None,  # 设置默认值为 None
-    selected_classes_noise=None,  # 设置默认值为 None
-    batch_size=64,  # 默认batch_size
-    learning_rate=0.001,  # 默认学习率
-    optimizer="adam",
-    momentum=0.9,  # 默认 momentum 值（用于SGD）
-    weight_decay=1e-4,  # 默认 weight decay 值
-    num_epochs=200,  # 默认epoch数量
-    early_stopping_patience=10,  # 早停耐心值
-    early_stopping_accuracy_threshold=0.95,  # 提前停止的准确率阈值
-    pretrained=False,  # 增加pretrained参数
-    **kwargs,  # 捕获额外的参数
-):
-    # 数据集路径和类别数量
-    dataset_paths = {
-        "cifar-10": "./data/cifar-10",
-        "cifar-100": "./data/cifar-100",
-        "flowers-102": "./data/flowers-102",
-        "tiny-imagenet-200": "./data/tiny-imagenet-200",
-    }
+def train_model(model, data, labels, epochs=10, batch_size=32, learning_rate=0.001):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+    model.train()
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-    num_classes_dict = {
-        "cifar-10": 10,
-        "cifar-100": 100,
-        "flowers-102": 102,
-        "tiny-imagenet-200": 200,
-    }
+    dataset = torch.utils.data.TensorDataset(data.to(device), labels.to(device))
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-    # 加载数据集
-    print(f"Loading dataset: {dataset_name}")
-    dataset_utils = DatasetUtils(dataset_name, dataset_paths, num_classes_dict)
+    for epoch in range(epochs):
+        total_loss = 0
+        for inputs, targets in dataloader:
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, targets)
+            loss.backward()
+            optimizer.step()
+            total_loss += loss.item()
 
-    # 显示数据加载进度
-    with tqdm(total=2, desc="Dataset Loading") as pbar:
-        train_dataset, val_dataset, test_dataset = dataset_utils.get_dataset()
-        pbar.update(1)
+        print(f"Epoch [{epoch + 1}/{epochs}], Loss: {total_loss / len(dataloader):.4f}")
 
-        # 处理不同实验条件的 DataLoader
-        if condition == "original_data":
-            train_loader = DataLoader(
-                train_dataset, batch_size=batch_size, shuffle=True, num_workers=2
+    return model
+
+
+def load_model(model_path):
+    model = models.resnet18(num_classes=10)  # 假设为 CIFAR-10 的 10 个类别
+    model.load_state_dict(torch.load(model_path))
+    return model
+
+
+def train_step(step, data_dir):
+    if step == 0:
+        # Step 1: 训练 M_{p0}
+        D_0_data = torch.load(os.path.join(data_dir, "D_0.npy"))
+        D_0_labels = torch.load(os.path.join(data_dir, "D_0_labels.npy"))
+
+        model_p0 = models.resnet18(num_classes=10)
+        model_p0 = train_model(model_p0, D_0_data, D_0_labels, epochs=10)
+        torch.save(model_p0.state_dict(), "model_p0.pth")
+        print("M_{p0} 训练完毕并保存。")
+
+    elif step == 1:
+        # Step 2: 训练 M_{p1}
+        model_p0_loaded = load_model("model_p0.pth")
+
+        D_tr_1_data = torch.tensor(
+            np.load(os.path.join(data_dir, "cifar10_D_tr_data_version_1.npy"))
+        )
+        D_tr_1_labels = torch.tensor(
+            np.load(os.path.join(data_dir, "cifar10_D_tr_labels_version_1.npy"))
+        )
+
+        model_p1 = train_model(model_p0_loaded, D_tr_1_data, D_tr_1_labels, epochs=10)
+        torch.save(model_p1.state_dict(), "model_p1.pth")
+        print("M_{p1} 训练完毕并保存。")
+
+    elif step >= 2:
+        # Step 3: 迭代训练 M_{p_{2-n}}
+        for i in range(2, step + 1):
+            model_r_j = load_model(f"model_p{i-1}.pth")
+            D_tr_i_data = torch.tensor(
+                np.load(os.path.join(data_dir, f"cifar10_D_tr_data_version_{i}.npy"))
             )
-        elif condition == "remove_data":
-            if selected_classes_remove is None:
-                raise ValueError("For 'remove_data', 'selected_classes_remove' must be provided.")
-            # 仅执行删除操作
-            train_dataset_shifted = dataset_utils.remove_fraction_of_selected_classes(
-                train_dataset, selected_classes_remove, remove_fraction=remove_fraction
+            D_tr_i_labels = torch.tensor(
+                np.load(os.path.join(data_dir, f"cifar10_D_tr_labels_version_{i}.npy"))
             )
-            train_loader = DataLoader(
-                train_dataset_shifted,
-                batch_size=batch_size,
-                shuffle=True,
-                num_workers=2,
-            )
-        elif condition == "noisy_data":
-            if selected_classes_noise is None:
-                raise ValueError("For 'noisy_data', 'selected_classes_noise' must be provided.")
-            # 仅执行噪声注入操作
-            train_dataset_shifted = dataset_utils.add_noise_to_selected_classes(
-                train_dataset,
-                selected_classes_noise,
-                noise_type=noise_type,
-                noise_fraction=noise_fraction,
-            )
-            train_loader = DataLoader(
-                train_dataset_shifted,
-                batch_size=batch_size,
-                shuffle=True,
-                num_workers=2,
-            )
-        elif condition == "all_perturbations":
-            # 同时删除样本并注入噪声
-            modified_dataset = dataset_utils.modify_dataset(
-                dataset=train_dataset,
-                selected_classes_remove=selected_classes_remove,
-                selected_classes_noise=selected_classes_noise,
-                remove_fraction=remove_fraction,
-                noise_type=noise_type,
-                noise_fraction=noise_fraction,
-            )
-            train_loader = DataLoader(
-                modified_dataset, batch_size=batch_size, shuffle=True, num_workers=2
-            )
-        else:
-            raise ValueError("Unsupported condition: " + condition)
 
-        pbar.update(1)  # 数据集加载完成
+            model_r_j = train_model(model_r_j, D_tr_i_data, D_tr_i_labels, epochs=10)
+            torch.save(model_r_j.state_dict(), f"model_p{i}.pth")
+            print(f"M_{i} 训练完毕并保存。")
 
-    # 创建模型
-    print(f"Creating model: {model_name}")
-    model_utils = ModelUtils(
-        model_name, num_classes_dict[dataset_name], pretrained=pretrained
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Train ResNet models step by step.")
+    parser.add_argument(
+        "--step",
+        type=int,
+        required=True,
+        help="Specify the step to execute: 0 for M_{p0}, 1 for M_{p1}, or 2+ for M_{p_{2-n}}.",
     )
-    model = model_utils.create_model()
 
-    # 选择优化器类型并设置相应的参数
-    if optimizer == "sgd":
-        criterion, optimizer = model_utils.get_criterion_and_optimizer(
-            model,
-            learning_rate=learning_rate,
-            optimizer="sgd",
-            momentum=momentum,  # 使用传递的 momentum 参数
-            weight_decay=weight_decay,  # 使用传递的 weight decay 参数
-        )
-    elif optimizer == "adam":
-        criterion, optimizer = model_utils.get_criterion_and_optimizer(
-            model,
-            learning_rate=learning_rate,
-            optimizer="adam",
-            weight_decay=weight_decay,  # 即使在 Adam 中也可以使用 weight decay
-        )
-    else:
-        raise ValueError(f"Unsupported optimizer: {optimizer}")
+    args = parser.parse_args()
+    data_dir = "./data/cifar-10/noise"
 
-    # 训练和测试工具
-    train_test_utils = TrainTestUtils(model_name, dataset_name)
-    save_path = train_test_utils.create_save_path(condition)
-
-    best_accuracy = 0
-    patience_counter = 0
-
-    alpha, beta = kwargs.get("alpha", 1), kwargs.get("beta", 0.1)
-
-    # 训练模型并显示进度
-    print(f"Training model on {dataset_name} with condition: {condition}")
-    
-    for epoch in tqdm(range(num_epochs), desc="Training Progress"):
-        train_test_utils.train_and_save(
-            model,
-            train_loader,
-            criterion,
-            optimizer,
-            save_path,
-            epoch=epoch,
-            num_epochs=num_epochs,
-            save_final_model_only=True,
-            alpha=alpha,  # 传递 alpha 参数
-            beta=beta,  # 传递 beta 参数
-        )
-
-        # 在验证集上评估模型性能
-        val_loader = DataLoader(
-            val_dataset, batch_size=batch_size, shuffle=False, num_workers=2
-        )
-        accuracy = train_test_utils.test(model, val_loader, condition)
-
-        # 如果使用了 early stopping
-        if use_early_stopping:
-            # 检查是否达到了早停的条件
-            if accuracy >= early_stopping_accuracy_threshold:
-                print(
-                    f"Accuracy {accuracy*100:.2f}% reached threshold. Stopping early."
-                )
-                break
-
-            # 检查性能是否下降
-            if accuracy < best_accuracy:
-                patience_counter += 1  # 如果性能下降，计数器加 1
-                print(
-                    f"Performance dropped. Patience counter: {patience_counter}/{early_stopping_patience}"
-                )
-            elif accuracy > best_accuracy:
-                # 如果准确率提高，更新 best_accuracy 并重置 patience_counter
-                best_accuracy = accuracy
-                patience_counter = 0
-            else:
-                # 性能持平时也重置计数器（持平不算下降）
-                patience_counter = 0
-
-            # 如果连续下降次数达到 early stopping 条件，则提前停止训练
-            if patience_counter >= early_stopping_patience:
-                print(
-                    f"Performance dropped for {early_stopping_patience} consecutive epochs. Stopping early."
-                )
-                break
-        else:
-            print(f"Epoch [{epoch + 1}/{num_epochs}] completed without early stopping.")
+    train_step(args.step, data_dir)

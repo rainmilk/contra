@@ -49,18 +49,18 @@ class ModelUtils:
         """
         if self.model_name == "resnet18":
             # 修改最后一层，适应 num_classes
-            # model = models.resnet18(pretrained=self.pretrained)
-            model = models.resnet18(weights="IMAGENET1K_V1")
-            model.avgpool = nn.AdaptiveAvgPool2d((1))
-            model.fc = nn.Linear(model.fc.in_features, self.num_classes)
+            model = models.resnet18(pretrained=False, num_classes=self.num_classes)
+            # model = models.resnet18(weights="IMAGENET1K_V1")
+            # model.avgpool = nn.AdaptiveAvgPool2d((1))
+            # model.fc = nn.Linear(model.fc.in_features, self.num_classes)
 
         elif self.model_name == "vgg16":
             # 加载预训练模型，但不传递 num_classes 参数
-            model = models.vgg16(pretrained=self.pretrained)
+            model = models.vgg16(pretrained=self.pretrained, num_classes=self.num_classes)
             # 修改 VGG16 的最后一层，使其适应 num_classes
-            model.classifier[6] = nn.Linear(
-                model.classifier[6].in_features, self.num_classes
-            )
+            # model.classifier[6] = nn.Linear(
+            #     model.classifier[6].in_features, self.num_classes
+            # )
 
         else:
             raise ValueError(f"Unsupported model: {self.model_name}")
