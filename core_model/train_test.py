@@ -12,18 +12,17 @@ def model_train(
     criterion,
     alpha,
     args,
+    device="cuda",
     save_path="",
 ):
     # todo opt 重置
     # 训练模型并显示进度
     print(f"Training model on {args.dataset}")
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device)  # 确保模型移动到正确的设备
+    model.train()
 
     for epoch in tqdm(range(args.num_epochs), desc="Training Progress"):
-        model.train()
-
         running_loss = 0.0
         correct = 0
         total = 0
@@ -60,6 +59,7 @@ def model_train(
 
         # 仅在最后一次保存模型，避免每个 epoch 都保存
         if epoch == args.num_epochs - 1:
+            os.makedirs(save_path, exist_ok=True)
             torch.save(
                 model.state_dict(),
                 os.path.join(save_path, f"{args.model}_{args.dataset}_final.pth"),
@@ -69,14 +69,14 @@ def model_train(
             )
 
 
-def model_test(dataset, data_loader, model, teacher_model=False):
+def model_test(dataset, data_loader, model, device='cuda', teacher_model=False):
     eval_results = {}
     data, labels = dataset.data, dataset.label
 
     if teacher_model:
-        embeds, predicts = teacher_model_forward(data_loader, model)
+        predicts, probs, embeds = teacher_model_forward(data_loader, model, device)
     else:
-        probs, predicts = working_model_forward(data_loader, model)
+        predicts, probs = working_model_forward(data_loader, model, device)
 
     # global acc
     global_acc = np.mean(predicts == labels)
@@ -94,15 +94,13 @@ def model_test(dataset, data_loader, model, teacher_model=False):
     return eval_results
 
 
-def working_model_forward(data_loader, model):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+def working_model_forward(data_loader, model, device='cuda'):
     model = model.to(device)
-
     model.eval()
+
     output_probs, output_predicts = [], []
 
     for i, (image, target) in enumerate(data_loader):
-        # image = image.cuda()
         image = image.to(device)
         logics = model(image)
 
@@ -113,25 +111,27 @@ def working_model_forward(data_loader, model):
         predicts = np.argmax(probs, axis=1)
         output_predicts.append(predicts)
 
-    return np.concatenate(output_probs, axis=0), np.concatenate(output_predicts, axis=0)
+    return np.concatenate(output_predicts, axis=0), np.concatenate(output_probs, axis=0)
 
 
-def teacher_model_forward(model, test_loader):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+def teacher_model_forward(test_loader, model, device='cuda'):
     model = model.to(device)
-
     model.eval()
-    embed_outs, outputs = [], []
+
+    embed_outs, output_probs, output_predicts = [], [], []
 
     for i, (image, target) in enumerate(test_loader):
-        # image = image.cuda()
         image = image.to(device)  # 数据移动到设备
 
-        embed_out, output = model(image)  # embedding out [batch, 512]
+        embed_out, logics = model(image)  # embedding out [batch, 512]
 
         embed_outs.append(embed_out.data.cpu().numpy())
-        output = output.data.cpu().numpy()
-        output = np.argmax(output, axis=1)
-        outputs.append(output)
 
-    return np.concatenate(embed_outs, axis=0), np.concatenate(outputs, axis=0)
+        probs = nn.functional.softmax(logics, dim=-1)
+        probs = probs.data.cpu().numpy()
+        output_probs.append(probs)
+
+        predicts = np.argmax(probs, axis=1)
+        output_predicts.append(predicts)
+
+    return np.concatenate(output_predicts, axis=0), np.concatenate(output_probs, axis=0), np.concatenate(embed_outs, axis=0)
