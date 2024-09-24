@@ -29,20 +29,14 @@ class CustomDataset(Dataset):
 
 
 def get_dataset_loader(
-    loader_name, data_dir, batch_size, drop_last=False, shuffle=False
+    dataset_name, loader_name, data_dir, batch_size, num_classes=0, drop_last=False, shuffle=False
 ):
     """
     根据 loader_name 加载相应的数据集：支持增量训练 (inc)、辅助数据 (aux) 和测试数据 (test)。
     """
-    # todo 待确定路径以及文件名称
-    data_name, label_name = "", ""
-
-    if loader_name == "inc":
-        data_name, label_name = "cifar10_inc_data.npy", "cifar10_inc_labels.npy"
-    elif loader_name == "aux":
-        data_name, label_name = "cifar10_aux_data.npy", "cifar10_aux_labels.npy"
-    elif loader_name == "test":
-        data_name, label_name = "cifar10_test_data.npy", "cifar10_test_labels.npy"
+    if loader_name in ['inc', 'aux', 'test', 'train']:
+        data_name = "%s_%s_data.npy" % (dataset_name, loader_name)
+        label_name = "%s_%s_labels.npy" % (dataset_name, loader_name)
     else:
         raise ValueError(
             f"Invalid loader_name {loader_name}. Choose from 'inc', 'aux', or 'test'."
@@ -57,6 +51,8 @@ def get_dataset_loader(
 
     data = np.load(data_path)
     label = np.load(label_path)
+    if loader_name == 'train':  # train label change to onehot for teacher model
+        label = np.eye(num_classes)[label]
 
     # 构建自定义数据集
     dataset = CustomDataset(data, label)
