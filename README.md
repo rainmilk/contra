@@ -17,14 +17,15 @@ TODO 5. input image: 10 images，5 rows 10 cols
 TODO 6. recall-precision figures, line plot
 TODO 7. www 完成 method.
 
-1. 院士
+1. 胡院
    1. 1-2，调通
    2. 3-6, baseline
    3. 同步记录 ablation study 的结果。
-2. 1-6, dataset / base model
-   1. 3 种噪声, sy, asy, pair-flipping。
-   2. 至少 3 个数据集, CIFAR-10 CIFAR-100 TINY-200。（Animal-10 备选）从 pytorch 内置。
-   3. 1 个模型。
+2. AILab：1-6, dataset / base model
+   1. 实现 2 种噪声, sy, asy
+   2. 至少 3 个数据集, CIFAR-10 CIFAR-100 TINY-200。
+   3. （Animal-10 备选）从 pytorch 内置。
+   4. 1 个模型 resnet 。
 3. 国庆期间，所有结果 ready。
 4. 分析代码和论文的图表可以在国庆期间同步实现。
 5. 国庆期间 abstract ddl 。
@@ -32,23 +33,6 @@ TODO 7. www 完成 method.
 7. 国庆后第一周，full paper 修改完成。
 
 For later experiment, we should firstly prepare the datasets and models. The logic of generating dataset is as follows:
-
-[ $D_{train}$ ]  
-&nbsp;&nbsp;&nbsp;&nbsp;|  
-&nbsp;&nbsp;&nbsp;&nbsp;+-- Split into $D_0$, $D_{inc}$
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-- $D_0$ --> Initial training of base model (25000 samples)  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-- Sample $D_a$ from $D_0$ (10% of $D_0$, 2500 samples)  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  
-&nbsp;&nbsp;&nbsp;&nbsp;+-- $D_{inc}$ --> Construct $D_{tr}$ (Incremental training data)  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-- Forgetting classes: Sample 10% per class  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-- Non-forgetting classes: Sample 50% per class  
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-- Add noise to 20% of non-forgetting samples  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-- Train $M_p$ on $D_{tr}$  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-- $M_p(D_{tr})$  
-[ $D_{test}$ ] (10000 samples)  
 
 ### 数据集构造逻辑
 
@@ -127,13 +111,11 @@ python test_model.py \
     --batch_size 64 \
     --seed 42
 
-
 python test_model.py \
     --model_path ./ckpt/nr_0.2_nt_asymmetric/model_p2.pth \
     --data_dir ./data/cifar-10/noise/nr_0.2_nt_asymmetric \
     --batch_size 64 \
     --seed 42
-
 
 ```
 
@@ -182,7 +164,7 @@ conda activate tta-mr
 pip install -r requirements.txt
 ```
 
-## Forgetting Class
+## Forget Class
 
 ### Usage
 
@@ -245,7 +227,7 @@ optional arguments:
 python main.py --dataset cifar-10 --model resnet18 --condition remove_data --classes_remove 0 1 2 3 4
 ```
 
-## Add Noises on Classes
+## Add Noise
 
 ### Supported Noise Label types
 
@@ -261,99 +243,9 @@ Explanations of the above types:
 
 **Pairwise noise** is when the probability of a label being flipped is different for each pair of classes.
 
-### Add noises on classes of CIFAR-X Datasets
+### Usage
 
-#### Usage
-
-```bash
-$ python Train_cifar.py --help
-
-usage: Train_cifar.py [-h] [--batch_size BATCH_SIZE] [--lr LR] [--noise_mode NOISE_MODE] [--alpha ALPHA] [--lambda_u LAMBDA_U] [--lambda_c LAMBDA_C] [--T T] [--num_epochs NUM_EPOCHS]
-                      [--r R] [--d_u D_U] [--tau TAU] [--metric METRIC] [--seed SEED] [--gpuid GPUID] [--resume RESUME] [--num_class NUM_CLASS] [--data_path DATA_PATH]
-                      [--dataset DATASET]
-
-PyTorch CIFAR Training
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --batch_size BATCH_SIZE
-                        train batchsize
-  --lr LR, --learning_rate LR
-                        initial learning rate
-  --noise_mode NOISE_MODE
-  --alpha ALPHA         parameter for Beta
-  --lambda_u LAMBDA_U   weight for unsupervised loss
-  --lambda_c LAMBDA_C   weight for contrastive loss
-  --T T                 sharpening temperature
-  --num_epochs NUM_EPOCHS
-  --r R                 noise ratio
-  --d_u D_U
-  --tau TAU             filtering coefficient
-  --metric METRIC       Comparison Metric
-  --seed SEED
-  --gpuid GPUID
-  --resume RESUME       Resume from the warmup checkpoint
-  --num_class NUM_CLASS
-  --data_path DATA_PATH
-                        path to dataset
-  --dataset DATASET
-```
-
-#### Example run (CIFAR10 with 50% symmetric noise) 
-
-```bash
-python Train_cifar.py --dataset cifar-10 --num_class 10 --data_path ./data/cifar10 --noise_mode 'sym' --r 0.5 
-```
-
-#### Example run (CIFAR100 with 90% symmetric noise)
-
-```bash
-python Train_cifar.py --dataset cifar-100 --num_class 100 --data_path ./data/cifar100 --noise_mode 'sym' --r 0.9 
-```
-
-This will throw an error as downloaded files will not be in the proper folder. That is why they must be manually moved to the "data_path".
-
-### TODO Add noises on classes of TinyImageNet Dataset
-
-#### Usage
-
-```bash
-python Train_TinyImageNet.py --ratio 0.5
-```
-
-#### Example Run (TinyImageNet with 50% symmetric noise)
-
-```bash
-# todo
-```
-
-### TODO Add noises on classes of MiniWebVision dataset
-
-#### Usage
-
-```bash
-$ python Train_webvision.py --help
-```
-
-#### Example Run (MiniWebVision with 50% symmetric noise)
-
-```bash
-# todo
-```
-
-### TODO Add noises on classes of Clothing1M Dataset
-
-#### Usage
-
-```bash
-$ python Train_clothing1M.py --help
-```
-
-#### Example Run (Clothing1M with 50% symmetric noise)
-
-```bash
-# todo
-```
+### Example Run
 
 ## Acknowledgements
 

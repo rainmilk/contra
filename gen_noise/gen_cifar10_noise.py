@@ -253,9 +253,7 @@ def main():
     D_inc_versions = []
     for t in range(args.num_versions):
         D_inc_data = torch.load(os.path.join(subdir, f"D_inc_{t+1}.npy"))
-        D_inc_labels = torch.load(
-            os.path.join(subdir, f"D_inc_labels_{t+1}.npy")
-        )
+        D_inc_labels = torch.load(os.path.join(subdir, f"D_inc_labels_{t+1}.npy"))
         D_inc_versions.append((D_inc_data, D_inc_labels))
 
     create_incremental_data_versions(
