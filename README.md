@@ -65,7 +65,7 @@ An incremental training dataset $D_{tr}$ with noise is constructed, and part of 
 
 ```bash
 # 生成对称噪声数据集
-python gen_noise/gen_cifar10_noise.py --noise_type symmetric --noise_ratio 0.2 --num_versions 3 --retention_ratios 0.5 0.3 0.1
+python gen_dataset/gen_cifar10_exp_data.py --noise_type symmetric --noise_ratio 0.2 --num_versions 3 --retention_ratios 0.5 0.3 0.1
 
 # 训练初始模型 Mp0
 python run_experiment.py --step 0 --noise_ratio 0.2 --noise_type symmetric
@@ -79,7 +79,7 @@ python run_experiment.py --step 2 --noise_ratio 0.2 --noise_type symmetric
 
 ```bash
 # 生成非对称噪声数据集
-python gen_noise/gen_cifar10_noise.py --noise_type asymmetric --noise_ratio 0.2 --num_versions 3 --retention_ratios 0.5 0.3 0.1
+python gen_dataset/gen_cifar10_exp_data.py --noise_type asymmetric --noise_ratio 0.2 --num_versions 3 --retention_ratios 0.5 0.3 0.1
 
 # 训练初始模型 Mp0
 python run_experiment.py --step 0 --noise_ratio 0.2 --noise_type asymmetric
@@ -101,19 +101,19 @@ python run_experiment.py --step 2 --noise_ratio 0.2 --noise_type asymmetric --lo
 
 python test_model.py \
     --model_path ./ckpt/nr_0.2_nt_asymmetric/model_p0.pth \
-    --data_dir ./data/cifar-10/noise/nr_0.2_nt_asymmetric \
+    --data_dir ./data/cifar-10/gen/nr_0.2_nt_asymmetric \
     --batch_size 64 \
     --seed 42
 
 python test_model.py \
     --model_path ./ckpt/nr_0.2_nt_asymmetric/model_p1.pth \
-    --data_dir ./data/cifar-10/noise/nr_0.2_nt_asymmetric \
+    --data_dir ./data/cifar-10/gen/nr_0.2_nt_asymmetric \
     --batch_size 64 \
     --seed 42
 
 python test_model.py \
     --model_path ./ckpt/nr_0.2_nt_asymmetric/model_p2.pth \
-    --data_dir ./data/cifar-10/noise/nr_0.2_nt_asymmetric \
+    --data_dir ./data/cifar-10/gen/nr_0.2_nt_asymmetric \
     --batch_size 64 \
     --seed 42
 
