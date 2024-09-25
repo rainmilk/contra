@@ -42,11 +42,11 @@ def add_noise_labels(labels, noise_type="symmetric", noise_ratio=0.2, num_classe
 
 def create_cifar100_npy_files(
     data_dir,
-    noise_dir,
+    gen_dir,
+    noise_type="symmetric",
     noise_ratio=0.2,
     num_versions=3,
     retention_ratios=[0.5, 0.3, 0.1],
-    noise_type="symmetric",
 ):
     transform = transforms.Compose([transforms.ToTensor()])
 
@@ -151,7 +151,7 @@ def create_cifar100_npy_files(
 
         D_inc_versions.append((D_inc_data, D_inc_labels))
 
-    subdir = os.path.join(noise_dir, f"nr_{noise_ratio}_nt_{noise_type}")
+    subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}")
     os.makedirs(subdir, exist_ok=True)
 
     torch.save(D_0_data, os.path.join(subdir, "D_0.npy"))
@@ -184,12 +184,12 @@ def create_incremental_data_versions(
 
         if save_dir:
             np.save(
-                os.path.join(save_dir, f"cifar100_D_tr_data_version_{version_num}.npy"),
+                os.path.join(save_dir, f"cifar-100_D_tr_data_version_{version_num}.npy"),
                 D_tr_data.numpy(),
             )
             np.save(
                 os.path.join(
-                    save_dir, f"cifar100_D_tr_labels_version_{version_num}.npy"
+                    save_dir, f"cifar-100_D_tr_labels_version_{version_num}.npy"
                 ),
                 D_tr_labels.numpy(),
             )
@@ -206,11 +206,14 @@ def main():
     parser.add_argument(
         "--data_dir",
         type=str,
-        default="./data/cifar-100",
+        default="./data/cifar-100/normal",
         help="原始CIFAR-100数据集的目录",
     )
     parser.add_argument(
-        "--noise_dir", type=str, default=None, help="噪声数据集的保存目录"
+        "--gen_dir",
+        type=str,
+        default="./data/cifar-100/gen",
+        help="生成数据集的保存目录",
     )
     parser.add_argument(
         "--noise_ratio", type=float, default=0.2, help="增量数据集中的噪声比例"
@@ -235,19 +238,20 @@ def main():
 
     args = parser.parse_args()
 
-    if args.noise_dir is None:
-        args.noise_dir = os.path.join(args.data_dir, "noise")
+    if args.gen_dir is None:
+        base_data_dir = os.path.join(os.path.dirname(__file__), "../data/cifar-100")
+        args.gen_dir = os.path.join(base_data_dir, "noise")
 
     create_cifar100_npy_files(
         data_dir=args.data_dir,
-        noise_dir=args.noise_dir,
+        gen_dir=args.gen_dir,
+        noise_type=args.noise_type,
         noise_ratio=args.noise_ratio,
         num_versions=args.num_versions,
         retention_ratios=args.retention_ratios,
-        noise_type=args.noise_type,
     )
 
-    subdir = os.path.join(args.noise_dir, f"nr_{args.noise_ratio}_nt_{args.noise_type}")
+    subdir = os.path.join(args.gen_dir, f"nr_{args.noise_ratio}_nt_{args.noise_type}")
     print("subdir:", subdir)
     D_a_data = torch.load(os.path.join(subdir, "D_a.npy"))
     D_a_labels = torch.load(os.path.join(subdir, "D_a_labels.npy"))

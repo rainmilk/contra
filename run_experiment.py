@@ -192,10 +192,10 @@ def main():
         help="标签噪声类型，与生成数据时使用的参数相匹配。",
     )
     parser.add_argument(
-        "--noise_dir",
+        "--gen_dir",
         type=str,
         default="./data",
-        help="噪声数据集的根目录。",
+        help="生成数据集的根目录。",
     )
     parser.add_argument(
         "--output_dir",
@@ -214,7 +214,7 @@ def main():
 
     # 构建数据子目录路径
     subdir = os.path.join(
-        args.noise_dir, args.dataset_type, "noise", f"nr_{args.noise_ratio}_nt_{args.noise_type}"
+        args.gen_dir, args.dataset_type, "gen", f"nr_{args.noise_ratio}_nt_{args.noise_type}"
     )
 
     if not os.path.exists(subdir):
