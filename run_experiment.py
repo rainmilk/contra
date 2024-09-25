@@ -44,39 +44,50 @@ def train_model(model, data, labels, epochs=10, batch_size=32, learning_rate=0.0
     return model
 
 
-def load_model(model_path):
+def load_model(model_path, num_classes):
     """
     加载训练好的模型
     :param model_path: 模型文件路径
+    :param num_classes: 分类类别数
     :return: 加载的模型
     """
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"模型文件 {model_path} 未找到。")
 
-    model = models.resnet18(num_classes=10)  # CIFAR-10 有 10 个类别
+    model = models.resnet18(num_classes=num_classes)  # 根据类别数加载模型
     model.load_state_dict(torch.load(model_path))
     return model
 
 
-def train_step(step, subdir, ckpt_subdir, output_dir="ckpt", load_model_path=None):
+def train_step(
+    step,
+    subdir,
+    ckpt_subdir,
+    output_dir="ckpt",
+    dataset_type="cifar10",
+    load_model_path=None,
+):
     """
     根据步骤训练模型
     :param step: 要执行的步骤（0, 1, 2, ...）
     :param subdir: 数据子目录路径
     :param ckpt_subdir: 模型检查点子目录路径
     :param output_dir: 模型保存目录
+    :param dataset_type: 使用的数据集类型（cifar10 或 cifar100）
     :param load_model_path: 指定加载的模型路径（可选）
     """
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(ckpt_subdir, exist_ok=True)
+
+    num_classes = 10 if dataset_type == "cifar10" else 100  # 根据数据集类型设置类别数
 
     if step == 0:
         # Step 1: 训练 M_p0
         D_0_data = torch.load(os.path.join(subdir, "D_0.npy"))
         D_0_labels = torch.load(os.path.join(subdir, "D_0_labels.npy"))
 
-        model_p0 = models.resnet18(num_classes=10)
-        print("开始训练 M_p0...")
+        model_p0 = models.resnet18(num_classes=num_classes)
+        print(f"开始训练 M_p0 ({dataset_type})...")
         model_p0 = train_model(model_p0, D_0_data, D_0_labels, epochs=10)
         model_p0_path = os.path.join(ckpt_subdir, "model_p0.pth")
         torch.save(model_p0.state_dict(), model_p0_path)
@@ -85,7 +96,7 @@ def train_step(step, subdir, ckpt_subdir, output_dir="ckpt", load_model_path=Non
     elif step == 1:
         # Step 2: 训练 M_p1
         if load_model_path:
-            model_p0_loaded = load_model(load_model_path)
+            model_p0_loaded = load_model(load_model_path, num_classes)
             print(f"加载指定模型: {load_model_path}")
         else:
             model_p0_path = os.path.join(ckpt_subdir, "model_p0.pth")
@@ -93,19 +104,19 @@ def train_step(step, subdir, ckpt_subdir, output_dir="ckpt", load_model_path=Non
                 raise FileNotFoundError(
                     f"模型文件 {model_p0_path} 未找到。请先训练 M_p0 (step=0)。"
                 )
-            model_p0_loaded = load_model(model_p0_path)
+            model_p0_loaded = load_model(model_p0_path, num_classes)
             print(f"加载模型: {model_p0_path}")
 
         D_tr_1_data = torch.tensor(
-            np.load(os.path.join(subdir, "cifar10_D_tr_data_version_1.npy"))
+            np.load(os.path.join(subdir, f"{dataset_type}_D_tr_data_version_1.npy"))
         )
         D_tr_1_labels = torch.tensor(
-            np.load(os.path.join(subdir, "cifar10_D_tr_labels_version_1.npy"))
+            np.load(os.path.join(subdir, f"{dataset_type}_D_tr_labels_version_1.npy"))
         )
 
-        model_p1 = models.resnet18(num_classes=10)
+        model_p1 = models.resnet18(num_classes=num_classes)
         model_p1.load_state_dict(model_p0_loaded.state_dict())
-        print("开始训练 M_p1...")
+        print(f"开始训练 M_p1 ({dataset_type})...")
         model_p1 = train_model(model_p1, D_tr_1_data, D_tr_1_labels, epochs=10)
         model_p1_path = os.path.join(ckpt_subdir, "model_p1.pth")
         torch.save(model_p1.state_dict(), model_p1_path)
@@ -116,7 +127,7 @@ def train_step(step, subdir, ckpt_subdir, output_dir="ckpt", load_model_path=Non
         for i in range(2, step + 1):
             if load_model_path and i == step:
                 # 仅在当前步指定加载模型
-                model_prev = load_model(load_model_path)
+                model_prev = load_model(load_model_path, num_classes)
                 print(f"加载指定模型: {load_model_path}")
             else:
                 prev_model_path = os.path.join(ckpt_subdir, f"model_p{i-1}.pth")
@@ -124,19 +135,23 @@ def train_step(step, subdir, ckpt_subdir, output_dir="ckpt", load_model_path=Non
                     raise FileNotFoundError(
                         f"模型文件 {prev_model_path} 未找到。请先训练 M_p{i-1}。"
                     )
-                model_prev = load_model(prev_model_path)
+                model_prev = load_model(prev_model_path, num_classes)
                 print(f"加载模型: {prev_model_path}")
 
             D_tr_i_data = torch.tensor(
-                np.load(os.path.join(subdir, f"cifar10_D_tr_data_version_{i}.npy"))
+                np.load(
+                    os.path.join(subdir, f"{dataset_type}_D_tr_data_version_{i}.npy")
+                )
             )
             D_tr_i_labels = torch.tensor(
-                np.load(os.path.join(subdir, f"cifar10_D_tr_labels_version_{i}.npy"))
+                np.load(
+                    os.path.join(subdir, f"{dataset_type}_D_tr_labels_version_{i}.npy")
+                )
             )
 
-            model_current = models.resnet18(num_classes=10)
+            model_current = models.resnet18(num_classes=num_classes)
             model_current.load_state_dict(model_prev.state_dict())
-            print(f"开始训练 M_p{i}...")
+            print(f"开始训练 M_p{i} ({dataset_type})...")
             model_current = train_model(
                 model_current, D_tr_i_data, D_tr_i_labels, epochs=10
             )
@@ -157,6 +172,13 @@ def main():
         help="Specify the step to execute: 0 for M_p0, 1 for M_p1, or 2+ for M_p2, M_p3, etc.",
     )
     parser.add_argument(
+        "--dataset_type",
+        type=str,
+        choices=["cifar-10", "cifar-100"],
+        required=True,
+        help="选择数据集类型 (cifar10 或 cifar100)",
+    )
+    parser.add_argument(
         "--noise_ratio",
         type=float,
         default=0.2,
@@ -172,7 +194,7 @@ def main():
     parser.add_argument(
         "--noise_dir",
         type=str,
-        default="./data/cifar-10/noise",
+        default="./data",
         help="噪声数据集的根目录。",
     )
     parser.add_argument(
@@ -191,7 +213,9 @@ def main():
     args = parser.parse_args()
 
     # 构建数据子目录路径
-    subdir = os.path.join(args.noise_dir, f"nr_{args.noise_ratio}_nt_{args.noise_type}")
+    subdir = os.path.join(
+        args.noise_dir, args.dataset_type, "noise", f"nr_{args.noise_ratio}_nt_{args.noise_type}"
+    )
 
     if not os.path.exists(subdir):
         raise FileNotFoundError(
@@ -200,7 +224,9 @@ def main():
 
     # 构建模型检查点子目录路径
     ckpt_subdir = os.path.join(
-        args.output_dir, f"nr_{args.noise_ratio}_nt_{args.noise_type}"
+        args.output_dir,
+        args.dataset_type,
+        f"nr_{args.noise_ratio}_nt_{args.noise_type}",
     )
 
     print(f"使用数据子目录: {subdir}")
@@ -211,6 +237,7 @@ def main():
         subdir,
         ckpt_subdir,
         output_dir=ckpt_subdir,
+        dataset_type=args.dataset_type,
         load_model_path=args.load_model,
     )
 
