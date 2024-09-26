@@ -41,13 +41,11 @@ For later experiment, we should firstly prepare the datasets and models. The log
 python gen_dataset/gen_cifar10_exp_data.py --data_dir ./data/cifar-10/normal --gen_dir ./data/cifar-10/gen/ --noise_type symmetric --noise_ratio 0.2 --num_versions 3 --retention_ratios 0.5 0.3 0.1
 
 # 训练初始模型 Mp0
-python run_experiment.py --step 0 --noise_ratio 0.2 --noise_type symmetric
-
+CUDA_VISIBLE_DEVICES=1 python run_experiment.py --step 0 --dataset_type cifar-10 --epochs 100 --batch_size 32 --learning_rate 0.001
 # 训练增量模型 Mp1
-python run_experiment.py --step 1 --noise_ratio 0.2 --noise_type symmetric
-
+CUDA_VISIBLE_DEVICES=2 python run_experiment.py --step 1 --dataset_type cifar-10 --epochs 100 --batch_size 32 --learning_rate 0.001
 # 训练迭代增量模型 Mp2
-python run_experiment.py --step 2 --noise_ratio 0.2 --noise_type symmetric
+CUDA_VISIBLE_DEVICES=3 python run_experiment.py --step 2 --dataset_type cifar-10 --epochs 100 --batch_size 32 --learning_rate 0.001
 ```
 
 ```bash
@@ -55,16 +53,14 @@ python run_experiment.py --step 2 --noise_ratio 0.2 --noise_type symmetric
 python gen_dataset/gen_cifar10_exp_data.py --data_dir ./data/cifar-10/normal --gen_dir ./data/cifar-10/gen/ --noise_type asymmetric --noise_ratio 0.2 --num_versions 3 --retention_ratios 0.5 0.3 0.1
 
 # 训练初始模型 Mp0
-python run_experiment.py --step 0 --noise_ratio 0.2 --noise_type asymmetric
-
+CUDA_VISIBLE_DEVICES=1 python run_experiment.py --step 0 --dataset_type cifar-10 --epochs 100 --batch_size 32 --learning_rate 0.001
 # 训练增量模型 Mp1
-python run_experiment.py --step 1 --noise_ratio 0.2 --noise_type asymmetric
-
+CUDA_VISIBLE_DEVICES=2 python run_experiment.py --step 1 --dataset_type cifar-10 --epochs 100 --batch_size 32 --learning_rate 0.001
 # 训练迭代增量模型 Mp2
-python run_experiment.py --step 2 --noise_ratio 0.2 --noise_type asymmetric
+CUDA_VISIBLE_DEVICES=3 python run_experiment.py --step 2 --dataset_type cifar-10 --epochs 100 --batch_size 32 --learning_rate 0.001
 
-# OR 可以执行模型路径
-python run_experiment.py --step 2 --noise_ratio 0.2 --noise_type asymmetric --load_model ./ckpt/nr_0.2_nt_asymmetric/model_p1.pth
+# 如果 step >2 ，可以指定外部模型，基于它继续训练
+python run_experiment.py --step 3 --noise_ratio 0.2 --noise_type asymmetric --load_model ./ckpt/nr_0.2_nt_asymmetric/model_p_step{n}.pth
 
 ```
 

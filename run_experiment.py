@@ -125,7 +125,7 @@ def train_step(
     D_test_data = torch.load(os.path.join(subdir, "test_data.npy"))
     D_test_labels = torch.load(os.path.join(subdir, "test_labels.npy"))
 
-    if step == 0:
+    if step == 0:  # 基于$D_0$数据集和原始的resnet网络训练一个模型 M_p0
         model_p0 = models.resnet18(num_classes=num_classes)
         print(f"开始训练 M_p0 ({dataset_type})...")
         D_train_data = torch.load(os.path.join(subdir, f"D_0.npy"))
@@ -143,12 +143,15 @@ def train_step(
         model_p0_path = os.path.join(ckpt_subdir, "model_p0.pth")
         torch.save(model_p0.state_dict(), model_p0_path)
         print(f"M_p0 训练完毕并保存至 {model_p0_path}")
-
-    elif step == 1:
-        if load_model_path:
+    elif (
+        step == 1
+    ):  # load上一步训练好的M_p0模型，然后基于 D_tr_data_version_1 和 D_tr_labels_version_1 进行训练，得到M_p1
+        if load_model_path:  # 只能是 M_p0 模型
+            if "model_p0" not in load_model_path:
+                raise ValueError("加载的模型必须是 M_p0 模型。")
             model_p0_loaded = load_model(load_model_path, num_classes)
             print(f"加载指定模型: {load_model_path}")
-        else:
+        else:  # 只能是 M_p0 模型
             model_p0_path = os.path.join(ckpt_subdir, "model_p0.pth")
             model_p0_loaded = load_model(model_p0_path, num_classes)
             print(f"加载模型: {model_p0_path}")
@@ -157,7 +160,6 @@ def train_step(
         D_train_labels = torch.load(
             os.path.join(subdir, f"D_tr_labels_version_{step}.npy")
         )
-
         model_p1 = models.resnet18(num_classes=num_classes)
         model_p1.load_state_dict(model_p0_loaded.state_dict())
         print(f"开始训练 M_p1 ({dataset_type})...")
@@ -174,9 +176,44 @@ def train_step(
         model_p1_path = os.path.join(ckpt_subdir, "model_p1.pth")
         torch.save(model_p1.state_dict(), model_p1_path)
         print(f"M_p1 训练完毕并保存至 {model_p1_path}")
+    else:  # 从外部加载通过命令行指定的某个模型
+        if load_model_path:
+            model_prev = load_model(load_model_path, num_classes)
+            print(f"加载指定模型: {load_model_path}")
+        else:  # 如果 step>=2 且用户通过命令行没有提供外部模型，则加载前一个模型
+            prev_model_path = os.path.join(ckpt_subdir, f"model_p{step-1}.pth")
+            if not os.path.exists(prev_model_path):
+                raise FileNotFoundError(
+                    f"模型文件 {prev_model_path} 未找到。请先训练 M_p{step-1}。"
+                )
+            model_prev = load_model(prev_model_path, num_classes)
+            print(f"加载模型: {prev_model_path}")
 
-    else:
-        raise ValueError("无效的步骤参数。请选择 step >= 0。")
+        # 加载当前步骤的训练数据
+        D_train_data = torch.tensor(
+            np.load(os.path.join(subdir, f"D_tr_data_version_{step}.npy"))
+        )
+        D_train_labels = torch.tensor(
+            np.load(os.path.join(subdir, f"D_tr_labels_version_{step}.npy"))
+        )
+
+        # 训练当前模型
+        model_current = models.resnet18(num_classes=num_classes)
+        model_current.load_state_dict(model_prev.state_dict())
+        print(f"开始训练 M_p{step} ({dataset_type})...")
+        model_current = train_model(
+            model_current,
+            D_train_data,
+            D_train_labels,
+            D_test_data,
+            D_test_labels,
+            epochs=epochs,
+            batch_size=batch_size,
+            learning_rate=learning_rate,
+        )
+        model_current_path = os.path.join(ckpt_subdir, f"model_p{step}.pth")
+        torch.save(model_current.state_dict(), model_current_path)
+        print(f"M_p{step} 训练完毕并保存至 {model_current_path}")
 
 
 def main():
