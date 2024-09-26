@@ -9,6 +9,7 @@ def model_train(
     train_loader,
     model,
     optimizer,
+    lr_scheduler,
     criterion,
     alpha,
     args,
@@ -51,11 +52,14 @@ def model_train(
                 pbar.set_postfix({"Loss": f"{loss.item():.4f}"})
                 pbar.update(1)
 
+        lr_scheduler.step()
+
         avg_loss = running_loss / len(train_loader)  # 计算平均损失
         accuracy = correct / total  # 计算训练集的准确率
         print(
             f"Epoch [{epoch + 1}/{args.num_epochs}], Training Loss: {avg_loss:.4f}, Training Accuracy: {accuracy * 100:.2f}%"
         )
+        torch.cuda.empty_cache()
 
         # 仅在最后一次保存模型，避免每个 epoch 都保存
         if epoch == args.num_epochs - 1:
@@ -69,9 +73,8 @@ def model_train(
             )
 
 
-def model_test(dataset, data_loader, model, device='cuda', teacher_model=False):
+def model_test(labels, data_loader, model, device='cuda', teacher_model=False):
     eval_results = {}
-    data, labels = dataset.data, dataset.label
 
     if teacher_model:
         predicts, probs, embeds = teacher_model_forward(data_loader, model, device)
