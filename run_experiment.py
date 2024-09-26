@@ -108,10 +108,10 @@ def train_step(
             print(f"加载模型: {model_p0_path}")
 
         D_tr_1_data = torch.tensor(
-            np.load(os.path.join(subdir, f"{dataset_type}_D_tr_data_version_1.npy"))
+            torch.load(os.path.join(subdir, f"D_tr_data_version_1.npy"))
         )
         D_tr_1_labels = torch.tensor(
-            np.load(os.path.join(subdir, f"{dataset_type}_D_tr_labels_version_1.npy"))
+            torch.load(os.path.join(subdir, f"D_tr_labels_version_1.npy"))
         )
 
         model_p1 = models.resnet18(num_classes=num_classes)
@@ -138,15 +138,10 @@ def train_step(
                 model_prev = load_model(prev_model_path, num_classes)
                 print(f"加载模型: {prev_model_path}")
 
-            D_tr_i_data = torch.tensor(
-                np.load(
-                    os.path.join(subdir, f"{dataset_type}_D_tr_data_version_{i}.npy")
-                )
-            )
-            D_tr_i_labels = torch.tensor(
-                np.load(
-                    os.path.join(subdir, f"{dataset_type}_D_tr_labels_version_{i}.npy")
-                )
+            D_tr_i_data = torch.load(os.path.join(subdir, f"D_tr_data_version_{i}.npy"))
+
+            D_tr_i_labels = torch.load(
+                os.path.join(subdir, f"D_tr_labels_version_{i}.npy")
             )
 
             model_current = models.resnet18(num_classes=num_classes)
@@ -214,7 +209,10 @@ def main():
 
     # 构建数据子目录路径
     subdir = os.path.join(
-        args.gen_dir, args.dataset_type, "gen", f"nr_{args.noise_ratio}_nt_{args.noise_type}"
+        args.gen_dir,
+        args.dataset_type,
+        "gen",
+        f"nr_{args.noise_ratio}_nt_{args.noise_type}",
     )
 
     if not os.path.exists(subdir):
