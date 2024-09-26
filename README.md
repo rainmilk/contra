@@ -123,8 +123,8 @@ Mini-WebVision
 
 **Reference:**
 
-1. https://github.com/sangamesh-kodge/Mini-WebVision
-2. https://github.com/sangamesh-kodge/Clothing1M
+1. <https://github.com/sangamesh-kodge/Mini-WebVision>
+2. <https://github.com/sangamesh-kodge/Clothing1M>
 
 ### Creating a virtual environment
 
@@ -222,8 +222,8 @@ Explanations of the above types:
 
 ## Acknowledgements
 
-- https://github.com/nazmul-karim170/UNICON-Noisy-Label
-- https://github.com/LiJunnan1992/DivideMix
-- https://github.com/sangamesh-kodge/LabelNoiseRobustness
-- https://github.com/sangamesh-kodge/Mini-WebVision
-- https://github.com/sangamesh-kodge/Clothing1M
+- <https://github.com/nazmul-karim170/UNICON-Noisy-Label>
+- <https://github.com/LiJunnan1992/DivideMix>
+- <https://github.com/sangamesh-kodge/LabelNoiseRobustness>
+- <https://github.com/sangamesh-kodge/Mini-WebVision>
+- <https://github.com/sangamesh-kodge/Clothing1M>

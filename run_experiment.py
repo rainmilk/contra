@@ -8,7 +8,7 @@ import torchvision.models as models
 from torch.utils.data import DataLoader
 
 
-def train_model(model, data, labels, epochs=10, batch_size=32, learning_rate=0.001):
+def train_model(model, data, labels, epochs=50, batch_size=32, learning_rate=0.001):
     """
     训练模型函数
     :param model: 要训练的 ResNet 模型
@@ -88,7 +88,7 @@ def train_step(
 
         model_p0 = models.resnet18(num_classes=num_classes)
         print(f"开始训练 M_p0 ({dataset_type})...")
-        model_p0 = train_model(model_p0, D_0_data, D_0_labels, epochs=10)
+        model_p0 = train_model(model_p0, D_0_data, D_0_labels)
         model_p0_path = os.path.join(ckpt_subdir, "model_p0.pth")
         torch.save(model_p0.state_dict(), model_p0_path)
         print(f"M_p0 训练完毕并保存至 {model_p0_path}")
@@ -117,7 +117,7 @@ def train_step(
         model_p1 = models.resnet18(num_classes=num_classes)
         model_p1.load_state_dict(model_p0_loaded.state_dict())
         print(f"开始训练 M_p1 ({dataset_type})...")
-        model_p1 = train_model(model_p1, D_tr_1_data, D_tr_1_labels, epochs=10)
+        model_p1 = train_model(model_p1, D_tr_1_data, D_tr_1_labels)
         model_p1_path = os.path.join(ckpt_subdir, "model_p1.pth")
         torch.save(model_p1.state_dict(), model_p1_path)
         print(f"M_p1 训练完毕并保存至 {model_p1_path}")
@@ -147,9 +147,7 @@ def train_step(
             model_current = models.resnet18(num_classes=num_classes)
             model_current.load_state_dict(model_prev.state_dict())
             print(f"开始训练 M_p{i} ({dataset_type})...")
-            model_current = train_model(
-                model_current, D_tr_i_data, D_tr_i_labels, epochs=10
-            )
+            model_current = train_model(model_current, D_tr_i_data, D_tr_i_labels)
             model_current_path = os.path.join(ckpt_subdir, f"model_p{i}.pth")
             torch.save(model_current.state_dict(), model_current_path)
             print(f"M_p{i} 训练完毕并保存至 {model_current_path}")
