@@ -5,43 +5,6 @@ import argparse
 from torchvision import datasets, transforms
 
 
-def add_noise_labels(labels, noise_type="symmetric", noise_ratio=0.2, num_classes=10):
-    noisy_labels = labels.clone()
-    n_samples = len(labels)
-    n_noisy = int(noise_ratio * n_samples)
-
-    noisy_indices = np.random.choice(n_samples, n_noisy, replace=False)
-
-    if noise_type == "symmetric":
-        for idx in noisy_indices:
-            original_label = noisy_labels[idx].item()
-            new_label = original_label
-            while new_label == original_label:
-                new_label = np.random.randint(0, num_classes)
-            noisy_labels[idx] = new_label
-    elif noise_type == "asymmetric":
-        asymmetric_mapping = {
-            1: 9,
-            3: 5,
-            5: 3,
-            7: 1,
-            9: 1,
-        }
-        for idx in noisy_indices:
-            original_label = noisy_labels[idx].item()
-            if original_label in asymmetric_mapping:
-                noisy_labels[idx] = asymmetric_mapping[original_label]
-            else:
-                new_label = original_label
-                while new_label == original_label:
-                    new_label = np.random.randint(0, num_classes)
-                noisy_labels[idx] = new_label
-    else:
-        raise ValueError("Invalid noise type. Choose 'symmetric' or 'asymmetric'.")
-
-    return noisy_labels
-
-
 def create_cifar10_npy_files(
     data_dir,
     gen_dir,
@@ -52,6 +15,7 @@ def create_cifar10_npy_files(
 ):
     transform = transforms.Compose([transforms.ToTensor()])
 
+    # 加载 CIFAR-10 数据集
     train_dataset = datasets.CIFAR10(
         root=data_dir, train=True, download=True, transform=transform
     )
@@ -69,143 +33,146 @@ def create_cifar10_npy_files(
     num_samples = len(train_data)
     indices = np.random.permutation(num_samples)
     split_idx = num_samples // 2
+
+    # 划分初始数据集 D_0 和增量数据集 D_inc^(0)
     D_0_indices = indices[:split_idx]
     D_inc_indices = indices[split_idx:]
 
     D_0_data = train_data[D_0_indices]
     D_0_labels = train_labels[D_0_indices]
 
-    forget_classes = [1, 3, 5, 7, 9]
-    non_forget_classes = [0, 2, 4, 6, 8]
+    D_inc_data = train_data[D_inc_indices]
+    D_inc_labels = train_labels[D_inc_indices]
 
-    D_0_forget_indices = [
-        i for i in range(len(D_0_labels)) if D_0_labels[i] in forget_classes
-    ]
-    D_0_non_forget_indices = [
-        i for i in range(len(D_0_labels)) if D_0_labels[i] in non_forget_classes
-    ]
-
-    D_0_forget_data = D_0_data[D_0_forget_indices]
-    D_0_forget_labels = D_0_labels[D_0_forget_indices]
-    D_0_non_forget_data = D_0_data[D_0_non_forget_indices]
-    D_0_non_forget_labels = D_0_labels[D_0_non_forget_indices]
-
+    # 构建重放数据集 D_a（从 D_0 中随机抽取 10% 的样本）
     num_replay_samples = int(len(D_0_data) * 0.1)
     D_a_indices = np.random.choice(len(D_0_data), num_replay_samples, replace=False)
     D_a_data = D_0_data[D_a_indices]
     D_a_labels = D_0_labels[D_a_indices]
 
-    D_inc_versions = []
-    for t in range(num_versions):
-        retention_ratio = retention_ratios[t]
-        num_forget_samples = int(len(D_0_forget_data) * retention_ratio * 0.5)
-        num_non_forget_samples = int(len(D_0_non_forget_data) * retention_ratio * 0.5)
+    # 定义遗忘类别和噪声类别
+    forget_classes = [1, 3, 5, 7, 9]
+    noise_classes = [0, 2, 4, 6, 8]
 
-        D_inc_forget_data, D_inc_forget_labels = (
-            (torch.empty(0, 3, 32, 32), torch.empty(0, dtype=torch.long))
-            if num_forget_samples == 0
-            else (
-                D_0_forget_data[
-                    np.random.choice(
-                        len(D_0_forget_data), num_forget_samples, replace=False
-                    )
-                ],
-                D_0_forget_labels[
-                    np.random.choice(
-                        len(D_0_forget_data), num_forget_samples, replace=False
-                    )
-                ],
-            )
-        )
+    # 获取增量数据集中的遗忘类别和噪声类别的索引
+    D_inc_forget_indices = [
+        i for i in range(len(D_inc_labels)) if D_inc_labels[i] in forget_classes
+    ]
+    D_inc_noise_indices = [
+        i for i in range(len(D_inc_labels)) if D_inc_labels[i] in noise_classes
+    ]
 
-        D_inc_non_forget_data, D_inc_non_forget_labels = (
-            (torch.empty(0, 3, 32, 32), torch.empty(0, dtype=torch.long))
-            if num_non_forget_samples == 0
-            else (
-                D_0_non_forget_data[
-                    np.random.choice(
-                        len(D_0_non_forget_data), num_non_forget_samples, replace=False
-                    )
-                ],
-                D_0_non_forget_labels[
-                    np.random.choice(
-                        len(D_0_non_forget_data), num_non_forget_samples, replace=False
-                    )
-                ],
-            )
-        )
-
-        D_inc_data = torch.cat([D_inc_forget_data, D_inc_non_forget_data], dim=0)
-        D_inc_labels = torch.cat([D_inc_forget_labels, D_inc_non_forget_labels], dim=0)
-
-        num_noisy_samples = int(len(D_inc_non_forget_data) * noise_ratio)
-        if num_noisy_samples > 0 and len(D_inc_non_forget_data) > 0:
-            D_inc_labels = add_noise_labels(
-                D_inc_labels,
-                noise_type=noise_type,
-                noise_ratio=noise_ratio,
-                num_classes=10,
-            )
-
-        D_inc_versions.append((D_inc_data, D_inc_labels))
+    # 定义非对称噪声映射
+    asymmetric_mapping = {
+        0: 2,
+        2: 0,
+        4: 6,
+        6: 4,
+        8: 0,
+    }
 
     subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}")
     os.makedirs(subdir, exist_ok=True)
 
+    # 保存初始数据集、初始增量数据集、重放数据集
     torch.save(D_0_data, os.path.join(subdir, "D_0.npy"))
     torch.save(D_0_labels, os.path.join(subdir, "D_0_labels.npy"))
+    
+    torch.save(D_inc_data, os.path.join(subdir, "D_inc_0_data.npy"))
+    torch.save(D_inc_labels, os.path.join(subdir, "D_inc_0_labels.npy"))
+    
     torch.save(D_a_data, os.path.join(subdir, "D_a.npy"))
     torch.save(D_a_labels, os.path.join(subdir, "D_a_labels.npy"))
 
-    for t, (data, labels) in enumerate(D_inc_versions):
-        torch.save(data, os.path.join(subdir, f"D_inc_{t+1}.npy"))
-        torch.save(labels, os.path.join(subdir, f"D_inc_labels_{t+1}.npy"))
-
+    # 保存测试数据集
     torch.save(test_data, os.path.join(subdir, "test_data.npy"))
     torch.save(test_labels, os.path.join(subdir, "test_labels.npy"))
 
-    print("数据集生成完毕。")
-    return (
-        train_data[D_inc_indices],
-        train_labels[D_inc_indices],
-        test_data,
-        test_labels,
-    )
+    num_classes = 10
 
+    # 生成增量版本数据集
+    for t in range(num_versions):
+        retention_ratio = retention_ratios[t]
 
-def create_incremental_data_versions(
-    D_a_data, D_a_labels, D_inc_versions, save_dir=None
-):
-    for version_num, (D_inc_data, D_inc_labels) in enumerate(D_inc_versions, start=1):
-        D_tr_data = torch.cat([D_a_data, D_inc_data], dim=0)
-        D_tr_labels = torch.cat([D_a_labels, D_inc_labels], dim=0)
-
-        if save_dir:
-            np.save(
-                os.path.join(save_dir, f"cifar-10_D_tr_data_version_{version_num}.npy"),
-                D_tr_data.numpy(),
+        # 模拟遗忘：根据保留比例抽取遗忘类别的样本
+        num_forget_samples = int(len(D_inc_forget_indices) * retention_ratio)
+        if num_forget_samples > 0:
+            forget_sample_indices = np.random.choice(
+                D_inc_forget_indices, num_forget_samples, replace=False
             )
-            np.save(
-                os.path.join(
-                    save_dir, f"cifar-10_D_tr_labels_version_{version_num}.npy"
-                ),
-                D_tr_labels.numpy(),
-            )
-            print(f"D_tr 版本 {version_num} 已保存到 {save_dir}")
+            D_f_data = D_inc_data[forget_sample_indices]
+            D_f_labels = D_inc_labels[forget_sample_indices]
+        else:
+            D_f_data = torch.empty(0, 3, 32, 32)
+            D_f_labels = torch.empty(0, dtype=torch.long)
 
-    print("所有 D_tr 版本数据保存完毕！")
+        # 噪声注入：对噪声类别的样本注入噪声
+        noise_sample_indices = D_inc_noise_indices
+        num_noisy_samples = int(len(noise_sample_indices) * noise_ratio)
+
+        if num_noisy_samples > 0:
+            noisy_indices = np.random.choice(
+                noise_sample_indices, num_noisy_samples, replace=False
+            )
+        else:
+            noisy_indices = []
+
+        D_n_data = D_inc_data[noise_sample_indices]
+        D_n_labels = D_inc_labels[noise_sample_indices].clone()
+
+        # 在 D_n_labels 中注入噪声
+        for idx_in_D_n, D_inc_idx in enumerate(noise_sample_indices):
+            if D_inc_idx in noisy_indices:
+                original_label = D_n_labels[idx_in_D_n].item()
+                if noise_type == "symmetric":
+                    new_label = original_label
+                    while new_label == original_label:
+                        new_label = np.random.randint(0, num_classes)
+                    D_n_labels[idx_in_D_n] = new_label
+                elif noise_type == "asymmetric":
+                    if original_label in asymmetric_mapping:
+                        D_n_labels[idx_in_D_n] = asymmetric_mapping[original_label]
+                    else:
+                        new_label = original_label
+                        while new_label == original_label:
+                            new_label = np.random.randint(0, num_classes)
+                        D_n_labels[idx_in_D_n] = new_label
+                else:
+                    raise ValueError("Invalid noise type.")
+            else:
+                # 未被选中注入噪声的样本标签保持不变
+                pass
+
+        # 组合训练数据集 D_tr^{(t)}
+        D_tr_data = torch.cat([D_a_data, D_f_data, D_n_data], dim=0)
+        D_tr_labels = torch.cat([D_a_labels, D_f_labels, D_n_labels], dim=0)
+
+        # 打乱训练数据集
+        perm = torch.randperm(len(D_tr_data))
+        D_tr_data = D_tr_data[perm]
+        D_tr_labels = D_tr_labels[perm]
+
+        # 保存训练数据集
+        torch.save(D_tr_data, os.path.join(subdir, f"D_tr_data_version_{t+1}.npy"))
+        torch.save(D_tr_labels, os.path.join(subdir, f"D_tr_labels_version_{t+1}.npy"))
+
+        print(f"D_tr 版本 {t+1} 已保存到 {subdir}")
+
+    print("所有数据集生成完毕。")
 
 
 def main():
     np.random.seed(42)
     torch.manual_seed(42)
 
-    parser = argparse.ArgumentParser(description="Generate CIFAR-10 noisy datasets.")
+    parser = argparse.ArgumentParser(
+        description="Generate CIFAR-10 incremental datasets."
+    )
     parser.add_argument(
         "--data_dir",
         type=str,
         default="./data/cifar-10/normal",
-        help="原始CIFAR-10数据集的目录",
+        help="原始 CIFAR-10 数据集的目录",
     )
     parser.add_argument(
         "--gen_dir",
@@ -221,17 +188,17 @@ def main():
         help="标签噪声类型：'symmetric' 或 'asymmetric'",
     )
     parser.add_argument(
-        "--noise_ratio", type=float, default=0.2, help="增量数据集中的噪声比例"
+        "--noise_ratio", type=float, default=0.2, help="噪声比例（默认 0.2）"
     )
     parser.add_argument(
-        "--num_versions", type=int, default=3, help="生成的增量版本数量"
+        "--num_versions", type=int, default=3, help="生成的增量版本数量（默认 3）"
     )
     parser.add_argument(
         "--retention_ratios",
         type=float,
         nargs="+",
         default=[0.5, 0.3, 0.1],
-        help="各增量版本的Retention ratio列表",
+        help="各增量版本的保留比例列表",
     )
 
     args = parser.parse_args()
@@ -247,24 +214,6 @@ def main():
         noise_ratio=args.noise_ratio,
         num_versions=args.num_versions,
         retention_ratios=args.retention_ratios,
-    )
-
-    subdir = os.path.join(args.gen_dir, f"nr_{args.noise_ratio}_nt_{args.noise_type}")
-    print("subdir:", subdir)
-    D_a_data = torch.load(os.path.join(subdir, "D_a.npy"))
-    D_a_labels = torch.load(os.path.join(subdir, "D_a_labels.npy"))
-
-    D_inc_versions = []
-    for t in range(args.num_versions):
-        D_inc_data = torch.load(os.path.join(subdir, f"D_inc_{t+1}.npy"))
-        D_inc_labels = torch.load(os.path.join(subdir, f"D_inc_labels_{t+1}.npy"))
-        D_inc_versions.append((D_inc_data, D_inc_labels))
-
-    create_incremental_data_versions(
-        D_a_data,
-        D_a_labels,
-        D_inc_versions,
-        save_dir=subdir,
     )
 
 
