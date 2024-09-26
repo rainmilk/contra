@@ -93,6 +93,8 @@ data/cifar-10/gen/
     ├── test_data.npy
     └── test_labels.npy
 
+验证数据集的生成效果，参考 result_analysis/dataset_analysis.ipynb.
+
 $ python run_experiment.py --help
 
 # 基于 CIFAR-10 D_0数据集训练初始模型, model_p0.pth
@@ -123,38 +125,6 @@ ckpt/
 
 
 ```
-
-
-**验证训练效果。**
-<!-- 
-```bash
-
-python test_model.py \
-    --model_path ./ckpt/nr_0.2_nt_asymmetric/model_p0.pth \
-    --data_dir ./data/cifar-10/gen/nr_0.2_nt_asymmetric \
-    --batch_size 64 \
-    --seed 42
-
-python test_model.py \
-    --model_path ./ckpt/nr_0.2_nt_asymmetric/model_p1.pth \
-    --data_dir ./data/cifar-10/gen/nr_0.2_nt_asymmetric \
-    --batch_size 64 \
-    --seed 42
-
-python test_model.py \
-    --model_path ./ckpt/nr_0.2_nt_asymmetric/model_p2.pth \
-    --data_dir ./data/cifar-10/gen/nr_0.2_nt_asymmetric \
-    --batch_size 64 \
-    --seed 42
-
-``` -->
-
-<!-- You can download the above files from baidu net disk.
-
-```bash
-Link: https://pan.baidu.com/s/1iKwmQC94GlpmvY3LteS-7g?pwd=tnpk
-Code: tnpk
-``` -->
 
 ## Preparation
 
