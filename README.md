@@ -34,35 +34,96 @@ TODO 7. www 完成 method.
 
 For later experiment, we should firstly prepare the datasets and models. The logic of generating dataset is as follows:
 
-### 数据集构造操作
+### 数据集构造和初始模型训练
 
 ```bash
-# 生成对称噪声数据集
+
+
+$pwd
+/home/xxx/tta-mr/
+
+# under tta-mr dir
+$ ll
+data/ # 保存所有数据（原始数据和生成数据）
+ckpt/ # 保存训练模型
+gen_dataset/ # 代码，生成数据
+run_experiment.py # 代码，训练模型
+
+$ python gen_dataset/gen_cifar10_exp_data.py --help
+
+$ python gen_dataset/gen_cifar100_exp_data.py --help
+
+
+# 基于 CIFAR-10 数据集生成对称噪声
 python gen_dataset/gen_cifar10_exp_data.py --data_dir ./data/cifar-10/normal --gen_dir ./data/cifar-10/gen/ --noise_type symmetric --noise_ratio 0.2 --num_versions 3 --retention_ratios 0.5 0.3 0.1
-
-# 训练初始模型 Mp0
-CUDA_VISIBLE_DEVICES=1 python run_experiment.py --step 0 --dataset_type cifar-10 --epochs 100 --batch_size 32 --learning_rate 0.001
-# 训练增量模型 Mp1
-CUDA_VISIBLE_DEVICES=2 python run_experiment.py --step 1 --dataset_type cifar-10 --epochs 100 --batch_size 32 --learning_rate 0.001
-# 训练迭代增量模型 Mp2
-CUDA_VISIBLE_DEVICES=3 python run_experiment.py --step 2 --dataset_type cifar-10 --epochs 100 --batch_size 32 --learning_rate 0.001
-```
-
-```bash
-# 生成非对称噪声数据集
+# 基于 CIFAR-10 数据集生成非对称噪声
 python gen_dataset/gen_cifar10_exp_data.py --data_dir ./data/cifar-10/normal --gen_dir ./data/cifar-10/gen/ --noise_type asymmetric --noise_ratio 0.2 --num_versions 3 --retention_ratios 0.5 0.3 0.1
 
-# 训练初始模型 Mp0
-CUDA_VISIBLE_DEVICES=1 python run_experiment.py --step 0 --dataset_type cifar-10 --epochs 100 --batch_size 32 --learning_rate 0.001
-# 训练增量模型 Mp1
-CUDA_VISIBLE_DEVICES=2 python run_experiment.py --step 1 --dataset_type cifar-10 --epochs 100 --batch_size 32 --learning_rate 0.001
-# 训练迭代增量模型 Mp2
-CUDA_VISIBLE_DEVICES=3 python run_experiment.py --step 2 --dataset_type cifar-10 --epochs 100 --batch_size 32 --learning_rate 0.001
 
-# 如果 step >2 ，可以指定外部模型，基于它继续训练
-python run_experiment.py --step 3 --noise_ratio 0.2 --noise_type asymmetric --load_model ./ckpt/nr_0.2_nt_asymmetric/model_p_step{n}.pth
+$ tree data/cifar-10/gen/
+data/cifar-10/gen/
+├── nr_0.2_nt_asymmetric
+│   ├── D_0_labels.npy
+│   ├── D_0.npy
+│   ├── D_a_labels.npy
+│   ├── D_a.npy
+│   ├── D_inc_0_data.npy
+│   ├── D_inc_0_labels.npy
+│   ├── D_tr_data_version_1.npy
+│   ├── D_tr_data_version_2.npy
+│   ├── D_tr_data_version_3.npy
+│   ├── D_tr_labels_version_1.npy
+│   ├── D_tr_labels_version_2.npy
+│   ├── D_tr_labels_version_3.npy
+│   ├── test_data.npy
+│   └── test_labels.npy
+└── nr_0.2_nt_symmetric
+    ├── D_0_labels.npy
+    ├── D_0.npy
+    ├── D_a_labels.npy
+    ├── D_a.npy
+    ├── D_inc_0_data.npy
+    ├── D_inc_0_labels.npy
+    ├── D_tr_data_version_1.npy
+    ├── D_tr_data_version_2.npy
+    ├── D_tr_data_version_3.npy
+    ├── D_tr_labels_version_1.npy
+    ├── D_tr_labels_version_2.npy
+    ├── D_tr_labels_version_3.npy
+    ├── test_data.npy
+    └── test_labels.npy
+
+$ python run_experiment.py --help
+
+# 基于 CIFAR-10 D_0数据集训练初始模型, model_p0.pth
+CUDA_VISIBLE_DEVICES=1 python run_experiment.py --step 0 --dataset_type cifar-10 --epochs 100 --batch_size 32 --learning_rate 0.001
+# load model_p0.pth
+# 基于 CIFAR-10 D_tr_1数据集(D_tr_data_version_1.npy + D_tr_labels_version_1.npy)训练初始模型, , model_p1.pth
+CUDA_VISIBLE_DEVICES=2 python run_experiment.py --step 1 --dataset_type cifar-10 --epochs 50 --batch_size 32 --learning_rate 0.001
+# load model_p1.pth (当step>=2时，支持从外部load模型而不是上一个训练好的模型)
+# 基于 CIFAR-10 D_tr_2数据集训练初始模型, model_p2.pth
+CUDA_VISIBLE_DEVICES=3 python run_experiment.py --step 2 --dataset_type cifar-10 --epochs 50 --batch_size 32 --learning_rate 0.001
+# load model_p2.pth
+# 基于 CIFAR-10 D_tr_3数据集训练初始模型, model_p3.pth
+CUDA_VISIBLE_DEVICES=4 python run_experiment.py --step 3 --dataset_type cifar-10 --epochs 50 --batch_size 32 --learning_rate 0.001
+
+$ tree ckpt/
+ckpt/
+├── cifar-10
+   ├── nr_0.2_nt_asymmetric
+   │   ├── model_p0.pth
+   │   ├── model_p1.pth
+   │   └── model_p2.pth
+       └── model_p3.pth
+   └── nr_0.2_nt_symmetric
+       ├── model_p0.pth
+       ├── model_p1.pth
+       └── model_p2.pth
+       └── model_p3.pth
+
 
 ```
+
 
 **验证训练效果。**
 <!-- 

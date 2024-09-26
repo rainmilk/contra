@@ -1,4 +1,5 @@
 import os
+import warnings
 import numpy as np
 import argparse
 import torch
@@ -114,6 +115,8 @@ def train_step(
     :param batch_size: 批次大小
     :param learning_rate: 学习率
     """
+    warnings.filterwarnings("ignore")
+
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(ckpt_subdir, exist_ok=True)
 
@@ -125,11 +128,25 @@ def train_step(
     D_test_data = torch.load(os.path.join(subdir, "test_data.npy"))
     D_test_labels = torch.load(os.path.join(subdir, "test_labels.npy"))
 
+    # 打印当前执行的参数
+    print(f"===== 执行步骤: {step} =====")
+    print(f"数据子目录: {subdir}")
+    print(f"检查点目录: {ckpt_subdir}")
+    print(f"输出目录: {output_dir}")
+    print(f"数据集类型: {dataset_type}")
+    print(f"Epochs: {epochs}, Batch Size: {batch_size}, Learning Rate: {learning_rate}")
+
     if step == 0:  # 基于$D_0$数据集和原始的resnet网络训练一个模型 M_p0
         model_p0 = models.resnet18(num_classes=num_classes)
         print(f"开始训练 M_p0 ({dataset_type})...")
+
         D_train_data = torch.load(os.path.join(subdir, f"D_0.npy"))
         D_train_labels = torch.load(os.path.join(subdir, f"D_0_labels.npy"))
+
+        # 打印用于训练的模型和数据
+        print("用于训练的数据: D_0.npy 和 D_0_labels.npy")
+        print("用于训练的模型: ResNet18 初始化")
+
         model_p0 = train_model(
             model_p0,
             D_train_data,
@@ -160,6 +177,13 @@ def train_step(
         D_train_labels = torch.load(
             os.path.join(subdir, f"D_tr_labels_version_{step}.npy")
         )
+
+        # 打印用于训练的模型和数据
+        print(
+            f"用于训练的数据: D_tr_data_version_{step}.npy 和 D_tr_labels_version_{step}.npy"
+        )
+        print("用于训练的模型: M_p0")
+
         model_p1 = models.resnet18(num_classes=num_classes)
         model_p1.load_state_dict(model_p0_loaded.state_dict())
         print(f"开始训练 M_p1 ({dataset_type})...")
@@ -190,12 +214,16 @@ def train_step(
             print(f"加载模型: {prev_model_path}")
 
         # 加载当前步骤的训练数据
-        D_train_data = torch.tensor(
-            np.load(os.path.join(subdir, f"D_tr_data_version_{step}.npy"))
+        D_train_data = torch.load(os.path.join(subdir, f"D_tr_data_version_{step}.npy"))
+        D_train_labels = torch.load(
+            os.path.join(subdir, f"D_tr_labels_version_{step}.npy")
         )
-        D_train_labels = torch.tensor(
-            np.load(os.path.join(subdir, f"D_tr_labels_version_{step}.npy"))
+
+        # 打印用于训练的模型和数据
+        print(
+            f"用于训练的数据: D_tr_data_version_{step}.npy 和 D_tr_labels_version_{step}.npy"
         )
+        print(f"用于训练的模型: M_p{step-1}")
 
         # 训练当前模型
         model_current = models.resnet18(num_classes=num_classes)
