@@ -1,6 +1,9 @@
 # TTA-MR
 
-## Data and model
+## TODO LIST
+
+```plain
+
 
 TODO 1. 保存每个 stage 的 $D_{tr}$ 的 image 和 label 。
  $D_{tr}$ npy 补充上传到网盘。
@@ -32,12 +35,15 @@ TODO 7. www 完成 method.
 6. 国庆期间，full paper 完成。
 7. 国庆后第一周，full paper 修改完成。
 
-For later experiment, we should firstly prepare the datasets and models. The logic of generating dataset is as follows:
 
-### 数据集构造和初始模型训练
+```
+
+
+## Preparation
+
+### Code Structure
 
 ```bash
-
 
 $pwd
 /home/xxx/tta-mr/
@@ -48,17 +54,70 @@ data/ # 保存所有数据（原始数据和生成数据）
 ckpt/ # 保存训练模型
 gen_dataset/ # 代码，生成数据
 run_experiment.py # 代码，训练模型
+.. # other files
 
 $ python gen_dataset/gen_cifar10_exp_data.py --help
 
 $ python gen_dataset/gen_cifar100_exp_data.py --help
 
+```
+
+### Create virtual environment
+
+```bash
+conda create -n tta-mr python=3.8
+conda activate tta-mr
+```
+
+```bash
+pip install -r requirements.txt
+```
+
+### Download datasets
+
+Supported datasets are:
+
+1. **CIFAR-10**
+2. **CIFAR-100**
+3. **FOOD-101**
+
+```bash
+
+$ mkdir -p data
+
+$ ll data/
+cifar-10
+cifar-100
+food-101
+```
+
+每个数据集的下面都包括`gen`和`normal`两个目录，分别用于存储生成的数据和原始的数据集。
+
+- 生成的数据会自动存储在`gen`目录下。
+- 原始下载的数据集手动放在`normal`目录下。
+
+比如对于`CIFAR-10`数据集：
+
+```bash
+$ ls data/cifar-10
+gen  normal
+
+$ ls data/cifar-10/gen/
+nr_0.2_nt_asymmetric  nr_0.2_nt_symmetric
+
+$ ls data/cifar-10/normal/
+batches.meta  cifar-10-batches-py  cifar-10-python.tar.gz  clean_0.5000_sym.npz  data_batch_1  data_batch_2  data_batch_3  data_batch_4  data_batch_5  readme.html  test_batch
+```
+
+### Construct Experimental Datasets
+
+```bash
 
 # 基于 CIFAR-10 数据集生成对称噪声
 python gen_dataset/gen_cifar10_exp_data.py --data_dir ./data/cifar-10/normal --gen_dir ./data/cifar-10/gen/ --noise_type symmetric --noise_ratio 0.2 --num_versions 3 --retention_ratios 0.5 0.3 0.1
+
 # 基于 CIFAR-10 数据集生成非对称噪声
 python gen_dataset/gen_cifar10_exp_data.py --data_dir ./data/cifar-10/normal --gen_dir ./data/cifar-10/gen/ --noise_type asymmetric --noise_ratio 0.2 --num_versions 3 --retention_ratios 0.5 0.3 0.1
-
 
 $ tree data/cifar-10/gen/
 data/cifar-10/gen/
@@ -92,8 +151,14 @@ data/cifar-10/gen/
     ├── D_tr_labels_version_3.npy
     ├── test_data.npy
     └── test_labels.npy
+```
 
-验证数据集的生成效果，参考 result_analysis/dataset_analysis.ipynb.
+The logic of generating dataset and validation codes to check the rightness fo generated datasts are within the following notebook:
+`result_analysis/dataset_analysis.ipynb` https://github.com/data-centric-research/tta-mr/blob/5bdddef032ea8167364ba6f05d55e1c68083314e/result_analysis/dataset_analysis.ipynb
+
+### Train Initial Models on Experimental Datasets
+
+```bash
 
 $ python run_experiment.py --help
 
@@ -123,129 +188,15 @@ ckpt/
        └── model_p2.pth
        └── model_p3.pth
 
-
 ```
 
-## Preparation
+## Core Experiment
 
-### Download datasets
+TODO
 
-Currently supported datasets(*9/19 pm*) are:
+## Validation
 
-1. **CIFAR-10**
-2. **CIFAR-100**
-3. The other datasets (**TinyImageNet**, **WebVision**, **Clothing1M**) are under development.
-
-```bash
-
-$ mkdir -p data
-
-$ ll data/
-cifar-10
-cifar-100
-tiny-imagenet-200
-Clothing1M
-Mini-WebVision
-```
-
-**Reference:**
-
-1. <https://github.com/sangamesh-kodge/Mini-WebVision>
-2. <https://github.com/sangamesh-kodge/Clothing1M>
-
-### Creating a virtual environment
-
-```bash
-conda create -n tta-mr python=3.8
-conda activate tta-mr
-```
-
-```bash
-pip install -r requirements.txt
-```
-
-## Forget Class
-
-### Usage
-
-```bash
-
-$ python main.py --help
-usage: main.py [-h] --dataset {cifar-10,cifar-100,flowers-102,tiny-imagenet-200} --model {resnet18,vgg16} [--pretrained] --condition
-               {original_data,remove_data,noisy_data,all_perturbations} [--classes_remove CLASSES_REMOVE [CLASSES_REMOVE ...]] [--remove_fraction REMOVE_FRACTION]
-               [--classes_noise CLASSES_NOISE [CLASSES_NOISE ...]] [--noise_type {gaussian,salt_pepper}] [--noise_fraction NOISE_FRACTION] [--gpu GPU] [--batch_size BATCH_SIZE]
-               [--learning_rate LEARNING_RATE] [--optimizer {sgd,adam}] [--momentum MOMENTUM] [--weight_decay WEIGHT_DECAY] [--num_epochs NUM_EPOCHS]
-               [--early_stopping_patience EARLY_STOPPING_PATIENCE] [--early_stopping_accuracy_threshold EARLY_STOPPING_ACCURACY_THRESHOLD] [--use_early_stopping]
-               [--kwargs [KWARGS [KWARGS ...]]]
-
-Run experiments with different datasets, models, and conditions.
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --dataset {cifar-10,cifar-100,flowers-102,tiny-imagenet-200}
-                        Dataset name, choose from: cifar-10, cifar-100, flowers-102, tiny-imagenet-200
-  --model {resnet18,vgg16}
-                        Model name, choose from: resnet18, vgg16
-  --pretrained          If specified, use pretrained weights for the model
-  --condition {original_data,remove_data,noisy_data,all_perturbations}
-                        Condition for the experiment: original_data, remove_data, noisy_data, all_perturbations
-  --classes_remove CLASSES_REMOVE [CLASSES_REMOVE ...]
-                        List of classes to remove samples from, e.g., --classes_remove 0 1 2 3 4 or 0-4
-  --remove_fraction REMOVE_FRACTION
-                        Fraction of samples to remove from the selected classes, e.g., --remove_fraction 0.5 for 50% removal (default: 0.5)
-  --classes_noise CLASSES_NOISE [CLASSES_NOISE ...]
-                        List of classes to add noise to, e.g., --classes_noise 5 6 7 8 9 or 5-9
-  --noise_type {gaussian,salt_pepper}
-                        Type of noise to add to the selected classes, e.g., --noise_type gaussian or --noise_type salt_pepper (default: gaussian)
-  --noise_fraction NOISE_FRACTION
-                        Fraction of samples in the selected classes to add noise to, e.g., --noise_fraction 0.1 for 10% noise injection (default: 0.8)
-  --gpu GPU             Specify the GPU(s) to use, e.g., --gpu 0,1 for multi-GPU or --gpu 0 for single GPU
-  --batch_size BATCH_SIZE
-                        Batch size for training (default: 64)
-  --learning_rate LEARNING_RATE
-                        Learning rate for the optimizer (default: 0.001)
-  --optimizer {sgd,adam}
-                        Optimizer for training weights
-  --momentum MOMENTUM   Momentum for SGD optimizer (default: 0.9). Only used if optimizer is 'sgd'.
-  --weight_decay WEIGHT_DECAY
-                        Weight decay for the optimizer (default: 0.0001).
-  --num_epochs NUM_EPOCHS
-                        Number of epochs to train the model (default: 200)
-  --early_stopping_patience EARLY_STOPPING_PATIENCE
-                        Patience for early stopping (default: 10)
-  --early_stopping_accuracy_threshold EARLY_STOPPING_ACCURACY_THRESHOLD
-                        Accuracy threshold for early stopping (default: 0.95)
-  --use_early_stopping  Enable early stopping if specified, otherwise train for the full number of epochs
-  --kwargs [KWARGS [KWARGS ...]]
-                        Additional key=value arguments for hyperparameters
-
-```
-
-### Example run (CIFAR10 with 50% removal)
-
-```bash
-python main.py --dataset cifar-10 --model resnet18 --condition remove_data --classes_remove 0 1 2 3 4
-```
-
-## Add Noise
-
-### Supported Noise Label types
-
-1. **sym**: Symmetric noise
-2. **asym**: Asymmetric noise
-3. **pair_flip**: Pairwise noise
-
-Explanations of the above types:
-
-**Symmetric noise** is when the probability of a label being flipped is the same for all classes.
-
-**Asymmetric noise** is when the probability of a label being flipped is different for each class.
-
-**Pairwise noise** is when the probability of a label being flipped is different for each pair of classes.
-
-### Usage
-
-### Example Run
+TODO
 
 ## Acknowledgements
 
