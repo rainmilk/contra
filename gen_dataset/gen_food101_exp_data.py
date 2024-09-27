@@ -3,9 +3,10 @@ import numpy as np
 import os
 import argparse
 from torchvision import datasets, transforms
+from tqdm import tqdm
 
 
-def create_cifar100_npy_files(
+def create_food101_npy_files(
     data_dir,
     gen_dir,
     noise_type="symmetric",
@@ -13,22 +14,41 @@ def create_cifar100_npy_files(
     num_versions=3,
     retention_ratios=[0.5, 0.3, 0.1],
 ):
-    transform = transforms.Compose([transforms.ToTensor()])
-
-    # 加载 CIFAR-100 数据集
-    train_dataset = datasets.CIFAR100(
-        root=data_dir, train=True, download=True, transform=transform
-    )
-    test_dataset = datasets.CIFAR100(
-        root=data_dir, train=False, download=True, transform=transform
+    transform = transforms.Compose(
+        [transforms.Resize((224, 224)), transforms.ToTensor()]
     )
 
-    train_data = torch.stack([train_dataset[i][0] for i in range(len(train_dataset))])
+    # # 加载 FOOD-101 数据集
+    # train_dataset = datasets.ImageFolder(root=os.path.join(data_dir, "train"), transform=transform)
+    # test_dataset = datasets.ImageFolder(root=os.path.join(data_dir, "test"), transform=transform)
+
+    # 加载 FOOD-101 数据集，直接使用 torchvision 提供的 Food101 类
+    print("Loading Food101 training and test datasets...")
+    train_dataset = datasets.Food101(root=data_dir, split="train", transform=transform)
+    test_dataset = datasets.Food101(root=data_dir, split="test", transform=transform)
+
+    # 使用 tqdm 显示进度条加载训练数据
+    print("Extracting training data and labels...")
+    train_data = torch.stack(
+        [train_dataset[i][0] for i in tqdm(range(len(train_dataset)))]
+    )
     train_labels = torch.tensor(
-        [train_dataset[i][1] for i in range(len(train_dataset))]
+        [train_dataset[i][1] for i in tqdm(range(len(train_dataset)))]
     )
-    test_data = torch.stack([test_dataset[i][0] for i in range(len(test_dataset))])
-    test_labels = torch.tensor([test_dataset[i][1] for i in range(len(test_dataset))])
+
+    # train_data = torch.stack([train_dataset[i][0] for i in range(len(train_dataset))])
+    # train_labels = torch.tensor([train_dataset[i][1] for i in range(len(train_dataset))])
+
+    print("Extracting test data and labels...")
+    test_data = torch.stack(
+        [test_dataset[i][0] for i in tqdm(range(len(test_dataset)))]
+    )
+    test_labels = torch.tensor(
+        [test_dataset[i][1] for i in tqdm(range(len(test_dataset)))]
+    )
+
+    # test_data = torch.stack([test_dataset[i][0] for i in range(len(test_dataset))])
+    # test_labels = torch.tensor([test_dataset[i][1] for i in range(len(test_dataset))])
 
     num_samples = len(train_data)
     indices = np.random.permutation(num_samples)
@@ -64,7 +84,7 @@ def create_cifar100_npy_files(
 
     # 定义非对称噪声映射
     asymmetric_mapping = {
-        i: (i + 1) % 100 for i in noise_classes  # 简单地将类别标签映射为下一个类别
+        i: (i + 1) % 101 for i in noise_classes  # 简单地将类别标签映射为下一个类别
     }
 
     subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}")
@@ -84,7 +104,7 @@ def create_cifar100_npy_files(
     torch.save(test_data, os.path.join(subdir, "test_data.npy"))
     torch.save(test_labels, os.path.join(subdir, "test_labels.npy"))
 
-    num_classes = 100
+    num_classes = 101
 
     # 生成增量版本数据集
     for t in range(num_versions):
@@ -99,7 +119,7 @@ def create_cifar100_npy_files(
             D_f_data = D_inc_data[forget_sample_indices]
             D_f_labels = D_inc_labels[forget_sample_indices]
         else:
-            D_f_data = torch.empty(0, 3, 32, 32)
+            D_f_data = torch.empty(0, 3, 224, 224)
             D_f_labels = torch.empty(0, dtype=torch.long)
 
         # 噪声注入：对噪声类别的样本注入噪声
@@ -117,7 +137,11 @@ def create_cifar100_npy_files(
         D_n_labels = D_inc_labels[noise_sample_indices].clone()
 
         # 在 D_n_labels 中注入噪声
-        for idx_in_D_n, D_inc_idx in enumerate(noise_sample_indices):
+        print("Injecting noise into labels...")
+        for idx_in_D_n, D_inc_idx in tqdm(
+            enumerate(noise_sample_indices), total=len(noise_sample_indices)
+        ):
+            # for idx_in_D_n, D_inc_idx in enumerate(noise_sample_indices):
             if D_inc_idx in noisy_indices:
                 original_label = D_n_labels[idx_in_D_n].item()
                 if noise_type == "symmetric":
@@ -162,18 +186,18 @@ def main():
     torch.manual_seed(42)
 
     parser = argparse.ArgumentParser(
-        description="Generate CIFAR-100 incremental datasets."
+        description="Generate FOOD-101 incremental datasets."
     )
     parser.add_argument(
         "--data_dir",
         type=str,
-        default="./data/cifar-100/normal",
-        help="原始 CIFAR-100 数据集的目录",
+        default="./data/food-101/normal",
+        help="原始 FOOD-101 数据集的目录",
     )
     parser.add_argument(
         "--gen_dir",
         type=str,
-        default="./data/cifar-100/gen/",
+        default="./data/food-101/gen/",
         help="生成数据集的保存目录",
     )
     parser.add_argument(
@@ -199,7 +223,7 @@ def main():
 
     args = parser.parse_args()
 
-    create_cifar100_npy_files(
+    create_food101_npy_files(
         data_dir=args.data_dir,
         gen_dir=args.gen_dir,
         noise_type=args.noise_type,
