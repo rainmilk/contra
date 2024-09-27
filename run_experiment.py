@@ -17,6 +17,7 @@ def train_model(
     test_labels,
     epochs=50,
     batch_size=32,
+    optimizer_type="adam",
     learning_rate=0.001,
 ):
     """
@@ -28,6 +29,7 @@ def train_model(
     :param test_labels: 测试集标签
     :param epochs: 训练的轮数
     :param batch_size: 批次大小
+    :optimizer_type: 优化器
     :param learning_rate: 学习率
     :return: 训练后的模型
     """
@@ -35,7 +37,15 @@ def train_model(
     model.to(device)
     model.train()
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    # optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+    # 根据用户选择的优化器初始化
+    if optimizer_type == "adam":
+        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    elif optimizer_type == "sgd":
+        optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
+    else:
+        raise ValueError(f"Unsupported optimizer type: {optimizer_type}")
 
     dataset = torch.utils.data.TensorDataset(data.to(device), labels.to(device))
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
@@ -97,10 +107,11 @@ def train_step(
     subdir,
     ckpt_subdir,
     output_dir="ckpt",
-    dataset_type="cifar10",
+    dataset_type="cifar-10",
     load_model_path=None,
     epochs=50,
     batch_size=32,
+    optimizer_type="adam",
     learning_rate=0.001,
 ):
     """
@@ -109,10 +120,11 @@ def train_step(
     :param subdir: 数据子目录路径
     :param ckpt_subdir: 模型检查点子目录路径
     :param output_dir: 模型保存目录
-    :param dataset_type: 使用的数据集类型（cifar10 或 cifar100）
+    :param dataset_type: 使用的数据集类型（cifar-10 或 cifar-100）
     :param load_model_path: 指定加载的模型路径（可选）
     :param epochs: 训练的轮数
     :param batch_size: 批次大小
+    :optimizer_type: 优化器
     :param learning_rate: 学习率
     """
     warnings.filterwarnings("ignore")
@@ -120,11 +132,9 @@ def train_step(
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(ckpt_subdir, exist_ok=True)
 
-    num_classes = 10 if dataset_type == "cifar10" else 100
+    num_classes = 10 if dataset_type == "cifar-10" else 100
 
     # 加载训练和测试数据集
-    # D_test_data = torch.tensor(np.load(os.path.join(subdir, "test_data.npy")))
-    # D_test_labels = torch.tensor(np.load(os.path.join(subdir, "test_labels.npy")))
     D_test_data = torch.load(os.path.join(subdir, "test_data.npy"))
     D_test_labels = torch.load(os.path.join(subdir, "test_labels.npy"))
 
@@ -195,6 +205,7 @@ def train_step(
             D_test_labels,
             epochs=epochs,
             batch_size=batch_size,
+            optimizer_type=optimizer_type,
             learning_rate=learning_rate,
         )
         model_p1_path = os.path.join(ckpt_subdir, "model_p1.pth")
@@ -229,6 +240,7 @@ def train_step(
         model_current = models.resnet18(num_classes=num_classes)
         model_current.load_state_dict(model_prev.state_dict())
         print(f"开始训练 M_p{step} ({dataset_type})...")
+
         model_current = train_model(
             model_current,
             D_train_data,
@@ -237,6 +249,7 @@ def train_step(
             D_test_labels,
             epochs=epochs,
             batch_size=batch_size,
+            optimizer_type=optimizer_type,
             learning_rate=learning_rate,
         )
         model_current_path = os.path.join(ckpt_subdir, f"model_p{step}.pth")
@@ -257,7 +270,7 @@ def main():
         type=str,
         choices=["cifar-10", "cifar-100"],
         required=True,
-        help="选择数据集类型 (cifar10 或 cifar100)",
+        help="选择数据集类型 (cifar-10 或 cifar-100)",
     )
     parser.add_argument(
         "--noise_ratio",
@@ -303,6 +316,13 @@ def main():
         help="每批训练样本数",
     )
     parser.add_argument(
+        "--optimizer",
+        type=str,
+        choices=["adam", "sgd"],
+        default="adam",
+        help="选择优化器 (adam 或 sgd)",
+    )
+    parser.add_argument(
         "--learning_rate",
         type=float,
         default=0.001,
@@ -343,6 +363,7 @@ def main():
         load_model_path=args.load_model,
         epochs=args.epochs,
         batch_size=args.batch_size,
+        optimizer_type=args.optimizer,
         learning_rate=args.learning_rate,
     )
 
