@@ -4,7 +4,7 @@ import os
 
 
 class CustomDataset(Dataset):
-    def __init__(self, data, label):
+    def __init__(self, data, label, mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010)):
         data = data.astype(np.float32)
         shape = data.shape
         channel_idx = np.where(np.array(shape) == 3)[0]
@@ -15,9 +15,14 @@ class CustomDataset(Dataset):
 
         # todo 保证所有数据集都正确
         if (data > 1).any():
-            self.data = data / 255
+            self.data = data / 255.
         else:
             self.data = data
+
+        # todo normalize mean std
+        mean = np.array(mean, dtype=np.float32)[np.newaxis, :, np.newaxis, np.newaxis]
+        std = np.array(std, dtype=np.float32)[np.newaxis, :, np.newaxis, np.newaxis]
+        self.data = (self.data - mean) / std
 
         self.label = label
 
@@ -29,7 +34,7 @@ class CustomDataset(Dataset):
 
 
 def get_dataset_loader(
-    dataset_name, loader_name, data_dir, batch_size, num_classes=0, drop_last=False, shuffle=False
+    dataset_name, loader_name, data_dir, mean, std, batch_size, num_classes=0, drop_last=False, shuffle=False
 ):
     """
     根据 loader_name 加载相应的数据集：支持增量训练 (inc)、辅助数据 (aux) 和测试数据 (test)。
@@ -50,18 +55,18 @@ def get_dataset_loader(
         raise FileNotFoundError(f"{data_name} or {label_name} not found in {data_dir}")
 
     data = np.load(data_path)
-    label = np.load(label_path)
+    labels = np.load(label_path)
     if loader_name == 'train':  # train label change to onehot for teacher model
-        label = np.eye(num_classes)[label]
+        labels = np.eye(num_classes)[labels]
 
     # 构建自定义数据集
-    dataset = CustomDataset(data, label)
+    dataset = CustomDataset(data, labels, mean=mean, std=std)
 
     data_loader = DataLoader(
         dataset, batch_size=batch_size, drop_last=drop_last, shuffle=shuffle
     )
 
-    return dataset, data_loader
+    return data, labels, data_loader
 
 
 if __name__ == "__main__":
