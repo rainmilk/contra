@@ -482,7 +482,8 @@ $$ \text{Save}(M_{p0}, \text{path} = \text{model_p0.pth}) $$
 
 #### Step 1：训练模型 $M_{p1}$
 
-训练数据集：使用 $D_{\text{tr}}^{(1)} = D_a \cup D_f^{(1)} \cup D_n^{(1)}$ 训练模型 $M_{p1}$。模型 $M_{p1}$ 是在 $M_{p0}$ 的基础上继续训练的。
+<!-- 训练数据集：使用 $D_{\text{tr}}^{(1)} = D_a \cup D_f^{(1)} \cup D_n^{(1)}$ 训练模型 $M_{p1}$。模型 $M_{p1}$ 是在 $M_{p0}$ 的基础上继续训练的。 -->
+训练数据集：使用 $D_{\text{tr}}^{(1)} = D_f^{(1)} \cup D_n^{(1)}$ 训练模型 $M_{p1}$。模型 $M_{p1}$ 是在 $M_{p0}$ 的基础上继续训练的。
 
 - 数据集 $D_{\text{tr}}^{(1)}$ 组成：
   - 重放数据集：$D_a$ 是从 $D_0$ 中随机抽取的 10% 样本。
@@ -494,9 +495,36 @@ $$ M_{p1} \leftarrow \text{Train}(M_{p0}, D_{\text{tr}}^{(1)}, \text{test data},
 保存模型：
 $$ \text{Save}(M_{p1}, \text{path} = \text{model_p1.pth}) $$
 
+M_{p1} 放到指定的目录 tta-mr../data/data_set_name/inc/D_f+D_n
+
+# baseline
+-rw-rw-rw- 1 suizhihao suizhihao  91914368 Sep 23 13:32 cifar-10_inc_data.npy
+-rw-rw-rw- 1 suizhihao suizhihao     59968 Sep 23 13:32 cifar-10_inc_labels.npy
+-rw-rw-rw- 1 suizhihao suizhihao 122880128 Sep 22 12:19 cifar-10_test_data.npy
+-rw-rw-rw- 1 suizhihao suizhihao     80128 Sep 22 12:19 cifar-10_test_labels.npy
+-rw-rw-rw- 1 suizhihao suizhihao 307200128 Sep 22 12:19 cifar-10_train_data.npy
+-rw-rw-rw- 1 suizhihao suizhihao    200128 Sep 22 12:19 cifar-10_train_labels.npy
+
+# our method:tta-mr 同级的 data 目录下的子目录
+
+-rw-rw-rw- 1 suizhihao suizhihao  91914368 Sep 23 13:32 cifar-10_inc_data.npy
+-rw-rw-rw- 1 suizhihao suizhihao     59968 Sep 23 13:32 cifar-10_inc_labels.npy
+-rw-rw-rw- 1 suizhihao suizhihao  91914368 Sep 23 13:32 cifar-10_aux_data.npy
+-rw-rw-rw- 1 suizhihao suizhihao     59968 Sep 23 13:32 cifar-10_aux_labels.npy
+-rw-rw-rw- 1 suizhihao suizhihao 122880128 Sep 22 12:19 cifar-10_test_data.npy
+-rw-rw-rw- 1 suizhihao suizhihao     80128 Sep 22 12:19 cifar-10_test_labels.npy
+-rw-rw-rw- 1 suizhihao suizhihao 307200128 Sep 22 12:19 cifar-10_train_data.npy
+-rw-rw-rw- 1 suizhihao suizhihao    200128 Sep 22 12:19 cifar-10_train_labels.npy
+<!-- 
 #### Step 2：训练模型 $M_{p2}$
 
-训练数据集：使用 $D_{\text{tr}}^{(2)} = D_a \cup D_f^{(2)} \cup D_n^{(2)}$ 训练模型 $M_{p2}$。模型 $M_{p2}$ 是在 $M_{p1}$ 的基础上继续训练的。
+<!-- 训练数据集：使用 $D_{\text{tr}}^{(2)} = D_a \cup D_f^{(2)} \cup D_n^{(2)}$ 训练模型 $M_{p2}$。模型 $M_{p2}$ 是在 $M_{p1}$ 的基础上继续训练的。 -->
+训练数据集：使用 $D_{\text{tr}}^{(2)} = D_f^{(2)} \cup D_n^{(2)}$ 训练模型 $M_{p2}$。模型 $M_{p2}$ 是在 $M_{p1}$ 的基础上继续训练的。
+
+loaded model 变为 M_{p1}_{repaired}
+
+core_model, core.py
+working_model/after_adapt
 
 - 数据集 $D_{\text{tr}}^{(2)}$ 组成：
   - 重放数据集：$D_a$ 保持不变。
@@ -520,7 +548,7 @@ $$ \text{Save}(M_{p2}, \text{path} = \text{model_p2.pth}) $$
 $$ M_{p3} \leftarrow \text{Train}(M_{p2}, D_{\text{tr}}^{(3)}, \text{test data}, \text{epochs}=50, \text{batch size}=32, \text{learning rate}=0.001) $$
 
 保存模型：
-$$ \text{Save}(M_{p3}, \text{path} = \text{model_p3.pth}) $$
+$$ \text{Save}(M_{p3}, \text{path} = \text{model_p3.pth}) $$ -->
 
 ---
 
@@ -559,6 +587,8 @@ $$ \text{Save}(M_{p3}, \text{path} = \text{model_p3.pth}) $$
 
 - 原始训练数据集：
   
+ | 细分切
+
   以 CIFAR-100 为例，每个类别有 500 张训练样本和 100 张测试样本，整个训练集包含 50,000 张图像。
   
   $$ D_{\text{train}} = \{(x_i, y_i) \mid i = 1, 2, \dots, 50000 \}$$
@@ -578,6 +608,8 @@ $$ \text{Save}(M_{p3}, \text{path} = \text{model_p3.pth}) $$
   $$ D_{\text{inc}}^{(0)} = D_{\text{train}} \setminus D_0, \quad |D_{\text{inc}}^{(0)}| = 25000 $$
 
 ### 3. 重放数据集 $D_a$
+
+｜ 每个类抽取
 
 - 从 $D_0$ 中随机抽取 10% 的样本，构成重放数据集 $D_a$，以缓解模型在增量学习中的遗忘问题：
   
@@ -644,6 +676,8 @@ $$ \text{Save}(M_{p3}, \text{path} = \text{model_p3.pth}) $$
      $$ D_{n_{\text{sym}}}^{(t)} = \{ (x_m, f_{\text{sym}}(y_m)) \mid y_m = c, m \in N_c^{(t)} \} $$
 
   2. 非对称噪声：
+   
+   **对于 c100, f101，选择 单向 10 个（5 个 mapping 关系）**
      
      定义类别映射 $M: Y \rightarrow Y$，将特定类别的标签替换为指定类别的标签：
      
@@ -670,7 +704,8 @@ $$ \text{Save}(M_{p3}, \text{path} = \text{model_p3.pth}) $$
   
   在每个增量版本 $t$ 中，将重放数据集 $D_a$、遗忘类别样本集 $D_f^{(t)}$ 和噪声数据集 $D_n^{(t)}$ 合并，构成训练数据集：
   
-  $$ D_{\text{tr}}^{(t)} = D_a \cup D_f^{(t)} \cup D_n^{(t)}$$
+  <!-- $$ D_{\text{tr}}^{(t)} = D_a \cup D_f^{(t)} \cup D_n^{(t)}$$ -->
+  $$ D_{\text{tr}}^{(t)} = D_f^{(t)} \cup D_n^{(t)}$$
 
 - 每个增量版本只包含一种噪声类型的数据。
 

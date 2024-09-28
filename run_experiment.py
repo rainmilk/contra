@@ -42,7 +42,7 @@ def train_model(
     # 根据用户选择的优化器初始化
     if optimizer_type == "adam":
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    elif optimizer_type == "sgd":
+    elif optimizer_type == "sgd": # add weight_decay, 0.7/0.8
         optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
     else:
         raise ValueError(f"Unsupported optimizer type: {optimizer_type}")
