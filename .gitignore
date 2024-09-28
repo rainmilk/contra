@@ -1,3 +1,6 @@
+# baseline_code
+baseline_code/
+
 # directory for export
 export_dir/
 
@@ -9,10 +12,11 @@ backup/
 *.zip
 *.rar
 
-# dataset
+# dataset and data files
 data/
 !data/cifar-10/noise/reconstruct_D_tr.py
 dataset/
+*.npy
 
 # model
 models/
