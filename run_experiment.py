@@ -18,7 +18,7 @@ def train_model(
     epochs=50,
     batch_size=32,
     optimizer_type="adam",
-    learning_rate=0.001,
+    learning_rate=0.01,
 ):
     """
     训练模型函数
@@ -41,9 +41,11 @@ def train_model(
 
     # 根据用户选择的优化器初始化
     if optimizer_type == "adam":
-        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+        optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
     elif optimizer_type == "sgd": # add weight_decay, 0.7/0.8
         optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
+        scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
     else:
         raise ValueError(f"Unsupported optimizer type: {optimizer_type}")
 
@@ -64,7 +66,7 @@ def train_model(
             outputs = model(inputs)
             loss = criterion(outputs, targets)
             loss.backward()
-            optimizer.step()
+            scheduler.step()
             total_loss += loss.item()
 
         avg_loss = total_loss / len(dataloader)
