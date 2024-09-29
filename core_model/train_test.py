@@ -73,7 +73,7 @@ def model_train(
             )
 
 
-def model_test(labels, data_loader, model, device='cuda', teacher_model=False):
+def model_test(labels, data_loader, model, device="cuda", teacher_model=False):
     eval_results = {}
 
     if teacher_model:
@@ -97,7 +97,7 @@ def model_test(labels, data_loader, model, device='cuda', teacher_model=False):
     return eval_results
 
 
-def working_model_forward(data_loader, model, device='cuda'):
+def working_model_forward(data_loader, model, device="cuda"):
     model = model.to(device)
     model.eval()
 
@@ -117,7 +117,7 @@ def working_model_forward(data_loader, model, device='cuda'):
     return np.concatenate(output_predicts, axis=0), np.concatenate(output_probs, axis=0)
 
 
-def teacher_model_forward(test_loader, model, device='cuda'):
+def teacher_model_forward(test_loader, model, device="cuda"):
     model = model.to(device)
     model.eval()
 
@@ -137,4 +137,8 @@ def teacher_model_forward(test_loader, model, device='cuda'):
         predicts = np.argmax(probs, axis=1)
         output_predicts.append(predicts)
 
-    return np.concatenate(output_predicts, axis=0), np.concatenate(output_probs, axis=0), np.concatenate(embed_outs, axis=0)
+    return (
+        np.concatenate(output_predicts, axis=0),
+        np.concatenate(output_probs, axis=0),
+        np.concatenate(embed_outs, axis=0),
+    )

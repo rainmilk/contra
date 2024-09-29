@@ -152,11 +152,11 @@ def create_food101_npy_files(
                 elif noise_type == "asymmetric":
                     if original_label in asymmetric_mapping:
                         D_n_labels[idx_in_D_n] = asymmetric_mapping[original_label]
-                    else:
-                        new_label = original_label
-                        while new_label == original_label:
-                            new_label = np.random.randint(0, num_classes)
-                        D_n_labels[idx_in_D_n] = new_label
+                    # else:
+                    #     new_label = original_label
+                    #     while new_label == original_label:
+                    #         new_label = np.random.randint(0, num_classes)
+                    #     D_n_labels[idx_in_D_n] = new_label
                 else:
                     raise ValueError("Invalid noise type.")
             else:
