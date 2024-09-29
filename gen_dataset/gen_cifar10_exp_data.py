@@ -144,8 +144,10 @@ def create_cifar10_npy_files(
                 pass
 
         # 组合训练数据集 D_tr^{(t)}
-        D_tr_data = torch.cat([D_a_data, D_f_data, D_n_data], dim=0)
-        D_tr_labels = torch.cat([D_a_labels, D_f_labels, D_n_labels], dim=0)
+        # D_tr_data = torch.cat([D_a_data, D_f_data, D_n_data], dim=0)
+        # D_tr_labels = torch.cat([D_a_labels, D_f_labels, D_n_labels], dim=0)
+        D_tr_data = torch.cat([D_f_data, D_n_data], dim=0)
+        D_tr_labels = torch.cat([D_f_labels, D_n_labels], dim=0)
 
         # 打乱训练数据集
         perm = torch.randperm(len(D_tr_data))
