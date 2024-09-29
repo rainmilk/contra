@@ -1,6 +1,6 @@
 import os
 import argparse
-from run_experiment import run_experiment
+# from run_experiment import run_experiment
 
 
 # 自定义检查函数
@@ -282,26 +282,26 @@ def main():
 
     print(f"Additional kwargs: {kwargs}")
 
-    run_experiment(
-        dataset_name=args.dataset,
-        model_name=args.model,
-        condition=args.condition,
-        remove_fraction=args.remove_fraction,
-        noise_type=args.noise_type,
-        noise_fraction=args.noise_fraction,
-        use_early_stopping=args.use_early_stopping,
-        selected_classes_remove=args.classes_remove,
-        selected_classes_noise=args.classes_noise,
-        batch_size=args.batch_size,
-        learning_rate=args.learning_rate,
-        optimizer=args.optimizer,
-        momentum=args.momentum,
-        weight_decay=args.weight_decay,
-        num_epochs=args.num_epochs,
-        early_stopping_patience=args.early_stopping_patience,
-        early_stopping_accuracy_threshold=args.early_stopping_accuracy_threshold,
-        **kwargs,
-    )
+    # run_experiment(
+    #     dataset_name=args.dataset,
+    #     model_name=args.model,
+    #     condition=args.condition,
+    #     remove_fraction=args.remove_fraction,
+    #     noise_type=args.noise_type,
+    #     noise_fraction=args.noise_fraction,
+    #     use_early_stopping=args.use_early_stopping,
+    #     selected_classes_remove=args.classes_remove,
+    #     selected_classes_noise=args.classes_noise,
+    #     batch_size=args.batch_size,
+    #     learning_rate=args.learning_rate,
+    #     optimizer=args.optimizer,
+    #     momentum=args.momentum,
+    #     weight_decay=args.weight_decay,
+    #     num_epochs=args.num_epochs,
+    #     early_stopping_patience=args.early_stopping_patience,
+    #     early_stopping_accuracy_threshold=args.early_stopping_accuracy_threshold,
+    #     **kwargs,
+    # )
 
 
 if __name__ == "__main__":
