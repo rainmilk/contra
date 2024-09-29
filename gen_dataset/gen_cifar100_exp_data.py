@@ -5,6 +5,7 @@ import argparse
 from torchvision import datasets, transforms
 import json
 
+
 def split_by_class(data, labels, num_classes=100):
     """按类别划分数据集"""
     class_data = {i: [] for i in range(num_classes)}
@@ -206,7 +207,7 @@ def create_cifar100_npy_files(
     # 定义非对称噪声映射
 
     # 读取 CIFAR-100 类别
-    cifar100_classes_file = "./configs/classes/cifar_100_flattened_classes.txt"
+    cifar100_classes_file = "./configs/classes/cifar_100_classes.txt"
     cifar100_classes = load_classes_from_file(cifar100_classes_file)
 
     # 读取 CIFAR-100 的 superclass 和 child class 映射
@@ -215,7 +216,7 @@ def create_cifar100_npy_files(
         cifar100_mapping_file
     )
 
-    # 打印读取到的类别信息（可选）
+    # 打印读取到的类别信息
     print("CIFAR-100 Classes:", cifar100_classes)
 
     # 构建非对称映射，如果选择了非对称噪声
@@ -267,7 +268,7 @@ def create_cifar100_npy_files(
                         new_label = np.random.randint(0, num_classes)
                     D_n_labels[idx_in_D_n] = new_label
                 elif noise_type == "asymmetric":
-                    if original_class_name  in asymmetric_mapping:
+                    if original_class_name in asymmetric_mapping:
                         new_class_name = asymmetric_mapping[original_class_name]
                         new_label = cifar100_classes.index(new_class_name)
                         D_n_labels[idx_in_D_n] = new_label

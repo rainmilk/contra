@@ -67,6 +67,47 @@ def sample_replay_data(D_0_data, D_0_labels, replay_ratio=0.1):
     return D_a_data, D_a_labels
 
 
+def load_classes_from_file(file_path):
+    """从文件中读取类别列表"""
+    with open(file_path, "r") as f:
+        classes = [line.strip() for line in f.readlines()]
+    return classes
+
+
+def load_superclass_mapping(file_path):
+    """从JSON文件中加载 superclass 与 child class 的映射"""
+    with open(file_path, "r") as f:
+        mapping = json.load(f)
+    return mapping
+
+
+def build_asymmetric_mapping(superclass_mapping, classes):
+    """构建非对称标签映射，确保标签替换为同superclass内的其他类"""
+    child_to_superclass_mapping = {}
+
+    # 构建child class到superclass的反向映射
+    for superclass, child_classes in superclass_mapping.items():
+        for child_class in child_classes:
+            child_to_superclass_mapping[child_class] = (superclass, child_classes)
+
+    # 构建非对称映射表
+    asymmetric_mapping = {}
+    for class_name in classes:
+        # 获取该类别所属的大类（superclass）以及该大类中的所有类别
+        if class_name in child_to_superclass_mapping:
+            superclass, child_classes = child_to_superclass_mapping[class_name]
+            # 在同一superclass中随机选择一个不同的类别作为替换
+            available_classes = [c for c in child_classes if c != class_name]
+            if available_classes:
+                new_class = np.random.choice(available_classes)
+                asymmetric_mapping[class_name] = new_class
+            else:
+                asymmetric_mapping[class_name] = (
+                    class_name  # 如果没有其他类别，则保持原标签不变
+                )
+    return asymmetric_mapping
+
+
 def create_food101_npy_files(
     data_dir,
     gen_dir,
@@ -175,9 +216,22 @@ def create_food101_npy_files(
     ]
 
     # 定义非对称噪声映射
-    asymmetric_mapping = {
-        i: (i + 1) % 101 for i in noise_classes  # 简单地将类别标签映射为下一个类别
-    }
+
+    # 读取类别信息和映射
+    classes_file = "./configs/classes/food_101_classes.txt"
+    superclass_mapping_file = "./configs/classes/food_101_mapping.json"
+    food_classes = load_classes_from_file(classes_file)
+    superclass_mapping = load_superclass_mapping(superclass_mapping_file)
+
+    # 打印读取到的类别信息
+    print("FOOD-101 Classes:", food_classes)
+
+    # asymmetric_mapping = {
+    #     i: (i + 1) % 101 for i in noise_classes  # 简单地将类别标签映射为下一个类别
+    # }
+
+    if noise_type == "asymmetric":
+        asymmetric_mapping = build_asymmetric_mapping(superclass_mapping, food_classes)
 
     # 生成增量版本数据集
     for t in range(num_versions):
@@ -216,14 +270,18 @@ def create_food101_npy_files(
         ):
             if D_inc_idx in noisy_indices:
                 original_label = D_n_labels[idx_in_D_n].item()
+                original_class_name = food_classes[original_label]
+
                 if noise_type == "symmetric":
                     new_label = original_label
                     while new_label == original_label:
                         new_label = np.random.randint(0, num_classes)
                     D_n_labels[idx_in_D_n] = new_label
                 elif noise_type == "asymmetric":
-                    if original_label in asymmetric_mapping:
-                        D_n_labels[idx_in_D_n] = asymmetric_mapping[original_label]
+                    if original_class_name in asymmetric_mapping:
+                        new_class_name = asymmetric_mapping[original_class_name]
+                        new_label = food_classes.index(new_class_name)
+                        D_n_labels[idx_in_D_n] = new_label
                 else:
                     raise ValueError("Invalid noise type.")
             else:
