@@ -41,6 +41,19 @@ num_classes_dict = {
     # "tiny-imagenet-200": 200,
 }
 
+def create_optimizer_scheduler(optimizer_type, parameters, learning_rate=1e-3):
+    # 根据用户选择的优化器初始化
+    if optimizer_type == "adam":
+        optimizer = optim.AdamW(parameters, lr=learning_rate)
+        lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
+    elif optimizer_type == "sgd":  # add weight_decay, 0.7/0.8
+        optimizer = optim.SGD(parameters, lr=learning_rate, momentum=0.9)
+        lr_scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=20, T_mult=2)
+    else:
+        raise ValueError(f"Unsupported optimizer type: {optimizer_type}")
+
+    return optimizer, lr_scheduler
+
 
 def iterate_repair_model(
     working_model,
@@ -268,9 +281,7 @@ def iterate_adapt_model(
     )
 
 
-def mix_up_data(
-    inc_data, inc_probs, aug_data, aug_probs, mean, std, batch_size, alpha=0.15
-):
+def mix_up_data(inc_data, inc_probs, aug_data, aug_probs, mean, std, batch_size, alpha=0.15):
     aug_size, inc_size = len(aug_probs), len(inc_data)
     sampling_random_idx = np.random.choice(np.arange(aug_size), inc_size)
     aug_data_sampling = aug_data[sampling_random_idx]
@@ -336,9 +347,11 @@ def execute(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     learning_rate = getattr(args, "learning_rate", 0.001)
-    weight_decay = getattr(args, "weight_decay", 1e-4)
+    # weight_decay = getattr(args, "weight_decay", 1e-4)
     repair_iter_num = getattr(args, "repair_iter_num", 2)
     adapt_iter_num = getattr(args, "adapt_iter_num", 2)
+    optimizer_type = getattr(args, "optimizer", 'adam')
+
 
     model_paths = get_model_paths(args, args.dataset)
 
@@ -367,15 +380,10 @@ def execute(args):
     elif args.model == "vgg16":
         working_model = vgg16_bn_lth(num_classes=num_classes)
 
-    # working_opt = optim.Adam(
-    #     working_model.parameters(), lr=learning_rate, weight_decay=weight_decay
-    # )
-    working_opt = optim.SGD(
-        working_model.parameters(), lr=learning_rate, momentum=0.9, weight_decay=5e-4
-    )
-    working_lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        working_opt, T_max=200
-    )
+    working_opt, working_lr_scheduler = create_optimizer_scheduler(optimizer_type,
+                                                                   working_model.parameters(),
+                                                                   learning_rate)
+
     working_criterion = nn.CrossEntropyLoss()
 
     checkpoint = torch.load(working_model_path)
@@ -385,19 +393,11 @@ def execute(args):
     resnet = models.resnet18(pretrained=False, num_classes=512)
     resnet = nn.Sequential(*list(resnet.children())[:-1])
     lip_teacher_model = SimpleLipNet(resnet, 512, num_classes)
-    # teacher_opt = optim.Adam(
-    #     lip_teacher_model.parameters(), lr=learning_rate, weight_decay=weight_decay
-    # )
-    teacher_opt = optim.SGD(
-        lip_teacher_model.parameters(),
-        lr=learning_rate,
-        momentum=0.9,
-        weight_decay=5e-4,
-    )
-    teacher_lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        teacher_opt, T_max=200
-    )
 
+    # 根据用户选择的优化器初始化
+    teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(optimizer_type,
+                                                                   lip_teacher_model.parameters(),
+                                                                   learning_rate)
     teacher_criterion = nn.CrossEntropyLoss()
 
     if os.path.exists(lip_teacher_model_path):

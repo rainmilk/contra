@@ -45,7 +45,7 @@ def train_model(
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
     elif optimizer_type == "sgd": # add weight_decay, 0.7/0.8
         optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
-        scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
+        scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=20, T_mult=2)
     else:
         raise ValueError(f"Unsupported optimizer type: {optimizer_type}")
 
@@ -56,17 +56,18 @@ def train_model(
         test_data.to(device), test_labels.to(device)
     )
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
-
+    iters = len(test_loader)
     for epoch in range(epochs):
         total_loss = 0
         model.train()
 
-        for inputs, targets in dataloader:
+        for i, (inputs, targets) in enumerate(dataloader):
             optimizer.zero_grad()
             outputs = model(inputs)
             loss = criterion(outputs, targets)
             loss.backward()
-            scheduler.step()
+            optimizer.step()
+            scheduler.step(epoch + i/iters)
             total_loss += loss.item()
 
         avg_loss = total_loss / len(dataloader)

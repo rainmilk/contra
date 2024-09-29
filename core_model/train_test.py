@@ -23,6 +23,7 @@ def model_train(
     model = model.to(device)  # 确保模型移动到正确的设备
     model.train()
 
+    iters = len(train_loader)
     for epoch in tqdm(range(args.num_epochs), desc="Training Progress"):
         running_loss = 0.0
         correct = 0
@@ -33,13 +34,12 @@ def model_train(
             for i, (inputs, labels) in enumerate(train_loader):
                 inputs, labels = inputs.to(device), labels.to(device)
                 optimizer.zero_grad()  # 清除上一步的梯度
-
                 outputs = model(inputs)
 
                 loss = criterion(outputs, labels) * alpha  # 使用 alpha 参数调整损失函数
                 loss.backward()  # 反向传播
                 optimizer.step()  # 更新参数
-
+                lr_scheduler.step(epoch + i/iters)
                 running_loss += loss.item()
 
                 # 计算准确率
@@ -51,8 +51,6 @@ def model_train(
                 # 更新进度条显示每个 mini-batch 的损失
                 pbar.set_postfix({"Loss": f"{loss.item():.4f}"})
                 pbar.update(1)
-
-        lr_scheduler.step()
 
         avg_loss = running_loss / len(train_loader)  # 计算平均损失
         accuracy = correct / total  # 计算训练集的准确率
