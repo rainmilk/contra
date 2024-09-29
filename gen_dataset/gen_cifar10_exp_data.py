@@ -97,6 +97,9 @@ def create_cifar10_npy_files(
 
     if balanced:
         print("使用类均衡的数据划分方式...")
+
+        subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}_balanced")
+
         # 按类别划分训练数据
         class_data = split_by_class(train_data, train_labels)
 
@@ -113,6 +116,9 @@ def create_cifar10_npy_files(
     else:
         print("使用随机的数据划分方式...")
         # 随机划分初始数据集 D_0 和增量数据集 D_inc^(0)
+
+        subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}")
+
         D_0_indices = indices[:split_idx]
         D_inc_indices = indices[split_idx:]
 
@@ -128,7 +134,7 @@ def create_cifar10_npy_files(
         D_a_data = D_0_data[D_a_indices]
         D_a_labels = D_0_labels[D_a_indices]
 
-    subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}")
+    # 创建存储目录
     os.makedirs(subdir, exist_ok=True)
 
     # 保存初始数据集、初始增量数据集、重放数据集
@@ -211,9 +217,9 @@ def create_cifar10_npy_files(
                     if original_label in asymmetric_mapping:
                         D_n_labels[idx_in_D_n] = asymmetric_mapping[original_label]
                     # else:
-                        # print(
-                        #     f"Warning: Original label {original_label} not in asymmetric mapping. Skipping label modification."
-                        # )
+                    # print(
+                    #     f"Warning: Original label {original_label} not in asymmetric mapping. Skipping label modification."
+                    # )
                 else:
                     raise ValueError("Invalid noise type.")
             else:
