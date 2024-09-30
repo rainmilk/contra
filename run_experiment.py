@@ -271,7 +271,7 @@ def main():
     parser.add_argument(
         "--dataset_type",
         type=str,
-        choices=["cifar-10", "cifar-100"],
+        choices=["cifar-10", "cifar-100", "food-101"],
         required=True,
         help="选择数据集类型 (cifar-10 或 cifar-100)",
     )

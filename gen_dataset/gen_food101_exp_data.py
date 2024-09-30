@@ -37,10 +37,15 @@ def sample_class_balanced_data(class_data, split_ratio=0.5):
         D_inc_data.extend([samples[i] for i in shuffled_indices[split_idx:]])
         D_inc_labels.extend([class_label] * (num_samples - split_idx))
 
-    D_0_data = torch.stack(D_0_data)
-    D_0_labels = torch.tensor(D_0_labels)
-    D_inc_data = torch.stack(D_inc_data)
-    D_inc_labels = torch.tensor(D_inc_labels)
+    # D_0_data = torch.stack(D_0_data)
+    # D_0_labels = torch.tensor(D_0_labels)
+    # D_inc_data = torch.stack(D_inc_data)
+    # D_inc_labels = torch.tensor(D_inc_labels)
+
+    D_0_data = np.stack(D_0_data)
+    D_0_labels = np.array(D_0_labels)
+    D_inc_data = np.stack(D_inc_data)
+    D_inc_labels = np.array(D_inc_labels)
 
     return D_0_data, D_0_labels, D_inc_data, D_inc_labels
 
@@ -61,8 +66,11 @@ def sample_replay_data(D_0_data, D_0_labels, replay_ratio=0.1):
         D_a_data.extend([samples[i] for i in replay_indices])
         D_a_labels.extend([class_label] * num_replay_samples)
 
-    D_a_data = torch.stack(D_a_data)
-    D_a_labels = torch.tensor(D_a_labels)
+    # D_a_data = torch.stack(D_a_data)
+    # D_a_labels = torch.tensor(D_a_labels)
+
+    D_a_data = np.stack(D_a_data)
+    D_a_labels = np.array(D_a_labels)
 
     return D_a_data, D_a_labels
 
@@ -121,27 +129,33 @@ def create_food101_npy_files(
         [transforms.Resize((224, 224)), transforms.ToTensor()]
     )
 
-    # 加载 FOOD-101 数据集，直接使用 torchvision 提供的 Food101 类
-    print("Loading Food101 training and test datasets...")
-    train_dataset = datasets.Food101(root=data_dir, split="train", transform=transform)
-    test_dataset = datasets.Food101(root=data_dir, split="test", transform=transform)
+    # # 加载 FOOD-101 数据集，直接使用 torchvision 提供的 Food101 类
+    # print("Loading Food101 training and test datasets...")
+    # train_dataset = datasets.Food101(root=data_dir, split="train", transform=transform)
+    # test_dataset = datasets.Food101(root=data_dir, split="test", transform=transform)
 
-    # 使用 tqdm 显示进度条加载训练数据
-    print("Extracting training data and labels...")
-    train_data = torch.stack(
-        [train_dataset[i][0] for i in tqdm(range(len(train_dataset)))]
-    )
-    train_labels = torch.tensor(
-        [train_dataset[i][1] for i in tqdm(range(len(train_dataset)))]
-    )
+    # # 使用 tqdm 显示进度条加载训练数据
+    # print("Extracting training data and labels...")
+    # train_data = torch.stack(
+    #     [train_dataset[i][0] for i in tqdm(range(len(train_dataset)))]
+    # )
+    # train_labels = torch.tensor(
+    #     [train_dataset[i][1] for i in tqdm(range(len(train_dataset)))]
+    # )
+    # print("Extracting test data and labels...")
+    # test_data = torch.stack(
+    #     [test_dataset[i][0] for i in tqdm(range(len(test_dataset)))]
+    # )
+    # test_labels = torch.tensor(
+    #     [test_dataset[i][1] for i in tqdm(range(len(test_dataset)))]
+    # )
 
-    print("Extracting test data and labels...")
-    test_data = torch.stack(
-        [test_dataset[i][0] for i in tqdm(range(len(test_dataset)))]
-    )
-    test_labels = torch.tensor(
-        [test_dataset[i][1] for i in tqdm(range(len(test_dataset)))]
-    )
+    # 从npy文件加载数据
+    print("Loading preprocessed training and test datasets from .npy files...")
+    train_data = np.load(os.path.join(data_dir, "train_data.npy"))
+    train_labels = np.load(os.path.join(data_dir, "train_labels.npy"))
+    test_data = np.load(os.path.join(data_dir, "test_data.npy"))
+    test_labels = np.load(os.path.join(data_dir, "test_labels.npy"))
 
     # 根据 balanced 参数调整存储路径
     if balanced:
@@ -186,19 +200,33 @@ def create_food101_npy_files(
     # 创建存储目录
     os.makedirs(subdir, exist_ok=True)
 
+    # # 保存初始数据集、初始增量数据集、重放数据集
+    # torch.save(D_0_data, os.path.join(subdir, "D_0.npy"))
+    # torch.save(D_0_labels, os.path.join(subdir, "D_0_labels.npy"))
+
+    # torch.save(D_inc_data, os.path.join(subdir, "D_inc_0_data.npy"))
+    # torch.save(D_inc_labels, os.path.join(subdir, "D_inc_0_labels.npy"))
+
+    # torch.save(D_a_data, os.path.join(subdir, "D_a.npy"))
+    # torch.save(D_a_labels, os.path.join(subdir, "D_a_labels.npy"))
+
+    # # 保存测试数据集
+    # torch.save(test_data, os.path.join(subdir, "test_data.npy"))
+    # torch.save(test_labels, os.path.join(subdir, "test_labels.npy"))
+
     # 保存初始数据集、初始增量数据集、重放数据集
-    torch.save(D_0_data, os.path.join(subdir, "D_0.npy"))
-    torch.save(D_0_labels, os.path.join(subdir, "D_0_labels.npy"))
+    np.save(os.path.join(subdir, "D_0.npy"), D_0_data)
+    np.save(os.path.join(subdir, "D_0_labels.npy"), D_0_labels)
 
-    torch.save(D_inc_data, os.path.join(subdir, "D_inc_0_data.npy"))
-    torch.save(D_inc_labels, os.path.join(subdir, "D_inc_0_labels.npy"))
+    np.save(os.path.join(subdir, "D_inc_0_data.npy"), D_inc_data)
+    np.save(os.path.join(subdir, "D_inc_0_labels.npy"), D_inc_labels)
 
-    torch.save(D_a_data, os.path.join(subdir, "D_a.npy"))
-    torch.save(D_a_labels, os.path.join(subdir, "D_a_labels.npy"))
+    np.save(os.path.join(subdir, "D_a.npy"), D_a_data)
+    np.save(os.path.join(subdir, "D_a_labels.npy"), D_a_labels)
 
     # 保存测试数据集
-    torch.save(test_data, os.path.join(subdir, "test_data.npy"))
-    torch.save(test_labels, os.path.join(subdir, "test_labels.npy"))
+    np.save(os.path.join(subdir, "test_data.npy"), test_data)
+    np.save(os.path.join(subdir, "test_labels.npy"), test_labels)
 
     num_classes = 101
 
@@ -261,7 +289,8 @@ def create_food101_npy_files(
             noisy_indices = []
 
         D_n_data = D_inc_data[noise_sample_indices]
-        D_n_labels = D_inc_labels[noise_sample_indices].clone()
+        # D_n_labels = D_inc_labels[noise_sample_indices].clone()
+        D_n_labels = D_inc_labels[noise_sample_indices].copy()
 
         # 在 D_n_labels 中注入噪声
         print("Injecting noise into labels...")
@@ -289,17 +318,23 @@ def create_food101_npy_files(
                 pass
 
         # 组合训练数据集 D_tr^{(t)}
-        D_tr_data = torch.cat([D_f_data, D_n_data], dim=0)
-        D_tr_labels = torch.cat([D_f_labels, D_n_labels], dim=0)
+        # D_tr_data = torch.cat([D_f_data, D_n_data], dim=0)
+        # D_tr_labels = torch.cat([D_f_labels, D_n_labels], dim=0)
+        D_tr_data = np.concatenate([D_f_data, D_n_data], axis=0)
+        D_tr_labels = np.concatenate([D_f_labels, D_n_labels], axis=0)
 
         # 打乱训练数据集
         perm = torch.randperm(len(D_tr_data))
         D_tr_data = D_tr_data[perm]
         D_tr_labels = D_tr_labels[perm]
 
+        # # 保存训练数据集
+        # torch.save(D_tr_data, os.path.join(subdir, f"D_tr_data_version_{t+1}.npy"))
+        # torch.save(D_tr_labels, os.path.join(subdir, f"D_tr_labels_version_{t+1}.npy"))
+
         # 保存训练数据集
-        torch.save(D_tr_data, os.path.join(subdir, f"D_tr_data_version_{t+1}.npy"))
-        torch.save(D_tr_labels, os.path.join(subdir, f"D_tr_labels_version_{t+1}.npy"))
+        np.save(os.path.join(subdir, f"D_tr_data_version_{t+1}.npy"), D_tr_data)
+        np.save(os.path.join(subdir, f"D_tr_labels_version_{t+1}.npy"), D_tr_labels)
 
         print(f"D_tr 版本 {t+1} 已保存到 {subdir}")
 
