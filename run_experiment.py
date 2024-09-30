@@ -9,6 +9,31 @@ import torchvision.models as models
 from torch.utils.data import DataLoader
 
 
+def load_dataset(subdir, dataset_type, file_name):
+    """
+    根据数据集类型加载数据。
+    :param subdir: 数据目录
+    :param dataset_type: 数据集类型 (cifar-10, cifar-100, food-101)
+    :param file_name: 数据文件名
+    :return: PyTorch 张量格式的数据
+    """
+    file_path = os.path.join(subdir, file_name)
+
+    if dataset_type in ["cifar-10", "cifar-100"]:
+        # 如果是 cifar-10 或 cifar-100，使用 torch.load()
+        data = torch.load(file_path)
+    elif dataset_type == "food-101":
+        # 如果是 food-101，使用 numpy.load() 并转换为 PyTorch 张量
+        data = np.load(file_path)
+        data = torch.tensor(
+            data, dtype=torch.float32 if "data" in file_name else torch.long
+        )
+    else:
+        raise ValueError(f"Unsupported dataset type: {dataset_type}")
+
+    return data
+
+
 def train_model(
     model,
     data,
@@ -137,7 +162,17 @@ def train_step(
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(ckpt_subdir, exist_ok=True)
 
-    num_classes = 10 if dataset_type == "cifar-10" else 100
+    # num_classes = 10 if dataset_type == "cifar-10" else 100
+
+    # 根据 dataset_type 设置分类类别数
+    if dataset_type == "cifar-10":
+        num_classes = 10
+    elif dataset_type == "cifar-100":
+        num_classes = 100
+    elif dataset_type == "food-101":
+        num_classes = 101
+    else:
+        raise ValueError(f"Unsupported dataset type: {dataset_type}")
 
     # 加载训练和测试数据集
     D_test_data = torch.load(os.path.join(subdir, "test_data.npy"))
@@ -152,9 +187,6 @@ def train_step(
     print(f"Epochs: {epochs}, Batch Size: {batch_size}, Learning Rate: {learning_rate}")
 
     if step == 0:  # 基于$D_0$数据集和原始的resnet网络训练一个模型 M_p0
-        model_p0 = models.resnet18(num_classes=num_classes)
-        print(f"开始训练 M_p0 ({dataset_type})...")
-
         D_train_data = torch.load(os.path.join(subdir, f"D_0.npy"))
         D_train_labels = torch.load(os.path.join(subdir, f"D_0_labels.npy"))
 
@@ -162,6 +194,9 @@ def train_step(
         print("用于训练的数据: D_0.npy 和 D_0_labels.npy")
         print("用于训练的模型: ResNet18 初始化")
 
+        model_p0 = models.resnet18(num_classes=num_classes)
+        print(f"开始训练 M_p0 ({dataset_type})...")
+        
         model_p0 = train_model(
             model_p0,
             D_train_data,
@@ -178,6 +213,11 @@ def train_step(
     elif (
         step == 1
     ):  # load上一步训练好的M_p0模型，然后基于 D_tr_data_version_1 和 D_tr_labels_version_1 进行训练，得到M_p1
+        D_train_data = torch.load(os.path.join(subdir, f"D_tr_data_version_{step}.npy"))
+        D_train_labels = torch.load(
+            os.path.join(subdir, f"D_tr_labels_version_{step}.npy")
+        )
+        
         if load_model_path:  # 只能是 M_p0 模型
             if "model_p0" not in load_model_path:
                 raise ValueError("加载的模型必须是 M_p0 模型。")
@@ -187,11 +227,6 @@ def train_step(
             model_p0_path = os.path.join(ckpt_subdir, "model_p0.pth")
             model_p0_loaded = load_model(model_p0_path, num_classes)
             print(f"加载模型: {model_p0_path}")
-
-        D_train_data = torch.load(os.path.join(subdir, f"D_tr_data_version_{step}.npy"))
-        D_train_labels = torch.load(
-            os.path.join(subdir, f"D_tr_labels_version_{step}.npy")
-        )
 
         # 打印用于训练的模型和数据
         print(
@@ -275,7 +310,7 @@ def main():
         type=str,
         choices=["cifar-10", "cifar-100", "food-101"],
         required=True,
-        help="选择数据集类型 (cifar-10 或 cifar-100)",
+        help="选择数据集类型 (cifar-10 或 cifar-100 或 food-101)",
     )
     parser.add_argument(
         "--noise_ratio",
