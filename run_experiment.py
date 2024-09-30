@@ -67,9 +67,9 @@ def train_model(
             loss = criterion(outputs, targets)
             loss.backward()
             optimizer.step()
-            scheduler.step(epoch + i/iters)
             total_loss += loss.item()
 
+        scheduler.step(epoch)
         avg_loss = total_loss / len(dataloader)
         print(f"Epoch [{epoch + 1}/{epochs}], Loss: {avg_loss:.4f}")
 

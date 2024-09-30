@@ -39,7 +39,6 @@ def model_train(
                 loss = criterion(outputs, labels) * alpha  # 使用 alpha 参数调整损失函数
                 loss.backward()  # 反向传播
                 optimizer.step()  # 更新参数
-                lr_scheduler.step(epoch + i/iters)
                 running_loss += loss.item()
 
                 # 计算准确率
@@ -52,6 +51,7 @@ def model_train(
                 pbar.set_postfix({"Loss": f"{loss.item():.4f}"})
                 pbar.update(1)
 
+        lr_scheduler.step(epoch)
         avg_loss = running_loss / len(train_loader)  # 计算平均损失
         accuracy = correct / total  # 计算训练集的准确率
         print(
