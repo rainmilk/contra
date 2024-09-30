@@ -357,7 +357,7 @@ def main():
     parser.add_argument(
         "--gen_dir",
         type=str,
-        default="./data/food-101/gen/",
+        default="./data/food-101/gen/cache",
         help="生成数据集的保存目录",
     )
     parser.add_argument(

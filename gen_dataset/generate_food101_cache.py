@@ -74,5 +74,5 @@ def generate_food101_cache(data_dir, gen_dir, batch_size=512, num_workers=4):
 
 if __name__ == "__main__":
     data_dir = "./data/food-101/normal"  # 数据集目录
-    gen_dir = "./data/food-101/gen"  # 缓存生成目录
+    gen_dir = "./data/food-101/gen/cache"  # 缓存生成目录
     generate_food101_cache(data_dir, gen_dir)

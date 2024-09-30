@@ -43,9 +43,11 @@ def train_model(
     if optimizer_type == "adam":
         optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
-    elif optimizer_type == "sgd": # add weight_decay, 0.7/0.8
+    elif optimizer_type == "sgd":  # add weight_decay, 0.7/0.8
         optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
-        scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=20, T_mult=2)
+        scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
+            optimizer, T_0=20, T_mult=2
+        )
     else:
         raise ValueError(f"Unsupported optimizer type: {optimizer_type}")
 
@@ -331,16 +333,29 @@ def main():
         default=0.001,
         help="学习率",
     )
-
+    parser.add_argument(
+        "--balanced",
+        action="store_true",
+        help="是否使用类均衡的数据划分方式。如果不指定，则使用随机划分。",
+    )
     args = parser.parse_args()
 
-    # 构建数据子目录路径
-    subdir = os.path.join(
-        args.gen_dir,
-        args.dataset_type,
-        "gen",
-        f"nr_{args.noise_ratio}_nt_{args.noise_type}",
-    )
+    if args.balanced == True:
+        # 构建数据子目录路径
+        subdir = os.path.join(
+            args.gen_dir,
+            args.dataset_type,
+            "gen",
+            f"nr_{args.noise_ratio}_nt_{args.noise_type}_balanced",
+        )
+    else:
+        # 构建数据子目录路径
+        subdir = os.path.join(
+            args.gen_dir,
+            args.dataset_type,
+            "gen",
+            f"nr_{args.noise_ratio}_nt_{args.noise_type}",
+        )
 
     if not os.path.exists(subdir):
         raise FileNotFoundError(
