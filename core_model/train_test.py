@@ -29,6 +29,9 @@ def model_train(
         correct = 0
         total = 0
 
+        # 更新学习率调度器
+        lr_scheduler.step(epoch)
+
         # 用 tqdm 显示训练进度条
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for i, (inputs, labels) in enumerate(train_loader):
@@ -51,7 +54,6 @@ def model_train(
                 pbar.set_postfix({"Loss": f"{loss.item():.4f}"})
                 pbar.update(1)
 
-        lr_scheduler.step(epoch)
         avg_loss = running_loss / len(train_loader)  # 计算平均损失
         accuracy = correct / total  # 计算训练集的准确率
         print(

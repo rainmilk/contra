@@ -107,6 +107,9 @@ def train_model(
         correct = 0
         total = 0
 
+        # 更新学习率调度器
+        scheduler.step(epoch)
+
         # tqdm 进度条显示
         with tqdm(total=len(dataloader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for inputs, targets in dataloader:
@@ -125,9 +128,6 @@ def train_model(
                 # 更新进度条
                 pbar.set_postfix({"Loss": f"{loss.item():.4f}"})
                 pbar.update(1)
-
-        # 更新学习率调度器
-        scheduler.step(epoch)
 
         # 打印训练集的平均损失和准确率
         avg_loss = running_loss / len(dataloader)
