@@ -13,6 +13,7 @@ class SimpleLipNet(nn.Module):
         super(SimpleLipNet, self).__init__()
 
         self.backbone = backbone
+        self.flatten = nn.Flatten()
         self.apply(self.add_spectral_norm_)
         self.fc = nn.Linear(input_sz, output_sz)
         self.apply(self._spectral_init)
@@ -45,7 +46,7 @@ class SimpleLipNet(nn.Module):
 
     def forward(self, inputs):  # [N,C,H,W]
         x = self.backbone(inputs)
-        embedding = torch.flatten(x, 1)
+        embedding = self.flatten(x)
         out = self.fc(embedding)
         if self.training:
             return out
