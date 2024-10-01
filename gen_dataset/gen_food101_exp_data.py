@@ -125,31 +125,6 @@ def create_food101_npy_files(
     retention_ratios=[0.5, 0.3, 0.1],
     balanced=False,
 ):
-    transform = transforms.Compose(
-        [transforms.Resize((224, 224)), transforms.ToTensor()]
-    )
-
-    # # 加载 FOOD-101 数据集，直接使用 torchvision 提供的 Food101 类
-    # print("Loading Food101 training and test datasets...")
-    # train_dataset = datasets.Food101(root=data_dir, split="train", transform=transform)
-    # test_dataset = datasets.Food101(root=data_dir, split="test", transform=transform)
-
-    # # 使用 tqdm 显示进度条加载训练数据
-    # print("Extracting training data and labels...")
-    # train_data = torch.stack(
-    #     [train_dataset[i][0] for i in tqdm(range(len(train_dataset)))]
-    # )
-    # train_labels = torch.tensor(
-    #     [train_dataset[i][1] for i in tqdm(range(len(train_dataset)))]
-    # )
-    # print("Extracting test data and labels...")
-    # test_data = torch.stack(
-    #     [test_dataset[i][0] for i in tqdm(range(len(test_dataset)))]
-    # )
-    # test_labels = torch.tensor(
-    #     [test_dataset[i][1] for i in tqdm(range(len(test_dataset)))]
-    # )
-
     # 从npy文件加载数据
     print("Loading preprocessed training and test datasets from .npy files...")
     train_data = np.load(os.path.join(data_dir, "train_data.npy"))

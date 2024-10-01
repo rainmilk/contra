@@ -5,22 +5,22 @@ import random
 import torch
 
 
-def normalize_data(data, mean, std):
-    shape = data.shape
+def normalize_dataset(dataset, mean, std):
+    shape = dataset.shape
     channel_idx = np.where(np.array(shape) == 3)[0]
     if channel_idx == 1:
-        data = np.transpose(data, [0, 2, 3, 1])
+        dataset = np.transpose(dataset, [0, 2, 3, 1])
     if channel_idx == 2:
-        data = np.transpose(data, [0, 1, 3, 2])
+        dataset = np.transpose(dataset, [0, 1, 3, 2])
 
     # normalize
-    if (data > 1).any():
-        data = data / 255.
+    if (dataset[0] > 1).any():
+        dataset = dataset / 255.
 
     # gaussian normalize
     mean = np.array(mean, dtype=np.float32)
     std = np.array(std, dtype=np.float32)
-    return (data - mean) / std
+    return (dataset - mean) / std
 
 def transform_data(data):
     shape = data.shape[:2]
@@ -33,8 +33,8 @@ class MixupDataset(Dataset):
     def __init__(self, data_pair, label_pair, mixup_alpha=0.2, transform=False,
                  mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010)):
         # modify shape to [N, H, W, C]
-        self.data_first = normalize_data(data_pair[0], mean, std)
-        self.data_second = normalize_data(data_pair[1], mean, std)
+        self.data_first = normalize_dataset(data_pair[0], mean, std)
+        self.data_second = normalize_dataset(data_pair[1], mean, std)
         self.label_first = label_pair[0]
         self.label_second = label_pair[1]
         self.mixup_alpha = mixup_alpha
@@ -67,7 +67,7 @@ class CustomDataset(Dataset):
     def __init__(self, data, label, transform=True,
                  mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010)):
         # modify shape to [N, H, W, C]
-        self.data = normalize_data(data, mean, std)
+        self.data = normalize_dataset(data, mean, std)
         self.label = label
         self.transform = transform
 
@@ -89,12 +89,20 @@ class CustomDataset(Dataset):
 
 
 def get_dataset_loader(
-    dataset_name, loader_name, data_dir, mean, std, batch_size, num_classes=0, drop_last=False, shuffle=False
+    dataset_name,
+    loader_name,
+    data_dir,
+    mean,
+    std,
+    batch_size,
+    num_classes=0,
+    drop_last=False,
+    shuffle=False,
 ):
     """
     根据 loader_name 加载相应的数据集：支持增量训练 (inc)、辅助数据 (aux) 、测试数据 (test)和 D0数据集(train)
     """
-    if loader_name in ['inc', 'aux', 'test', 'train']:
+    if loader_name in ["inc", "aux", "test", "train"]:
         data_name = "%s_%s_data.npy" % (dataset_name, loader_name)
         label_name = "%s_%s_labels.npy" % (dataset_name, loader_name)
     else:
@@ -113,10 +121,10 @@ def get_dataset_loader(
     labels = np.load(label_path)
 
     transform = False
-    if loader_name == 'train':
+    if loader_name == "train":
         transform = True
 
-    if loader_name == 'train':  # train label change to onehot for teacher model
+    if loader_name == "train":  # train label change to onehot for teacher model
         labels = np.eye(num_classes)[labels]
 
     # 构建自定义数据集
@@ -130,14 +138,14 @@ def get_dataset_loader(
 
 
 def random_crop(img, img_size, padding=4):
-    img = np.pad(img, ((padding, padding), (padding, padding), (0, 0)), 'constant')
+    img = np.pad(img, ((padding, padding), (padding, padding), (0, 0)), "constant")
     h, w = img.shape[:2]
 
     new_h, new_w = img_size
     start_x = np.random.randint(0, w - new_w)
     start_y = np.random.randint(0, h - new_h)
 
-    crop_img = img[start_y:start_y + new_h, start_x:start_x + new_w]
+    crop_img = img[start_y : start_y + new_h, start_x : start_x + new_w]
     return crop_img
 
 

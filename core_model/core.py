@@ -27,7 +27,7 @@ from configs.dataset import cifar10_config, cifar100_config, food101_config
 dataset_paths = {
     "cifar-10": "../data/cifar-10",
     "cifar-100": "../data/cifar-100",
-    "food-101": "../data/food-101"
+    "food-101": "../data/food-101",
 }
 
 
@@ -39,6 +39,7 @@ num_classes_dict = {
     # "tiny-imagenet-200": 200,
 }
 
+
 def create_optimizer_scheduler(optimizer_type, parameters, learning_rate=1e-3):
     # 根据用户选择的优化器初始化
     if optimizer_type == "adam":
@@ -46,7 +47,9 @@ def create_optimizer_scheduler(optimizer_type, parameters, learning_rate=1e-3):
         lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
     elif optimizer_type == "sgd":  # add weight_decay, 0.7/0.8
         optimizer = optim.SGD(parameters, lr=learning_rate, momentum=0.9)
-        lr_scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=20, T_mult=2)
+        lr_scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
+            optimizer, T_0=20, T_mult=2
+        )
     else:
         raise ValueError(f"Unsupported optimizer type: {optimizer_type}")
 
@@ -309,7 +312,7 @@ def execute(args):
     # weight_decay = getattr(args, "weight_decay", 1e-4)
     repair_iter_num = getattr(args, "repair_iter_num", 2)
     adapt_iter_num = getattr(args, "adapt_iter_num", 2)
-    optimizer_type = getattr(args, "optimizer", 'adam')
+    optimizer_type = getattr(args, "optimizer", "adam")
 
     model_paths = get_model_paths(args, args.dataset)
 
@@ -340,9 +343,9 @@ def execute(args):
     elif args.model == "vgg16":
         working_model = vgg16_bn_lth(num_classes=num_classes)
 
-    working_opt, working_lr_scheduler = create_optimizer_scheduler(optimizer_type,
-                                                                   working_model.parameters(),
-                                                                   learning_rate)
+    working_opt, working_lr_scheduler = create_optimizer_scheduler(
+        optimizer_type, working_model.parameters(), learning_rate
+    )
 
     working_criterion = nn.CrossEntropyLoss()
 
@@ -355,9 +358,9 @@ def execute(args):
     lip_teacher_model = SimpleLipNet(backbone, 512, num_classes)
 
     # 根据用户选择的优化器初始化
-    teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(optimizer_type,
-                                                                   lip_teacher_model.parameters(),
-                                                                   learning_rate)
+    teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(
+        optimizer_type, lip_teacher_model.parameters(), learning_rate
+    )
     teacher_criterion = nn.CrossEntropyLoss()
 
     if os.path.exists(lip_teacher_model_path):
