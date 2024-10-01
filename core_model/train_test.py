@@ -51,7 +51,7 @@ def model_train(
                 pbar.set_postfix({"Loss": f"{loss.item():.4f}"})
                 pbar.update(1)
 
-        lr_scheduler.step()
+        lr_scheduler.step(epoch)
         avg_loss = running_loss / len(train_loader)  # 计算平均损失
         accuracy = correct / total  # 计算训练集的准确率
         print(

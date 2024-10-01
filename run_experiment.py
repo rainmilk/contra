@@ -122,7 +122,7 @@ def train_model(
                 pbar.update(1)
 
         # 更新学习率调度器
-        scheduler.step()
+        scheduler.step(epoch)
 
         # 打印训练集的平均损失和准确率
         avg_loss = running_loss / len(dataloader)
