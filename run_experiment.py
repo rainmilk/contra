@@ -7,6 +7,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision.models as models
 from torch.utils.data import DataLoader
+from core_model.optimizer import create_optimizer_scheduler
 
 
 def load_dataset(subdir, dataset_name, file_name, is_data=True):
@@ -64,22 +65,8 @@ def train_model(
     criterion = nn.CrossEntropyLoss()
 
     # 根据用户选择的优化器初始化
-    if optimizer_type == "adam":
-        optimizer = optim.AdamW(
-            model.parameters(), lr=learning_rate, weight_decay=weight_decay
-        )
-        scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
-    elif optimizer_type == "sgd":  # add weight_decay, 0.7/0.8
-        optimizer = optim.SGD(
-            model.parameters(),
-            lr=learning_rate,
-            momentum=0.9,
-            weight_decay=weight_decay,
-        )
-        # scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
-        scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
-    else:
-        raise ValueError(f"Unsupported optimizer type: {optimizer_type}")
+    optimizer, scheduler = create_optimizer_scheduler(optimizer_type, learning_rate, weight_decay,
+                                                      step_size=epochs//10, gamma=0.5)
 
     dataset = torch.utils.data.TensorDataset(data.to(device), labels.to(device))
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
@@ -101,7 +88,7 @@ def train_model(
             optimizer.step()
             total_loss += loss.item()
 
-        scheduler.step(epoch)
+        scheduler.step()
         avg_loss = total_loss / len(dataloader)
         print(f"Epoch [{epoch + 1}/{epochs}], Loss: {avg_loss:.4f}")
 
