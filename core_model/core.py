@@ -138,7 +138,7 @@ def iterate_repair_model(
     )
     mix_dataloader_shuffled = mix_up_dataloader(
         mix_data, mix_labels_onehot, mix_data, mix_labels_onehot,
-        mean=mean, std=std, batch_size = args.batch_size, transform=True)
+        mean=mean, std=std, batch_size = args.batch_size, alpha=0.25, transform=True)
 
     model_train(
         mix_dataloader_shuffled,
@@ -208,7 +208,7 @@ def iterate_adapt_model(
     test_probs_sharpen = sharpen(test_probs)
     ts_mixed_dataloader_shuffled = mix_up_dataloader(
         test_data, test_probs_sharpen, aug_data, aug_probs,
-        mean=mean, std=std, batch_size=args.batch_size, transform=False)
+        mean=mean, std=std, batch_size=args.batch_size, alpha=0.15, transform=False)
 
     # 2. train Mt: Pt=Mt(Xt_max), Update Mt: Loss=CrossEntropy(Pt, Yp_mix)
     model_train(
@@ -233,7 +233,7 @@ def iterate_adapt_model(
     test_probs_new_sharpen = sharpen(test_probs_new)
     ts_mixed_dataloader_shuffled_new = mix_up_dataloader(
         test_data, test_probs_new_sharpen, aug_data, aug_probs,
-        mean=mean, std=std, batch_size=args.batch_size, transform=False)
+        mean=mean, std=std, batch_size=args.batch_size, alpha=0.15, transform=False)
 
     # 4. train Mp: Pp=Mp(Xp_max), Update Mp: Loss=CrossEntropy(Pp, Yp_mix)
     model_train(
@@ -250,10 +250,10 @@ def iterate_adapt_model(
 
 
 def mix_up_dataloader(inc_data, inc_probs, aug_data, aug_probs, mean, std, batch_size,
-                      alpha=0.15, transform=False):
+                      alpha=0.2, transform=False):
     mixed_dataset = MixupDataset(data_pair=(inc_data, aug_data), label_pair=(inc_probs, aug_probs),
                                  mixup_alpha=alpha, transform=transform, mean=mean, std=std)
-    return DataLoader(mixed_dataset, batch_size, shuffle=True)
+    return DataLoader(mixed_dataset, batch_size, drop_last=True, shuffle=True)
 
 
 def get_model_paths(args, dataset):
