@@ -44,7 +44,7 @@ class MixupDataset(Dataset):
         return len(self.label_first)
 
     def __getitem__(self, index):
-        lbd = np.random.beta(self.alpha, self.alpha)
+        lbd = np.random.beta(self.mixup_alpha, self.mixup_alpha)
         if lbd < 0.5:
             lbd = 1 - lbd
 
