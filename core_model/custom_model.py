@@ -15,7 +15,10 @@ class ClassifierWrapper(nn.Module):
         self.feature_model = nn.Sequential(*all_modules[:-1])
         self.fc = nn.Linear(all_modules[-1].out_features, num_classes)
 
-    def forward(self, x):
-        outputs = self.feature_model(x)
-        outputs = self.fc(outputs)
+    def forward(self, x, output_emb=False):
+        emb = self.feature_model(x)
+        outputs = self.fc(emb)
+        if output_emb:
+            return outputs, emb
+
         return outputs
