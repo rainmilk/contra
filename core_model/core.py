@@ -14,6 +14,7 @@ from nets.VGG_LTH import vgg16_bn_lth
 from lip_teacher import SimpleLipNet
 from dataset import MixupDataset, get_dataset_loader
 from optimizer import create_optimizer_scheduler
+from custom_model import ClassifierWrapper
 from train_test import (
     model_train,
     model_test,
@@ -325,9 +326,13 @@ def execute(args):
     # 2. load model
     # (1) load working model
     if args.model == "resnet18":
-        working_model = models.resnet18(pretrained=False, num_classes=num_classes)
+        weights = models.ResNet18_Weights.DEFAULT
+        working_model = models.resnet18(weights=weights, num_classes=num_classes)
     elif args.model == "vgg16":
-        working_model = vgg16_bn_lth(num_classes=num_classes)
+        weights = models.VGG19_BN_Weights
+        working_model = models.vgg19_bn(weights=weights, num_classes=num_classes)
+
+    working_model = ClassifierWrapper(working_model, num_classes)
 
     working_opt, working_lr_scheduler = create_optimizer_scheduler(
         optimizer_type, working_model.parameters(), learning_rate, weight_decay,

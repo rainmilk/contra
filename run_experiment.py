@@ -9,6 +9,7 @@ import torch.optim as optim
 import torchvision.models as models
 from torch.utils.data import DataLoader
 from core_model.optimizer import create_optimizer_scheduler
+from core_model.custom_model import ClassifierWrapper
 
 from torch.utils.data import DataLoader, TensorDataset
 from torch.utils.tensorboard import SummaryWriter
@@ -183,7 +184,7 @@ def load_model(model_path, num_classes):
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"模型文件 {model_path} 未找到。")
 
-    model = models.resnet18(num_classes=num_classes)
+    model = ClassifierWrapper(models.resnet18(), num_classes)
     model.load_state_dict(torch.load(model_path))
     return model
 
@@ -257,7 +258,7 @@ def train_step(
         print("用于训练的数据: train_data.npy 和 train_labels.npy")
         print("用于训练的模型: ResNet18 初始化")
 
-        model_raw = models.resnet18(num_classes=num_classes)
+        model_raw = ClassifierWrapper(models.resnet18(), num_classes=num_classes)
         print(f"开始训练 M_p0 ({dataset_name})...")
 
         model_raw = train_model(
@@ -287,7 +288,9 @@ def train_step(
         print("用于训练的数据: D_0.npy 和 D_0_labels.npy")
         print("用于训练的模型: ResNet18 初始化")
 
-        model_p0 = models.resnet18(num_classes=num_classes)
+        weights = models.ResNet18_Weights.DEFAULT
+        model_p0 = models.resnet18(weights=weights)
+        model_p0 = ClassifierWrapper(model_p0, num_classes)
         print(f"开始训练 M_p0 ({dataset_name})...")
 
         model_p0 = train_model(
@@ -333,7 +336,7 @@ def train_step(
         )
         print("用于训练的模型: M_p0")
 
-        model_p1 = models.resnet18(num_classes=num_classes)
+        model_p1 = ClassifierWrapper(models.resnet18(), num_classes=num_classes)
         model_p1.load_state_dict(model_p0_loaded.state_dict())
         print(f"开始训练 M_p1 ({dataset_name})...")
         model_p1 = train_model(
@@ -381,7 +384,7 @@ def train_step(
         print(f"用于训练的模型: M_p{step-1}")
 
         # 训练当前模型
-        model_current = models.resnet18(num_classes=num_classes)
+        model_current = ClassifierWrapper(models.resnet18(), num_classes=num_classes)
         model_current.load_state_dict(model_prev.state_dict())
         print(f"开始训练 M_p{step} ({dataset_name})...")
 
