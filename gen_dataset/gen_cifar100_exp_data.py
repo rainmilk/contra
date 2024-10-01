@@ -124,14 +124,31 @@ def create_cifar100_npy_files(
     retention_ratios=[0.5, 0.3, 0.1],
     balanced=False,
 ):
-    transform = transforms.Compose([transforms.ToTensor()])
+    # transform = transforms.Compose([transforms.ToTensor()])
 
+    transform_train = transforms.Compose(
+        [
+            transforms.RandomCrop(32, padding=4),  # 随机裁剪
+            transforms.RandomHorizontalFlip(),  # 随机水平翻转
+            transforms.ToTensor(),  # 转换为张量，并归一化到 [0, 1]
+            transforms.Normalize(
+                (0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)
+            ),  # 标准化
+        ]
+    )
+
+    transform_test = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
+        ]
+    )
     # 加载 CIFAR-100 数据集
     train_dataset = datasets.CIFAR100(
-        root=data_dir, train=True, download=True, transform=transform
+        root=data_dir, train=True, download=True, transform=transform_train
     )
     test_dataset = datasets.CIFAR100(
-        root=data_dir, train=False, download=True, transform=transform
+        root=data_dir, train=False, download=True, transform=transform_test
     )
 
     train_data = torch.stack([train_dataset[i][0] for i in range(len(train_dataset))])

@@ -6,7 +6,14 @@ import torch
 
 
 class CustomDataset(Dataset):
-    def __init__(self, data, label, transform=False, mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010)):
+    def __init__(
+        self,
+        data,
+        label,
+        transform=False,
+        mean=(0.4914, 0.4822, 0.4465),
+        std=(0.2023, 0.1994, 0.2010),
+    ):
         # modify shape to [N, H, W, C]
         data = data.astype(np.float32)
         shape = data.shape
@@ -20,7 +27,7 @@ class CustomDataset(Dataset):
 
         # normalize
         if (data > 1).any():
-            self.data = data / 255.
+            self.data = data / 255.0
         else:
             self.data = data
 
@@ -50,12 +57,20 @@ class CustomDataset(Dataset):
 
 
 def get_dataset_loader(
-    dataset_name, loader_name, data_dir, mean, std, batch_size, num_classes=0, drop_last=False, shuffle=False
+    dataset_name,
+    loader_name,
+    data_dir,
+    mean,
+    std,
+    batch_size,
+    num_classes=0,
+    drop_last=False,
+    shuffle=False,
 ):
     """
     根据 loader_name 加载相应的数据集：支持增量训练 (inc)、辅助数据 (aux) 、测试数据 (test)和 D0数据集(train)
     """
-    if loader_name in ['inc', 'aux', 'test', 'train']:
+    if loader_name in ["inc", "aux", "test", "train"]:
         data_name = "%s_%s_data.npy" % (dataset_name, loader_name)
         label_name = "%s_%s_labels.npy" % (dataset_name, loader_name)
     else:
@@ -74,10 +89,10 @@ def get_dataset_loader(
     labels = np.load(label_path)
 
     transform = False
-    if loader_name == 'train':
+    if loader_name == "train":
         transform = True
 
-    if loader_name == 'train':  # train label change to onehot for teacher model
+    if loader_name == "train":  # train label change to onehot for teacher model
         labels = np.eye(num_classes)[labels]
 
     # 构建自定义数据集
@@ -91,14 +106,14 @@ def get_dataset_loader(
 
 
 def random_crop(img, img_size, padding=4):
-    img = np.pad(img, ((padding, padding), (padding, padding), (0, 0)), 'constant')
+    img = np.pad(img, ((padding, padding), (padding, padding), (0, 0)), "constant")
     h, w = img.shape[:2]
 
     new_h, new_w = img_size
     start_x = np.random.randint(0, w - new_w)
     start_y = np.random.randint(0, h - new_h)
 
-    crop_img = img[start_y:start_y + new_h, start_x:start_x + new_w]
+    crop_img = img[start_y : start_y + new_h, start_x : start_x + new_w]
     return crop_img
 
 
