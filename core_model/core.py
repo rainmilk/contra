@@ -13,7 +13,7 @@ import sys
 from main import parse_args, parse_kwargs
 from nets.VGG_LTH import vgg16_bn_lth
 from lip_teacher import SimpleLipNet
-from dataset import CustomDataset, get_dataset_loader
+from dataset import MixupDataset, get_dataset_loader
 from train_test import (
     model_train,
     model_test,
@@ -149,18 +149,12 @@ def iterate_repair_model(
     mix_labels_onehot = np.concatenate(
         [aux_labels_onehot, selected_labels_onehot, centroid_probs_sharpen], axis=0
     )
-    working_mix_dataloader_shuffled = mix_up_data(
-        mix_data,
-        mix_labels_onehot,
-        mix_data,
-        mix_labels_onehot,
-        mean,
-        std,
-        args.batch_size,
-    )
+    mix_dataloader_shuffled = mix_up_dataloader(
+        mix_data, mix_labels_onehot, mix_data, mix_labels_onehot,
+        mean=mean, std=std, batch_size = args.batch_size, transform=True)
 
     model_train(
-        working_mix_dataloader_shuffled,
+        mix_dataloader_shuffled,
         working_model,
         working_opt,
         working_lr_schedule,
@@ -172,17 +166,12 @@ def iterate_repair_model(
     )
 
     # 2. 使用 D_mix=Da+Ds+Dc(重新mix_up), Train Pt=Mt(Xp_mix), Loss=CrossEntropy(Pt, Yt_mix)
-    teacher_mix_dataloader_shuffled = mix_up_data(
-        mix_data,
-        mix_labels_onehot,
-        mix_data,
-        mix_labels_onehot,
-        mean,
-        std,
-        args.batch_size,
-    )
+    # teacher_mix_dataloader_shuffled = mix_up_dataloader(
+    #     mix_data, mix_labels_onehot, mix_data, mix_labels_onehot,
+    #     mean=mean, std=std, batch_size=args.batch_size, transform=True)
+
     model_train(
-        teacher_mix_dataloader_shuffled,
+        mix_dataloader_shuffled,
         teacher_model,
         teacher_opt,
         teacher_lr_schedule,
@@ -230,9 +219,9 @@ def iterate_adapt_model(
 
     # (2) 构造 Dt_mix: Dt_mix = mix_up(Dts, D_aug), Xt_mix = {a*Xts+(1-a)*X_aug}, Yt_mix = {a*Pts+(1-a)*Y_aug}
     test_probs_sharpen = sharpen(test_probs)
-    ts_mixed_dataloader_shuffled = mix_up_data(
-        test_data, test_probs_sharpen, aug_data, aug_probs, mean, std, args.batch_size
-    )
+    ts_mixed_dataloader_shuffled = mix_up_dataloader(
+        test_data, test_probs_sharpen, aug_data, aug_probs,
+        mean=mean, std=std, batch_size=args.batch_size, transform=False)
 
     # 2. train Mt: Pt=Mt(Xt_max), Update Mt: Loss=CrossEntropy(Pt, Yp_mix)
     model_train(
@@ -255,15 +244,9 @@ def iterate_adapt_model(
 
     # (2) 构造 Dp_mix: Dp_mix = mix_up(Dts, D_aug), Xp_mix = {a*Xts+(1-a)*X_aug}, Yt_mix = {a*Pts+(1-a)*Y_aug}
     test_probs_new_sharpen = sharpen(test_probs_new)
-    ts_mixed_dataloader_shuffled_new = mix_up_data(
-        test_data,
-        test_probs_new_sharpen,
-        aug_data,
-        aug_probs,
-        mean,
-        std,
-        args.batch_size,
-    )
+    ts_mixed_dataloader_shuffled_new = mix_up_dataloader(
+        test_data, test_probs_new_sharpen, aug_data, aug_probs,
+        mean=mean, std=std, batch_size=args.batch_size, transform=False)
 
     # 4. train Mp: Pp=Mp(Xp_max), Update Mp: Loss=CrossEntropy(Pp, Yp_mix)
     model_train(
@@ -279,33 +262,11 @@ def iterate_adapt_model(
     )
 
 
-def mix_up_data(inc_data, inc_probs, aug_data, aug_probs, mean, std, batch_size, alpha=0.15):
-    aug_size, inc_size = len(aug_probs), len(inc_data)
-    sampling_random_idx = np.random.choice(np.arange(aug_size), inc_size)
-    aug_data_sampling = aug_data[sampling_random_idx]
-    aug_probs_sampling = aug_probs[sampling_random_idx]
-
-    lambda_from_beta = np.random.beta(alpha, alpha, size=inc_size)
-
-    compare_data = np.concatenate(
-        [lambda_from_beta[:, np.newaxis], (1 - lambda_from_beta)[:, np.newaxis]],
-        axis=-1,
-    )
-    lambda_from_beta = np.max(compare_data, axis=-1)
-    lambda_for_data = lambda_from_beta[:, np.newaxis, np.newaxis, np.newaxis]
-    lambda_for_probs = lambda_from_beta[:, np.newaxis]
-
-    ts_mixed_data = (
-        lambda_for_data * inc_data + (1 - lambda_for_data) * aug_data_sampling
-    )
-    ts_mixed_probs = (
-        lambda_for_probs * inc_probs + (1 - lambda_for_probs) * aug_probs_sampling
-    )
-    ts_mixed_dataset = CustomDataset(ts_mixed_data, ts_mixed_probs, mean=mean, std=std)
-    ts_mixed_dataloader_shuffled = DataLoader(
-        ts_mixed_dataset, batch_size, drop_last=True, shuffle=True
-    )
-    return ts_mixed_dataloader_shuffled
+def mix_up_dataloader(inc_data, inc_probs, aug_data, aug_probs, mean, std, batch_size,
+                      alpha=0.15, transform=False):
+    mixed_dataset = MixupDataset(data_pair=(inc_data, aug_data), label_pair=(inc_probs, aug_probs),
+                                 mixup_alpha=alpha, transform=transform, mean=mean, std=std)
+    return DataLoader(mixed_dataset, batch_size, shuffle=True)
 
 
 def get_model_paths(args, dataset):
@@ -417,7 +378,7 @@ def execute(args):
             std,
             args.batch_size,
             num_classes=num_classes,
-            drop_last=True,
+            drop_last=False,
             shuffle=True,
         )
 

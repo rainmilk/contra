@@ -5,31 +5,71 @@ import random
 import torch
 
 
-class CustomDataset(Dataset):
-    def __init__(self, data, label, transform=False, mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010)):
-        # modify shape to [N, H, W, C]
-        data = data.astype(np.float32)
-        shape = data.shape
-        channel_idx = np.where(np.array(shape) == 3)[0]
-        if channel_idx == 1:
-            data = np.transpose(data, [0, 2, 3, 1])
-        if channel_idx == 2:
-            data = np.transpose(data, [0, 1, 3, 2])
+def normalize_data(data, mean, std):
+    shape = data.shape
+    channel_idx = np.where(np.array(shape) == 3)[0]
+    if channel_idx == 1:
+        data = np.transpose(data, [0, 2, 3, 1])
+    if channel_idx == 2:
+        data = np.transpose(data, [0, 1, 3, 2])
 
+    # normalize
+    if (data > 1).any():
+        data = data / 255.
+
+    # gaussian normalize
+    mean = np.array(mean, dtype=np.float32)
+    std = np.array(std, dtype=np.float32)
+    return (data - mean) / std
+
+def transform_data(data):
+    shape = data.shape[:2]
+    data_mod = random_crop(data, shape)
+    data_mod = random_horiz_flip(data_mod)
+    return data_mod
+
+
+class MixupDataset(Dataset):
+    def __init__(self, data_pair, label_pair, mixup_alpha=0.2, transform=False,
+                 mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010)):
+        # modify shape to [N, H, W, C]
+        self.data_first = normalize_data(data_pair[0], mean, std)
+        self.data_second = normalize_data(data_pair[1], mean, std)
+        self.label_first = label_pair[0]
+        self.label_second = label_pair[1]
+        self.mixup_alpha = mixup_alpha
         self.transform = transform
 
-        # normalize
-        if (data > 1).any():
-            self.data = data / 255.
-        else:
-            self.data = data
+    def __len__(self):
+        return len(self.label_first)
 
-        # gaussian normalize
-        mean = np.array(mean, dtype=np.float32)
-        std = np.array(std, dtype=np.float32)
-        self.data = (self.data - mean) / std
+    def __getitem__(self, index):
+        lbd = np.random.beta(self.alpha, self.alpha)
+        if lbd < 0.5:
+            lbd = 1 - lbd
 
+        data_first = self.data_first[index]
+        label_first = self.label_first[index]
+        rnd_idx = np.random.randint(len(self.data_second))
+        data_rnd_ax = self.data_second[rnd_idx]
+        label_rnd_ax = self.label_second[rnd_idx]
+
+        if self.transform:
+            data_first = transform_data(data_first)
+            data_rnd_ax = transform_data(data_rnd_ax)
+
+        mixed_data = lbd * data_first + (1 - lbd) * data_rnd_ax
+        mixed_labels = lbd * label_first + (1 - lbd) * label_rnd_ax
+        return np.transpose(mixed_data, [2, 0, 1]), mixed_labels
+
+
+class CustomDataset(Dataset):
+    def __init__(self, data, label, transform=True,
+                 mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010)):
+        # modify shape to [N, H, W, C]
+        self.data = normalize_data(data, mean, std)
         self.label = label
+        self.transform = transform
 
     def __len__(self):
         return len(self.data)
@@ -38,13 +78,12 @@ class CustomDataset(Dataset):
         if self.transform:
             data = self.data[index]
             shape = data.shape[:2]
-
             data_crop = random_crop(data, shape)
             data_flip = random_horiz_flip(data_crop)
             # modify shape to [N, C, H, W]
             data_flip = np.transpose(data_flip, [2, 0, 1])
 
-            return data_flip.copy(), self.label[index]
+            return data_flip, self.label[index]
 
         return np.transpose(self.data[index], [2, 0, 1]), self.label[index]
 
