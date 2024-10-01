@@ -81,9 +81,14 @@ def train_model(
     model.train()
     criterion = nn.CrossEntropyLoss()
 
-    # 根据用户选择的优化器初始化
-    optimizer, scheduler = create_optimizer_scheduler(optimizer_type, learning_rate, weight_decay,
-                                                      step_size=epochs//10, gamma=0.5)
+    optimizer, scheduler = create_optimizer_scheduler(
+        optimizer_type=optimizer_type,
+        parameters=model.parameters(),
+        learning_rate=learning_rate,
+        weight_decay=weight_decay,
+        step_size=epochs // 10,
+        gamma=0.5,
+    )
 
     dataset = torch.utils.data.TensorDataset(data.to(device), labels.to(device))
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
