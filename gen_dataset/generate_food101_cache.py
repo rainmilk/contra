@@ -5,34 +5,49 @@ import torch
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
+MODEL_NAME = "resnet18"
 
-def generate_food101_cache(data_dir, gen_dir, batch_size=512, num_workers=4):
+RESCALE_SIZE = 256
+CROP_SIZE = 224
 
-    transform = transforms.Compose([transforms.Resize((96, 96)), transforms.ToTensor()])
+if MODEL_NAME == "resnet18":
+    RESCALE_SIZE = 256
+    CROP_SIZE = 224
+
+
+def generate_food101_cache(data_dir, gen_dir, batch_size=64, num_workers=4):
+
+    # transform = transforms.Compose([transforms.Resize((96, 96)), transforms.ToTensor()])
 
     # 定义训练和测试集的 transforms
-    # train_transforms = transforms.Compose([
-    #     transforms.Resize((96, 96)),
-    #     transforms.RandomRotation(30),
-    #     transforms.RandomResizedCrop(224),
-    #     # transforms.RandomHorizontalFlip(),
-    #     # ImageNetPolicy(),  # 如果不需要可以去掉，或者换成其他增强方法
-    #     transforms.ToTensor(),
-    #     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    # ])
+    train_transforms = transforms.Compose(
+        [
+            # transforms.Resize((96, 96)),
+            transforms.RandomResizedCrop(CROP_SIZE),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+        ]
+    )
 
-    # test_transforms = transforms.Compose([
-    #     transforms.Resize((96, 96)),
-    #     # transforms.Resize(255),
-    #     transforms.CenterCrop(224),
-    #     transforms.ToTensor(),
-    #     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    # ])
+    test_transforms = transforms.Compose(
+        [
+            # transforms.Resize((96, 96)),
+            transforms.Resize(RESCALE_SIZE),
+            transforms.CenterCrop(CROP_SIZE),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+        ]
+    )
 
     # 加载 FOOD-101 数据集
     print("Loading Food101 training and test datasets...")
-    train_dataset = datasets.Food101(root=data_dir, split="train", transform=transform)
-    test_dataset = datasets.Food101(root=data_dir, split="test", transform=transform)
+    train_dataset = datasets.Food101(
+        root=data_dir, split="train", transform=train_transforms
+    )
+    test_dataset = datasets.Food101(
+        root=data_dir, split="test", transform=test_transforms
+    )
 
     # 使用 DataLoader 进行批量加载
     train_loader = DataLoader(
