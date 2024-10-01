@@ -40,13 +40,13 @@ num_classes_dict = {
 }
 
 
-def create_optimizer_scheduler(optimizer_type, parameters, learning_rate=1e-3):
+def create_optimizer_scheduler(optimizer_type, parameters, learning_rate=1e-3, weight_decay=5e-4):
     # 根据用户选择的优化器初始化
     if optimizer_type == "adam":
-        optimizer = optim.AdamW(parameters, lr=learning_rate)
+        optimizer = optim.AdamW(parameters, lr=learning_rate, weight_decay=weight_decay)
         lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
     elif optimizer_type == "sgd":  # add weight_decay, 0.7/0.8
-        optimizer = optim.SGD(parameters, lr=learning_rate, momentum=0.9)
+        optimizer = optim.SGD(parameters, lr=learning_rate, momentum=0.9, weight_decay=weight_decay)
         lr_scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
             optimizer, T_0=20, T_mult=2
         )
@@ -309,7 +309,7 @@ def execute(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     learning_rate = getattr(args, "learning_rate", 0.001)
-    # weight_decay = getattr(args, "weight_decay", 1e-4)
+    weight_decay = getattr(args, "weight_decay", 5e-4)
     repair_iter_num = getattr(args, "repair_iter_num", 2)
     adapt_iter_num = getattr(args, "adapt_iter_num", 2)
     optimizer_type = getattr(args, "optimizer", "adam")
@@ -344,7 +344,7 @@ def execute(args):
         working_model = vgg16_bn_lth(num_classes=num_classes)
 
     working_opt, working_lr_scheduler = create_optimizer_scheduler(
-        optimizer_type, working_model.parameters(), learning_rate
+        optimizer_type, working_model.parameters(), learning_rate, weight_decay
     )
 
     working_criterion = nn.CrossEntropyLoss()
@@ -359,7 +359,7 @@ def execute(args):
 
     # 根据用户选择的优化器初始化
     teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(
-        optimizer_type, lip_teacher_model.parameters(), learning_rate
+        optimizer_type, lip_teacher_model.parameters(), learning_rate, weight_decay
     )
     teacher_criterion = nn.CrossEntropyLoss()
 
