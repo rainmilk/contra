@@ -2,11 +2,28 @@ import os
 import warnings
 import numpy as np
 import argparse
+from tqdm import tqdm
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.models as models
 from torch.utils.data import DataLoader
+
+from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.tensorboard import SummaryWriter
+
+
+# Warmup学习率调度器
+class WarmUpLR(torch.optim.lr_scheduler._LRScheduler):
+    def __init__(self, optimizer, total_iters, last_epoch=-1):
+        self.total_iters = total_iters
+        super(WarmUpLR, self).__init__(optimizer, last_epoch)
+
+    def get_lr(self):
+        return [
+            base_lr * (self.last_epoch + 1) / self.total_iters
+            for base_lr in self.base_lrs
+        ]
 
 
 def load_dataset(subdir, dataset_name, file_name, is_data=True):
@@ -19,8 +36,6 @@ def load_dataset(subdir, dataset_name, file_name, is_data=True):
     :return: PyTorch 张量格式的数据
     """
     file_path = os.path.join(subdir, file_name)
-
-    # 使用 numpy 加载文件
     data = np.load(file_path)
 
     if is_data:
@@ -44,6 +59,7 @@ def train_model(
     optimizer_type="adam",
     learning_rate=0.001,
     weight_decay=1e-4,
+    writer=None,
 ):
     """
     训练模型函数
@@ -60,6 +76,7 @@ def train_model(
     """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
+
     model.train()
     criterion = nn.CrossEntropyLoss()
 
@@ -69,6 +86,7 @@ def train_model(
             model.parameters(), lr=learning_rate, weight_decay=weight_decay
         )
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
+        warmup_scheduler = None  # Adam 不需要 warmup_scheduler
     elif optimizer_type == "sgd":  # add weight_decay, 0.7/0.8
         optimizer = optim.SGD(
             model.parameters(),
@@ -77,7 +95,11 @@ def train_model(
             weight_decay=weight_decay,
         )
         # scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
-        scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
+        # scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
+        scheduler = optim.lr_scheduler.MultiStepLR(
+            optimizer, milestones=[30, 60, 90], gamma=0.2
+        )
+        warmup_scheduler = WarmUpLR(optimizer, total_iters=len(data) // batch_size)
     else:
         raise ValueError(f"Unsupported optimizer type: {optimizer_type}")
 
@@ -88,36 +110,81 @@ def train_model(
         test_data.to(device), test_labels.to(device)
     )
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
-    # iters = len(test_loader)
-    for epoch in range(epochs):
-        total_loss = 0
-        model.train()
 
-        for i, (inputs, targets) in enumerate(dataloader):
-            optimizer.zero_grad()
-            outputs = model(inputs)
-            loss = criterion(outputs, targets)
-            loss.backward()
-            optimizer.step()
-            total_loss += loss.item()
+    # 用于存储训练和测试的损失和准确率
+    train_losses = []
+    test_accuracies = []
 
-        scheduler.step(epoch)
-        avg_loss = total_loss / len(dataloader)
-        print(f"Epoch [{epoch + 1}/{epochs}], Loss: {avg_loss:.4f}")
-
-        # Evaluate on test data
-        model.eval()
+    for epoch in tqdm(range(epochs), desc="Training Progress"):
+        running_loss = 0.0
         correct = 0
         total = 0
+
+        # tqdm 进度条显示
+        with tqdm(total=len(dataloader), desc=f"Epoch {epoch + 1} Training") as pbar:
+            for inputs, targets in dataloader:
+                inputs, targets = inputs.to(device), targets.to(device)
+                optimizer.zero_grad()
+                outputs = model(inputs)
+                loss = criterion(outputs, targets)
+                loss.backward()
+                optimizer.step()
+
+                running_loss += loss.item()
+                _, predicted = torch.max(outputs.data, 1)
+                total += targets.size(0)
+                correct += (predicted == targets).sum().item()
+
+                if optimizer_type == "sgd" and epoch < 5:  # Warm-up阶段
+                    warmup_scheduler.step()
+
+                # 更新进度条
+                pbar.set_postfix({"Loss": f"{loss.item():.4f}"})
+                pbar.update(1)
+
+        # 更新学习率调度器
+        scheduler.step(running_loss / len(dataloader))
+
+        # 打印训练集的平均损失和准确率
+        avg_loss = running_loss / len(dataloader)
+        accuracy = correct / total
+        train_losses.append(avg_loss)
+        print(
+            f"Epoch [{epoch + 1}/{epochs}], Training Loss: {avg_loss:.4f}, Training Accuracy: {accuracy * 100:.2f}%"
+        )
+
+        # TensorBoard记录
+        if writer:
+            writer.add_scalar("Train/Loss", avg_loss, epoch)
+            writer.add_scalar("Train/Accuracy", accuracy * 100, epoch)
+
+        # 测试集评估
+        model.eval()
+        test_loss = 0.0
+        correct_test = 0
+        total_test = 0
         with torch.no_grad():
             for test_inputs, test_targets in test_loader:
+                test_inputs, test_targets = test_inputs.to(device), test_targets.to(
+                    device
+                )
                 test_outputs = model(test_inputs)
-                _, predicted = torch.max(test_outputs, 1)
-                total += test_targets.size(0)
-                correct += (predicted == test_targets).sum().item()
+                loss = criterion(test_outputs, test_targets)
+                test_loss += loss.item()
+                _, predicted_test = torch.max(test_outputs, 1)
+                total_test += test_targets.size(0)
+                correct_test += (predicted_test == test_targets).sum().item()
 
-        accuracy = 100 * correct / total
-        print(f"Test Accuracy after Epoch {epoch + 1}: {accuracy:.2f}%")
+        test_loss /= len(test_loader)
+        test_accuracy = 100 * correct_test / total_test
+        test_accuracies.append(test_accuracy)
+        print(f"Test Accuracy after Epoch {epoch + 1}: {test_accuracy:.2f}%")
+
+        if writer:
+            writer.add_scalar("Test/Loss", test_loss, epoch)
+            writer.add_scalar("Test/Accuracy", test_accuracy, epoch)
+
+        model.train()
 
     return model
 
@@ -149,6 +216,7 @@ def train_step(
     optimizer_type="adam",
     learning_rate=0.001,
     weight_decay=1e-4,
+    writer=None,
 ):
     """
     根据步骤训练模型
@@ -181,8 +249,6 @@ def train_step(
         raise ValueError(f"Unsupported dataset type: {dataset_name}")
 
     # 加载训练和测试数据集
-    # D_test_data = torch.load(os.path.join(subdir, "test_data.npy"))
-    # D_test_labels = torch.load(os.path.join(subdir, "test_labels.npy"))
     D_test_data = load_dataset(subdir, dataset_name, "test_data.npy", is_data=True)
     D_test_labels = load_dataset(subdir, dataset_name, "test_labels.npy", is_data=False)
 
@@ -220,14 +286,14 @@ def train_step(
             batch_size=batch_size,
             learning_rate=learning_rate,
             weight_decay=weight_decay,
+            writer=writer,
         )
         model_raw_path = os.path.join(ckpt_subdir, "model_raw.pth")
         torch.save(model_raw.state_dict(), model_raw_path)
         print(f"M_p0 训练完毕并保存至 {model_raw_path}")
+        return
 
     if step == 0:  # 基于$D_0$数据集和原始的resnet网络训练一个模型 M_p0
-        # D_train_data = torch.load(os.path.join(subdir, f"D_0.npy"))
-        # D_train_labels = torch.load(os.path.join(subdir, f"D_0_labels.npy"))
         D_train_data = load_dataset(subdir, dataset_name, f"D_0.npy", is_data=True)
         D_train_labels = load_dataset(
             subdir, dataset_name, f"D_0_labels.npy", is_data=False
@@ -250,13 +316,16 @@ def train_step(
             batch_size=batch_size,
             learning_rate=learning_rate,
             weight_decay=weight_decay,
+            writer=writer,
         )
         model_p0_path = os.path.join(ckpt_subdir, "model_p0.pth")
         torch.save(model_p0.state_dict(), model_p0_path)
         print(f"M_p0 训练完毕并保存至 {model_p0_path}")
+
     elif (
         step == 1
     ):  # load上一步训练好的M_p0模型，然后基于 D_tr_data_version_1 和 D_tr_labels_version_1 进行训练，得到M_p1
+
         D_train_data = load_dataset(
             subdir, dataset_name, f"D_tr_data_version_{step}.npy", is_data=True
         )
@@ -294,11 +363,13 @@ def train_step(
             optimizer_type=optimizer_type,
             learning_rate=learning_rate,
             weight_decay=weight_decay,
+            writer=writer,
         )
         model_p1_path = os.path.join(ckpt_subdir, "model_p1.pth")
         torch.save(model_p1.state_dict(), model_p1_path)
         print(f"M_p1 训练完毕并保存至 {model_p1_path}")
-    else:  # 从外部加载通过命令行指定的某个模型
+
+    elif step >= 2:  # 从外部加载通过命令行指定的某个模型
         if load_model_path:
             model_prev = load_model(load_model_path, num_classes)
             print(f"加载指定模型: {load_model_path}")
@@ -312,10 +383,6 @@ def train_step(
             print(f"加载模型: {prev_model_path}")
 
         # 加载当前步骤的训练数据
-        # D_train_data = torch.load(os.path.join(subdir, f"D_tr_data_version_{step}.npy"))
-        # D_train_labels = torch.load(
-        #     os.path.join(subdir, f"D_tr_labels_version_{step}.npy")
-        # )
         D_train_data = load_dataset(
             subdir, dataset_name, f"D_tr_data_version_{step}.npy", is_data=True
         )
@@ -345,7 +412,9 @@ def train_step(
             optimizer_type=optimizer_type,
             learning_rate=learning_rate,
             weight_decay=weight_decay,
+            writer=writer,
         )
+
         model_current_path = os.path.join(ckpt_subdir, f"model_p{step}.pth")
         torch.save(model_current.state_dict(), model_current_path)
         print(f"M_p{step} 训练完毕并保存至 {model_current_path}")
@@ -433,6 +502,10 @@ def main():
         action="store_true",
         help="是否使用类均衡的数据划分方式。如果不指定，则使用随机划分。",
     )
+    parser.add_argument(
+        "--use_tensorboard", action="store_true", help="Use TensorBoard for logging."
+    )
+
     args = parser.parse_args()
 
     if args.balanced == True:
@@ -467,6 +540,8 @@ def main():
     print(f"使用数据子目录: {subdir}")
     print(f"模型将保存至: {ckpt_subdir}")
 
+    writer = SummaryWriter(log_dir="runs/experiment") if args.use_tensorboard else None
+
     train_step(
         args.step,
         subdir,
@@ -478,7 +553,11 @@ def main():
         batch_size=args.batch_size,
         optimizer_type=args.optimizer,
         learning_rate=args.learning_rate,
+        writer=writer,
     )
+
+    if writer:
+        writer.close()
 
 
 if __name__ == "__main__":
