@@ -42,7 +42,8 @@ def train_model(
     epochs=50,
     batch_size=32,
     optimizer_type="adam",
-    learning_rate=0.01,
+    learning_rate=0.001,
+    weight_decay=1e-4,
 ):
     """
     训练模型函数
@@ -61,17 +62,22 @@ def train_model(
     model.to(device)
     model.train()
     criterion = nn.CrossEntropyLoss()
-    # optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     # 根据用户选择的优化器初始化
     if optimizer_type == "adam":
-        optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=5e-4)
+        optimizer = optim.AdamW(
+            model.parameters(), lr=learning_rate, weight_decay=weight_decay
+        )
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
     elif optimizer_type == "sgd":  # add weight_decay, 0.7/0.8
-        optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9, weight_decay=5e-4)
-        scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
-            optimizer, T_0=20, T_mult=2
+        optimizer = optim.SGD(
+            model.parameters(),
+            lr=learning_rate,
+            momentum=0.9,
+            weight_decay=weight_decay,
         )
+        # scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
+        scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
     else:
         raise ValueError(f"Unsupported optimizer type: {optimizer_type}")
 
@@ -142,6 +148,7 @@ def train_step(
     batch_size=32,
     optimizer_type="adam",
     learning_rate=0.001,
+    weight_decay=1e-4,
 ):
     """
     根据步骤训练模型
@@ -187,6 +194,37 @@ def train_step(
     print(f"数据集类型: {dataset_name}")
     print(f"Epochs: {epochs}, Batch Size: {batch_size}, Learning Rate: {learning_rate}")
 
+    if step == (-1):
+
+        D_train_data = load_dataset(
+            subdir, dataset_name, f"train_data.npy", is_data=True
+        )
+        D_train_labels = load_dataset(
+            subdir, dataset_name, f"train_labels.npy", is_data=False
+        )
+
+        # 打印用于训练的模型和数据
+        print("用于训练的数据: train_data.npy 和 train_labels.npy")
+        print("用于训练的模型: ResNet18 初始化")
+
+        model_raw = models.resnet18(num_classes=num_classes)
+        print(f"开始训练 M_p0 ({dataset_name})...")
+
+        model_raw = train_model(
+            model_raw,
+            D_train_data,
+            D_train_labels,
+            D_test_data,
+            D_test_labels,
+            epochs=epochs,
+            batch_size=batch_size,
+            learning_rate=learning_rate,
+            weight_decay=weight_decay,
+        )
+        model_raw_path = os.path.join(ckpt_subdir, "model_raw.pth")
+        torch.save(model_raw.state_dict(), model_raw_path)
+        print(f"M_p0 训练完毕并保存至 {model_raw_path}")
+
     if step == 0:  # 基于$D_0$数据集和原始的resnet网络训练一个模型 M_p0
         # D_train_data = torch.load(os.path.join(subdir, f"D_0.npy"))
         # D_train_labels = torch.load(os.path.join(subdir, f"D_0_labels.npy"))
@@ -211,6 +249,7 @@ def train_step(
             epochs=epochs,
             batch_size=batch_size,
             learning_rate=learning_rate,
+            weight_decay=weight_decay,
         )
         model_p0_path = os.path.join(ckpt_subdir, "model_p0.pth")
         torch.save(model_p0.state_dict(), model_p0_path)
@@ -254,6 +293,7 @@ def train_step(
             batch_size=batch_size,
             optimizer_type=optimizer_type,
             learning_rate=learning_rate,
+            weight_decay=weight_decay,
         )
         model_p1_path = os.path.join(ckpt_subdir, "model_p1.pth")
         torch.save(model_p1.state_dict(), model_p1_path)
@@ -304,6 +344,7 @@ def train_step(
             batch_size=batch_size,
             optimizer_type=optimizer_type,
             learning_rate=learning_rate,
+            weight_decay=weight_decay,
         )
         model_current_path = os.path.join(ckpt_subdir, f"model_p{step}.pth")
         torch.save(model_current.state_dict(), model_current_path)
@@ -380,6 +421,12 @@ def main():
         type=float,
         default=0.001,
         help="学习率",
+    )
+    parser.add_argument(
+        "--weight_decay",
+        type=float,
+        default=1e-4,
+        help="权重衰减系数",
     )
     parser.add_argument(
         "--balanced",

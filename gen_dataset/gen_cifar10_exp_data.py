@@ -169,6 +169,10 @@ def create_cifar10_npy_files(
     np.save(os.path.join(subdir, "D_a.npy"), D_a_data)
     np.save(os.path.join(subdir, "D_a_labels.npy"), D_a_labels)
 
+    # 保存训练数据集
+    np.save(os.path.join(subdir, "train_data.npy"), train_data)
+    np.save(os.path.join(subdir, "train_labels.npy"), train_labels)
+
     # 保存测试数据集
     np.save(os.path.join(subdir, "test_data.npy"), test_data)
     np.save(os.path.join(subdir, "test_labels.npy"), test_labels)

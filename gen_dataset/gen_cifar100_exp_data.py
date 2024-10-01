@@ -128,7 +128,7 @@ def create_cifar100_npy_files(
 
     transform_train = transforms.Compose(
         [
-            transforms.RandomCrop(32, padding=4),  # 随机裁剪
+            transforms.RandomCrop(32, padding=4, padding_mode="reflect"),  # 随机裁剪
             transforms.RandomHorizontalFlip(),  # 随机水平翻转
             transforms.ToTensor(),  # 转换为张量，并归一化到 [0, 1]
             transforms.Normalize(
@@ -224,6 +224,10 @@ def create_cifar100_npy_files(
 
     np.save(os.path.join(subdir, "D_a.npy"), D_a_data)
     np.save(os.path.join(subdir, "D_a_labels.npy"), D_a_labels)
+
+    # 保存训练数据集
+    np.save(os.path.join(subdir, "train_data.npy"), train_data)
+    np.save(os.path.join(subdir, "train_labels.npy"), train_labels)
 
     # 保存测试数据集
     np.save(os.path.join(subdir, "test_data.npy"), test_data)
