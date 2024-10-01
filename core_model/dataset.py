@@ -22,6 +22,7 @@ def normalize_dataset(dataset, mean, std):
     std = np.array(std, dtype=np.float32)
     return (dataset - mean) / std
 
+
 def transform_data(data):
     shape = data.shape[:2]
     data_mod = random_crop(data, shape)
@@ -83,7 +84,7 @@ class CustomDataset(Dataset):
             # modify shape to [N, C, H, W]
             data_flip = np.transpose(data_flip, [2, 0, 1])
 
-            return data_flip, self.label[index]
+            return data_flip.copy(), self.label[index]
 
         return np.transpose(self.data[index], [2, 0, 1]), self.label[index]
 
