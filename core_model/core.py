@@ -20,16 +20,14 @@ from train_test import (
     working_model_forward,
     teacher_model_forward,
 )
-from configs.dataset import cifar10_config, cifar100_config
+from configs.dataset import cifar10_config, cifar100_config, food101_config
 
 
 # todo 数据集路径和类别数量
 dataset_paths = {
     "cifar-10": "../data/cifar-10",
     "cifar-100": "../data/cifar-100",
-    "food-101": "../data/food-101",
-    # "flowers-102": "../data/flowers-102",
-    # "tiny-imagenet-200": "../data/tiny-imagenet-200",
+    "food-101": "../data/food-101"
 }
 
 
@@ -318,14 +316,14 @@ def get_model_paths(args, dataset):
 
     return {
         "working_model_path": os.path.join(
-            ckpt_dir, "working_model_1", "p1_checkpoint.pth"
+            ckpt_dir, "working_model_1", "%s_%s_final.pth" % (args.model, args.dataset)
         ),
         "working_model_repair_save_path": os.path.join(
             ckpt_dir, "working_model_repair"
         ),
         "working_model_adapt_save_path": os.path.join(ckpt_dir, "working_model_adapt"),
         "lip_teacher_model_path": os.path.join(
-            ckpt_dir, "teacher_model_0", "t0_checkpoint.pth"
+            ckpt_dir, "teacher_model_0", "%s_%s_final.pth" % (args.model, args.dataset)
         ),
         "teacher_model_repair_save_path": os.path.join(
             ckpt_dir, "teacher_model_repair"
@@ -352,7 +350,6 @@ def execute(args):
     adapt_iter_num = getattr(args, "adapt_iter_num", 2)
     optimizer_type = getattr(args, "optimizer", 'adam')
 
-
     model_paths = get_model_paths(args, args.dataset)
 
     working_model_path = model_paths["working_model_path"]
@@ -362,7 +359,6 @@ def execute(args):
     teacher_model_repair_save_path = model_paths["teacher_model_repair_save_path"]
     teacher_model_adapt_save_path = model_paths["teacher_model_adapt_save_path"]
 
-    # todo load all dataset mean std
     mean, std = None, None
     if args.dataset == "cifar-10":
         mean = cifar10_config["mean"]
@@ -370,6 +366,9 @@ def execute(args):
     elif args.dataset == "cifar-100":
         mean = cifar100_config["mean"]
         std = cifar100_config["std"]
+    elif args.dataset == "food-101":
+        mean = food101_config["mean"]
+        std = food101_config["std"]
 
     working_model, lip_teacher_model = None, None
 
@@ -390,9 +389,9 @@ def execute(args):
     working_model.load_state_dict(checkpoint, strict=False)
 
     # (2) load lip_teacher model, t0的情况重新训练
-    resnet = models.resnet18(pretrained=False, num_classes=512)
-    resnet = nn.Sequential(*list(resnet.children())[:-1])
-    lip_teacher_model = SimpleLipNet(resnet, 512, num_classes)
+    backbone = models.resnet18(pretrained=False, num_classes=512)
+    backbone = nn.Sequential(*list(backbone.children())[:-1])
+    lip_teacher_model = SimpleLipNet(backbone, 512, num_classes)
 
     # 根据用户选择的优化器初始化
     teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(optimizer_type,
@@ -433,26 +432,6 @@ def execute(args):
             args,
             save_path=lip_teacher_model_dir,
         )
-
-        # todo temp code 待最后删除 训练 Mp0 Mp1
-        # test_data, test_labels, test_dataset, test_dataloader = get_dataset_loader(
-        #     args.dataset, "test", data_dir, mean, std, args.batch_size, shuffle=False
-        # )
-        # print("---------------------working model test before------------------------------")
-        # working_model_test_before = model_test(test_dataset, test_dataloader, working_model, device=device)
-
-        # working_model_dir = os.path.dirname(working_model_path)
-        # model_train(train_dataloader, working_model, working_opt, working_lr_scheduler, working_criterion, alpha, args,
-        #             save_path=working_model_dir)
-
-        # inc_data, inc_labels, inc_dataloader = (
-        #     get_dataset_loader(args.dataset, "inc", data_dir, mean, std, args.batch_size, shuffle=False))
-        #
-        # inc_labels_onehot = np.eye(num_classes)[inc_labels]
-        # inc_dataset = CustomDataset(inc_data, inc_labels_onehot)
-        # inc_dataloader = DataLoader(inc_dataset, args.batch_size, drop_last=True, shuffle=True)
-        # model_train(inc_dataloader, working_model, working_opt, working_lr_scheduler, working_criterion, alpha, args,
-        #             save_path=working_model_dir)
 
     # 3. 迭代修复过程
     # (1) 构造修复过程数据集: Dtr、 Da、Dts
