@@ -293,7 +293,7 @@ def create_cifar100_npy_files(
 
         D_n_data = D_inc_data[noise_sample_indices]
         # D_n_labels = D_inc_labels[noise_sample_indices].clone()
-        D_n_labels = D_inc_labels[noise_sample_indices].copy()
+        D_n_labels = D_inc_labels[noise_sample_indices]
 
         # 在 D_n_labels 中注入噪声
         for idx_in_D_n, D_inc_idx in enumerate(noise_sample_indices):

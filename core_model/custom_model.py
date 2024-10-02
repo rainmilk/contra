@@ -12,8 +12,8 @@ class ClassifierWrapper(nn.Module):
 
         # Remove the final layer
         all_modules = list(backbone.children())
-        self.feature_model = nn.Sequential(*all_modules[:-1])
-        self.fc = nn.Linear(all_modules[-1].out_features, num_classes)
+        self.feature_model = nn.Sequential(*all_modules[:-1], nn.Flatten())
+        self.fc = nn.Linear(all_modules[-1].in_features, num_classes)
 
     def forward(self, x, output_emb=False):
         emb = self.feature_model(x)
