@@ -328,9 +328,12 @@ def execute(args):
     if args.model == "resnet18":
         weights = models.ResNet18_Weights.DEFAULT
         working_model = models.resnet18(weights=weights, num_classes=num_classes)
-    elif args.model == "vgg16":
-        weights = models.VGG19_BN_Weights
+    elif args.model == "vgg19":
+        weights = models.VGG19_BN_Weights.DEFAULT
         working_model = models.vgg19_bn(weights=weights, num_classes=num_classes)
+    elif args.model == "swin":
+        weights = models.Swin_V2_T_Weights.DEFAULT
+        working_model = models.swin_v2_t(weights=weights, num_classes=num_classes)
 
     working_model = ClassifierWrapper(working_model, num_classes)
 
