@@ -26,6 +26,7 @@ model/
 # log
 logs/
 log/
+runs/
 
 # models
 *.pt
