@@ -87,7 +87,7 @@ def train_model(
         parameters=model.parameters(),
         learning_rate=learning_rate,
         weight_decay=weight_decay,
-        step_size=epochs // 10,
+        step_size=epochs // 5,
         gamma=0.5,
     )
 
@@ -258,7 +258,9 @@ def train_step(
         print("用于训练的数据: train_data.npy 和 train_labels.npy")
         print("用于训练的模型: ResNet18 初始化")
 
-        model_raw = ClassifierWrapper(models.resnet18(), num_classes=num_classes)
+        weights = models.ResNet18_Weights.DEFAULT
+        model_raw = models.resnet18(weights=weights)
+        model_raw = ClassifierWrapper(model_raw, freeze_weights=False, num_classes=num_classes)
         print(f"开始训练 M_p0 ({dataset_name})...")
 
         model_raw = train_model(
