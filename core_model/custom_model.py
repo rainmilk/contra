@@ -1,4 +1,30 @@
 import torch.nn as nn
+import torch
+from torchvision import models
+from core_model.wideresidual import wideresnet
+from core_model.resnet import resnet18
+
+
+def load_custom_model(model_name, num_classes, load_pretrained=False, ckpt_path=None):
+    weights = None
+    if model_name == "resnet18":
+        if load_pretrained:
+            weights = models.ResNet18_Weights.DEFAULT
+        model = models.resnet18(weights=weights, num_classes=num_classes)
+    elif model_name == "vgg19":
+        if load_pretrained:
+            weights = models.VGG19_BN_Weights.DEFAULT
+        model = models.vgg19_bn(weights=weights, num_classes=num_classes)
+    elif model_name == "cifar-resnet18":
+        model = resnet18(num_classes=num_classes)
+    elif model_name == "cifar-wideresnet40":
+        model = wideresnet(num_classes=num_classes)
+
+    if model and ckpt_path:
+        checkpoint = torch.load(ckpt_path)
+        model.load_state_dict(checkpoint, strict=False)
+
+    return model
 
 
 class ClassifierWrapper(nn.Module):

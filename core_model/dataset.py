@@ -5,6 +5,24 @@ import random
 import torch
 
 
+class BaseTensorDataset(Dataset):
+
+    def __init__(self, data, labels, transforms=None):
+        self.data = data
+        self.labels = labels
+        self.transforms = transforms
+
+    def __len__(self) -> int:
+        return len(self.data)
+
+    def __getitem__(self, index):
+        data = self.data[index]
+        if self.transforms is not None:
+            self.transforms(data)
+
+        return data, self.labels[index]
+
+
 def normalize_dataset(dataset, mean, std):
     shape = dataset.shape
     channel_idx = np.where(np.array(shape) == 3)[0]
@@ -32,10 +50,13 @@ def transform_data(data):
 
 class MixupDataset(Dataset):
     def __init__(self, data_pair, label_pair, mixup_alpha=0.2, transform=False,
-                 mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010)):
+                 mean=None, std=None):
         # modify shape to [N, H, W, C]
-        self.data_first = normalize_dataset(data_pair[0], mean, std)
-        self.data_second = normalize_dataset(data_pair[1], mean, std)
+        self.data_first = data_pair[0]
+        self.data_second = data_pair[1]
+        if mean is not None:
+            self.data_first = normalize_dataset(self.data_first, mean, std)
+            self.data_second = normalize_dataset(self.data_second, mean, std)
         self.label_first = label_pair[0]
         self.label_second = label_pair[1]
         self.mixup_alpha = mixup_alpha
@@ -65,10 +86,11 @@ class MixupDataset(Dataset):
 
 
 class CustomDataset(Dataset):
-    def __init__(self, data, label, transform=True,
-                 mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010)):
+    def __init__(self, data, label, transform=True, mean=None, std=None):
         # modify shape to [N, H, W, C]
-        self.data = normalize_dataset(data, mean, std)
+        self.data = data
+        if mean is not None:
+            self.data = normalize_dataset(data, mean, std)
         self.label = label
         self.transform = transform
 

@@ -142,12 +142,18 @@ def create_cifar100_npy_files(
         root=data_dir, train=False, download=True, transform=data_transform
     )
 
-    train_data = torch.stack([train_dataset[i][0] for i in range(len(train_dataset))])
-    train_labels = torch.tensor(
-        [train_dataset[i][1] for i in range(len(train_dataset))]
-    )
-    test_data = torch.stack([test_dataset[i][0] for i in range(len(test_dataset))])
-    test_labels = torch.tensor([test_dataset[i][1] for i in range(len(test_dataset))])
+    train_data, train_labels = zip(*train_dataset)
+    train_data = torch.stack(train_data)
+    train_labels = torch.tensor(train_labels)
+    # train_data = torch.stack([train_dataset[i][0] for i in range(len(train_dataset))])
+    # train_labels = torch.tensor(
+    #     [train_dataset[i][1] for i in range(len(train_dataset))]
+    # )
+    test_data, test_labels = zip(*test_dataset)
+    test_data = torch.stack(test_data)
+    test_labels = torch.tensor(test_labels)
+    # test_data = torch.stack([test_dataset[i][0] for i in range(len(test_dataset))])
+    # test_labels = torch.tensor([test_dataset[i][1] for i in range(len(test_dataset))])
 
     # 根据 balanced 参数调整存储路径
     if balanced:

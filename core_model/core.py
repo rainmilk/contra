@@ -14,7 +14,7 @@ from nets.VGG_LTH import vgg16_bn_lth
 from lip_teacher import SimpleLipNet
 from dataset import MixupDataset, get_dataset_loader
 from optimizer import create_optimizer_scheduler
-from custom_model import ClassifierWrapper
+from custom_model import load_custom_model, ClassifierWrapper
 from train_test import (
     model_train,
     model_test,
@@ -325,37 +325,26 @@ def execute(args):
 
     # 2. load model
     # (1) load working model
-    if args.model == "resnet18":
-        weights = models.ResNet18_Weights.DEFAULT
-        working_model = models.resnet18(weights=weights, num_classes=num_classes)
-    elif args.model == "vgg19":
-        weights = models.VGG19_BN_Weights.DEFAULT
-        working_model = models.vgg19_bn(weights=weights, num_classes=num_classes)
-    elif args.model == "swin":
-        weights = models.Swin_V2_T_Weights.DEFAULT
-        working_model = models.swin_v2_t(weights=weights, num_classes=num_classes)
+    working_model = load_custom_model(args.model, num_classes, ckpt_path=working_model_path)
 
     working_model = ClassifierWrapper(working_model, num_classes)
 
     working_opt, working_lr_scheduler = create_optimizer_scheduler(
         optimizer_type, working_model.parameters(), learning_rate, weight_decay,
-        step_size=step_size, gamma=0.5
+        epochs=num_epochs
     )
 
     working_criterion = nn.CrossEntropyLoss()
 
-    checkpoint = torch.load(working_model_path)
-    working_model.load_state_dict(checkpoint, strict=False)
-
     # (2) load lip_teacher model, t0的情况重新训练
-    backbone = models.resnet18(pretrained=False, num_classes=512)
+    backbone = load_custom_model(args.model, num_classes)
     backbone = nn.Sequential(*list(backbone.children())[:-1])
     lip_teacher_model = SimpleLipNet(backbone, 512, num_classes)
 
     # 根据用户选择的优化器初始化
     teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(
         optimizer_type, lip_teacher_model.parameters(), learning_rate, weight_decay,
-        step_size=step_size, gamma=0.5
+        epochs=num_epochs
     )
     teacher_criterion = nn.CrossEntropyLoss()
 

@@ -5,27 +5,31 @@ import argparse
 from tqdm import tqdm
 import torch
 import torch.nn as nn
-import torch.optim as optim
+from torchvision import transforms
 import torchvision.models as models
 from torch.utils.data import DataLoader
 from core_model.optimizer import create_optimizer_scheduler
-from core_model.custom_model import ClassifierWrapper
+from core_model.custom_model import ClassifierWrapper, load_custom_model
 
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, Dataset
 from torch.utils.tensorboard import SummaryWriter
 
 
-# Warmup学习率调度器
-class WarmUpLR(torch.optim.lr_scheduler._LRScheduler):
-    def __init__(self, optimizer, total_iters, last_epoch=-1):
-        self.total_iters = total_iters
-        super(WarmUpLR, self).__init__(optimizer, last_epoch)
+class BaseTensorDataset(Dataset):
 
-    def get_lr(self):
-        return [
-            base_lr * (self.last_epoch + 1) / self.total_iters
-            for base_lr in self.base_lrs
-        ]
+    def __init__(self, data, labels, transforms=None):
+        self.data = data
+        self.labels = labels
+        self.transforms = transforms
+
+    def __len__(self) -> int:
+        return len(self.data)
+    def __getitem__(self, index):
+        data = self.data[index]
+        if self.transforms is not None:
+            self.transforms(data)
+
+        return data, self.labels[index]
 
 
 def load_dataset(subdir, dataset_name, file_name, is_data=True):
@@ -57,7 +61,7 @@ def train_model(
     test_data,
     test_labels,
     epochs=50,
-    batch_size=32,
+    batch_size=256,
     optimizer_type="adam",
     learning_rate=0.001,
     weight_decay=1e-4,
@@ -87,14 +91,19 @@ def train_model(
         parameters=model.parameters(),
         learning_rate=learning_rate,
         weight_decay=weight_decay,
-        step_size=epochs // 5,
-        gamma=0.5,
+        epochs=epochs,
     )
 
-    dataset = torch.utils.data.TensorDataset(data.to(device), labels.to(device))
+    transform_train = transforms.Compose([
+        transforms.RandomCrop(32, padding=4),
+        transforms.RandomHorizontalFlip(),
+        # transforms.RandomRotation(15)
+    ])
+
+    dataset = BaseTensorDataset(data.to(device), labels.to(device), transforms=transform_train)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-    test_dataset = torch.utils.data.TensorDataset(
+    test_dataset = BaseTensorDataset(
         test_data.to(device), test_labels.to(device)
     )
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
@@ -184,7 +193,7 @@ def load_model(model_path, num_classes):
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"模型文件 {model_path} 未找到。")
 
-    model = ClassifierWrapper(models.resnet18(), num_classes)
+    model = load_model()
     model.load_state_dict(torch.load(model_path))
     return model
 
@@ -197,11 +206,12 @@ def train_step(
     dataset_name="cifar-10",
     load_model_path=None,
     epochs=50,
-    batch_size=32,
+    batch_size=256,
     optimizer_type="adam",
     learning_rate=0.001,
     weight_decay=1e-4,
     writer=None,
+    args=None
 ):
     """
     根据步骤训练模型
@@ -245,6 +255,7 @@ def train_step(
     print(f"数据集类型: {dataset_name}")
     print(f"Epochs: {epochs}, Batch Size: {batch_size}, Learning Rate: {learning_rate}")
 
+    model_name = args.model
     if step == (-1):
 
         D_train_data = load_dataset(
@@ -258,8 +269,7 @@ def train_step(
         print("用于训练的数据: train_data.npy 和 train_labels.npy")
         print("用于训练的模型: ResNet18 初始化")
 
-        weights = models.ResNet18_Weights.DEFAULT
-        model_raw = models.resnet18(weights=weights)
+        model_raw = load_custom_model(model_name, num_classes)
         model_raw = ClassifierWrapper(model_raw, freeze_weights=False, num_classes=num_classes)
         print(f"开始训练 M_p0 ({dataset_name})...")
 
@@ -290,8 +300,7 @@ def train_step(
         print("用于训练的数据: D_0.npy 和 D_0_labels.npy")
         print("用于训练的模型: ResNet18 初始化")
 
-        weights = models.ResNet18_Weights.DEFAULT
-        model_p0 = models.resnet18(weights=weights)
+        model_p0 = load_custom_model(model_name, num_classes)
         model_p0 = ClassifierWrapper(model_p0, num_classes)
         print(f"开始训练 M_p0 ({dataset_name})...")
 
@@ -338,7 +347,7 @@ def train_step(
         )
         print("用于训练的模型: M_p0")
 
-        model_p1 = ClassifierWrapper(models.resnet18(), num_classes=num_classes)
+        model_p1 = ClassifierWrapper(load_custom_model(model_name, num_classes), num_classes=num_classes)
         model_p1.load_state_dict(model_p0_loaded.state_dict())
         print(f"开始训练 M_p1 ({dataset_name})...")
         model_p1 = train_model(
@@ -386,7 +395,7 @@ def train_step(
         print(f"用于训练的模型: M_p{step-1}")
 
         # 训练当前模型
-        model_current = ClassifierWrapper(models.resnet18(), num_classes=num_classes)
+        model_current = ClassifierWrapper(load_custom_model(model_name, num_classes), num_classes=num_classes)
         model_current.load_state_dict(model_prev.state_dict())
         print(f"开始训练 M_p{step} ({dataset_name})...")
 
@@ -410,7 +419,16 @@ def train_step(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Train ResNet models step by step.")
+    parser = argparse.ArgumentParser(description="Train models step by step.")
+
+    parser.add_argument(
+        "--model",
+        type=str,
+        choices=["cifar-resnet18", "cifar-wideresnet40", "resnet18", "vgg19"],
+        required=True,
+        help="Select in (cifar-resnet18, cifar-wideresnet40, resnet18, vgg19)",
+    )
+
     parser.add_argument(
         "--step",
         type=int,
@@ -464,7 +482,7 @@ def main():
     parser.add_argument(
         "--batch_size",
         type=int,
-        default=32,
+        default=256,
         help="每批训练样本数",
     )
     parser.add_argument(
@@ -543,6 +561,7 @@ def main():
         optimizer_type=args.optimizer,
         learning_rate=args.learning_rate,
         writer=writer,
+        args=args
     )
 
     if writer:
