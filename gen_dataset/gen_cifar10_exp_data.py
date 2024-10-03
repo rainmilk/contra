@@ -92,12 +92,18 @@ def create_cifar10_npy_files(
         root=data_dir, train=False, download=True, transform=transform
     )
 
-    train_data = torch.stack([train_dataset[i][0] for i in range(len(train_dataset))])
-    train_labels = torch.tensor(
-        [train_dataset[i][1] for i in range(len(train_dataset))]
-    )
-    test_data = torch.stack([test_dataset[i][0] for i in range(len(test_dataset))])
-    test_labels = torch.tensor([test_dataset[i][1] for i in range(len(test_dataset))])
+    train_data, train_labels = zip(*train_dataset)
+    train_data = torch.stack(train_data)
+    train_labels = torch.tensor(train_labels)
+    # train_data = torch.stack([train_dataset[i][0] for i in range(len(train_dataset))])
+    # train_labels = torch.tensor(
+    #     [train_dataset[i][1] for i in range(len(train_dataset))]
+    # )
+    test_data, test_labels = zip(*test_dataset)
+    test_data = torch.stack(test_data)
+    test_labels = torch.tensor(test_labels)
+    # test_data = torch.stack([test_dataset[i][0] for i in range(len(test_dataset))])
+    # test_labels = torch.tensor([test_dataset[i][1] for i in range(len(test_dataset))])
 
     num_samples = len(train_data)
     indices = np.random.permutation(num_samples)
@@ -229,7 +235,7 @@ def create_cifar10_npy_files(
 
         D_n_data = D_inc_data[noise_sample_indices]
         # D_n_labels = D_inc_labels[noise_sample_indices].clone()
-        D_n_labels = D_inc_labels[noise_sample_indices].copy()
+        D_n_labels = D_inc_labels[noise_sample_indices]
 
         # 在 D_n_labels 中注入噪声
         for idx_in_D_n, D_inc_idx in enumerate(noise_sample_indices):

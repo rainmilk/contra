@@ -7,7 +7,7 @@ def create_optimizer_scheduler(
     epochs,
     learning_rate=1e-2,
     weight_decay=1e-3,
-    gamma=5e-5,
+    gamma=1e-6,
     min_epochs_for_decay=10,
     factor=0.99
 ):

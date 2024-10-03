@@ -32,6 +32,20 @@ class BaseTensorDataset(Dataset):
         return data, self.labels[index]
 
 
+def get_num_of_classes(dataset_name):
+    # 根据 dataset_name 设置分类类别数
+    if dataset_name == "cifar-10":
+        num_classes = 10
+    elif dataset_name == "cifar-100":
+        num_classes = 100
+    elif dataset_name == "food-101":
+        num_classes = 101
+    else:
+        raise ValueError(f"Unsupported dataset type: {dataset_name}")
+
+    return num_classes
+
+
 def load_dataset(subdir, dataset_name, file_name, is_data=True):
     """
     加载数据集文件并返回 PyTorch 张量。
@@ -98,6 +112,7 @@ def train_model(
         transforms.RandomCrop(32, padding=4),
         transforms.RandomHorizontalFlip(),
         # transforms.RandomRotation(15)
+        transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762))
     ])
 
     dataset = BaseTensorDataset(data.to(device), labels.to(device), transforms=transform_train)
@@ -112,6 +127,8 @@ def train_model(
     train_losses = []
     test_accuracies = []
 
+    from torchvision.transforms import v2
+    mixup_transform = v2.MixUp(num_classes=len(set(labels.tolist())))
     for epoch in tqdm(range(epochs), desc="Training Progress"):
         running_loss = 0.0
         correct = 0
@@ -124,9 +141,11 @@ def train_model(
         with tqdm(total=len(dataloader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for inputs, targets in dataloader:
                 inputs, targets = inputs.to(device), targets.to(device)
+                mix_input, mix_target = mixup_transform(inputs, targets)
+
                 optimizer.zero_grad()
-                outputs = model(inputs)
-                loss = criterion(outputs, targets)
+                outputs = model(mix_input)
+                loss = criterion(outputs, mix_target)
                 loss.backward()
                 optimizer.step()
 
@@ -232,16 +251,7 @@ def train_step(
     os.makedirs(ckpt_subdir, exist_ok=True)
 
     # num_classes = 10 if dataset_name == "cifar-10" else 100
-
-    # 根据 dataset_name 设置分类类别数
-    if dataset_name == "cifar-10":
-        num_classes = 10
-    elif dataset_name == "cifar-100":
-        num_classes = 100
-    elif dataset_name == "food-101":
-        num_classes = 101
-    else:
-        raise ValueError(f"Unsupported dataset type: {dataset_name}")
+    num_classes = get_num_of_classes(dataset_name)
 
     # 加载训练和测试数据集
     D_test_data = load_dataset(subdir, dataset_name, "test_data.npy", is_data=True)
@@ -270,7 +280,7 @@ def train_step(
         print("用于训练的模型: ResNet18 初始化")
 
         model_raw = load_custom_model(model_name, num_classes)
-        model_raw = ClassifierWrapper(model_raw, freeze_weights=False, num_classes=num_classes)
+        model_raw = ClassifierWrapper(model_raw, num_classes=num_classes, spectral_norm=True)
         print(f"开始训练 M_p0 ({dataset_name})...")
 
         model_raw = train_model(

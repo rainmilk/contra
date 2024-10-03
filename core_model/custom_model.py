@@ -28,7 +28,8 @@ def load_custom_model(model_name, num_classes, load_pretrained=False, ckpt_path=
 
 
 class ClassifierWrapper(nn.Module):
-    def __init__(self, backbone, num_classes, freeze_weights=False, batchnorm_blocks=-1):
+    def __init__(self, backbone, num_classes, freeze_weights=False,
+                 batchnorm_blocks=-1, spectral_norm=False):
         super(ClassifierWrapper, self).__init__()
 
         # Freezing the weights
@@ -46,6 +47,9 @@ class ClassifierWrapper(nn.Module):
                 *[nn.ReLU(), nn.BatchNorm1d(features), nn.Linear(features, features)] * batchnorm_blocks,
                 nn.ReLU(), nn.BatchNorm1d(features)]
         self.feature_model = nn.Sequential(*modules)
+        if spectral_norm:
+            self.apply(self.add_spectral_norm_)
+
         self.fc = nn.Linear(features, num_classes)
 
     def forward(self, x, output_emb=False):
@@ -55,3 +59,7 @@ class ClassifierWrapper(nn.Module):
             return outputs, emb
 
         return outputs
+
+    def add_spectral_norm_(self, m):
+        if isinstance(m, (nn.Linear, nn.Conv2d)):
+            torch.nn.utils.spectral_norm(m)
