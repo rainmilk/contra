@@ -135,7 +135,9 @@ def create_cifar100_npy_files(
     #     ]
     # )
 
-    data_transform = transforms.Compose([transforms.ToTensor()])
+    data_transform = transforms.Compose([transforms.ToTensor(),
+                                         transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762))
+                                         ])
 
     # 加载 CIFAR-100 数据集
     train_dataset = datasets.CIFAR100(

@@ -82,8 +82,9 @@ def create_cifar10_npy_files(
     retention_ratios=[0.5, 0.3, 0.1],
     balanced=False,  # 选择是否类均衡
 ):
-    transform = transforms.Compose([transforms.ToTensor()])
-
+    transform = transforms.Compose([transforms.ToTensor(),
+                                    transforms.Normalize([0.491, 0.482, 0.446], [0.247, 0.243, 0.261])
+                                    ])
     # 加载 CIFAR-10 数据集
     train_dataset = datasets.CIFAR10(
         root=data_dir, train=True, download=True, transform=transform

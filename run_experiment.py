@@ -2,6 +2,8 @@ import os
 import warnings
 import numpy as np
 import argparse
+
+import torchvision.models
 from tqdm import tqdm
 import torch
 import torch.nn as nn
@@ -78,7 +80,7 @@ def train_model(
     batch_size=256,
     optimizer_type="adam",
     learning_rate=0.001,
-    weight_decay=1e-4,
+    weight_decay=5e-4,
     writer=None,
 ):
     """
@@ -108,19 +110,20 @@ def train_model(
         epochs=epochs,
     )
 
+    # weights = torchvision.models.ResNet18_Weights.DEFAULT
     transform_train = transforms.Compose([
         transforms.RandomCrop(32, padding=4),
         transforms.RandomHorizontalFlip(),
         # transforms.RandomRotation(15)
-        transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762))
+    ])
+    transform_test = transforms.Compose([
+        # weights.transforms()
     ])
 
     dataset = BaseTensorDataset(data.to(device), labels.to(device), transforms=transform_train)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-    test_dataset = BaseTensorDataset(
-        test_data.to(device), test_labels.to(device)
-    )
+    test_dataset = BaseTensorDataset(test_data.to(device), test_labels.to(device))
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     # 用于存储训练和测试的损失和准确率
@@ -128,7 +131,7 @@ def train_model(
     test_accuracies = []
 
     from torchvision.transforms import v2
-    mixup_transform = v2.MixUp(num_classes=len(set(labels.tolist())))
+    mixup_transform = v2.MixUp(alpha=0.25, num_classes=len(set(labels.tolist())))
     for epoch in tqdm(range(epochs), desc="Training Progress"):
         running_loss = 0.0
         correct = 0
@@ -177,16 +180,21 @@ def train_model(
         correct_test = 0
         total_test = 0
         with torch.no_grad():
-            for test_inputs, test_targets in test_loader:
-                test_inputs, test_targets = test_inputs.to(device), test_targets.to(
-                    device
-                )
-                test_outputs = model(test_inputs)
-                loss = criterion(test_outputs, test_targets)
-                test_loss += loss.item()
-                _, predicted_test = torch.max(test_outputs, 1)
-                total_test += test_targets.size(0)
-                correct_test += (predicted_test == test_targets).sum().item()
+            with tqdm(total=len(test_loader), desc=f"Epoch {epoch + 1} Testing") as pbar:
+                for test_inputs, test_targets in test_loader:
+                    test_inputs, test_targets = test_inputs.to(device), test_targets.to(
+                        device
+                    )
+                    test_outputs = model(test_inputs)
+                    loss = criterion(test_outputs, test_targets)
+                    test_loss += loss.item()
+                    _, predicted_test = torch.max(test_outputs, 1)
+                    total_test += test_targets.size(0)
+                    correct_test += (predicted_test == test_targets).sum().item()
+
+                    # 更新进度条
+                    pbar.set_postfix({"Loss": f"{test_loss.item():.4f}"})
+                    pbar.update(1)
 
         test_loss /= len(test_loader)
         test_accuracy = 100 * correct_test / total_test
@@ -280,7 +288,7 @@ def train_step(
         print("用于训练的模型: ResNet18 初始化")
 
         model_raw = load_custom_model(model_name, num_classes)
-        model_raw = ClassifierWrapper(model_raw, num_classes=num_classes, spectral_norm=True)
+        model_raw = ClassifierWrapper(model_raw, num_classes=num_classes, spectral_norm=False)
         print(f"开始训练 M_p0 ({dataset_name})...")
 
         model_raw = train_model(
