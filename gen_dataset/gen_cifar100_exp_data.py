@@ -135,9 +135,12 @@ def create_cifar100_npy_files(
     #     ]
     # )
 
-    data_transform = transforms.Compose([transforms.ToTensor(),
-                                         transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762))
-                                         ])
+    data_transform = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
+        ]
+    )
 
     # 加载 CIFAR-100 数据集
     train_dataset = datasets.CIFAR100(
@@ -208,7 +211,6 @@ def create_cifar100_npy_files(
 
     # 检查 D_inc 数据分布
     print("D_inc Labels distribution:", collections.Counter(D_inc_labels))
-
 
     # 保存初始数据集、初始增量数据集、重放数据集
     np.save(os.path.join(subdir, "D_0.npy"), D_0_data)
