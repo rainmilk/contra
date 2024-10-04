@@ -310,7 +310,7 @@ def train_step(
         model_raw = ClassifierWrapper(
             model_raw, num_classes=num_classes, spectral_norm=False
         )
-        print(f"开始训练 M_p0 ({dataset_name})...")
+        print(f"开始训练 M_raw on ({dataset_name})...")
 
         model_raw = train_model(
             model_raw,
@@ -326,7 +326,7 @@ def train_step(
         )
         model_raw_path = os.path.join(ckpt_subdir, "model_raw.pth")
         torch.save(model_raw.state_dict(), model_raw_path)
-        print(f"M_p0 训练完毕并保存至 {model_raw_path}")
+        print(f"M_raw 训练完毕并保存至 {model_raw_path}")
         return
 
     if step == 0:  # 基于$D_0$数据集和原始的resnet网络训练一个模型 M_p0
@@ -341,7 +341,7 @@ def train_step(
 
         model_p0 = load_custom_model(model_name, num_classes)
         model_p0 = ClassifierWrapper(model_p0, num_classes)
-        print(f"开始训练 M_p0 ({dataset_name})...")
+        print(f"开始训练 M_p0 on ({dataset_name})...")
 
         model_p0 = train_model(
             model_p0,
@@ -452,7 +452,7 @@ def train_step(
             load_custom_model(model_name, num_classes), num_classes=num_classes
         )
         current_model.load_state_dict(prev_model_loaded.state_dict())
-        print(f"开始训练 M_p{step} ({dataset_name})...")
+        print(f"开始训练 M_p{step} on ({dataset_name})...")
 
         current_model = train_model(
             current_model,
