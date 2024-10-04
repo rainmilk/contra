@@ -362,7 +362,6 @@ def train_step(
     elif (
         step == 1
     ):  # load上一步训练好的M_p0模型，然后基于 D_tr_data_version_1 和 D_tr_labels_version_1 进行训练，得到M_p1
-
         D_train_data = load_dataset(
             subdir, dataset_name, f"D_tr_data_version_{step}.npy", is_data=True
         )
@@ -370,31 +369,33 @@ def train_step(
             subdir, dataset_name, f"D_tr_labels_version_{step}.npy", is_data=False
         )
 
-        if load_model_path:  # 只能是 M_p0 模型
-            if "model_p0" not in load_model_path:
-                raise ValueError("加载的模型必须是 M_p0 模型。")
-                return
-
-        model_p0_path = os.path.join(ckpt_subdir, "model_p0.pth")
-        model_p0_loaded = load_custom_model(
-            model_name=model_name, num_classes=num_classes, ckpt_path=model_p0_path
-        )
-
-        model_p0_loaded = ClassifierWrapper(model_p0_loaded, num_classes)
-
-        print(f"加载模型: {model_p0_path}")
-
         # 打印用于训练的模型和数据
         print(
             f"用于训练的数据: D_tr_data_version_{step}.npy 和 D_tr_labels_version_{step}.npy"
         )
         print("用于训练的模型: M_p0")
 
+        if load_model_path:  # 只能是 M_p0 模型
+            if "model_p0" not in load_model_path:
+                raise ValueError("加载的模型必须是 M_p0 模型。")
+                return
+
+        model_p0_path = os.path.join(ckpt_subdir, "model_p0.pth")
+        print(f"加载模型: {model_p0_path}")
+
+        # load model p0
+        model_p0_loaded = load_custom_model(
+            model_name=model_name, num_classes=num_classes, ckpt_path=model_p0_path
+        )
+        model_p0_loaded = ClassifierWrapper(model_p0_loaded, num_classes)
+
+        # prepare model p1
         model_p1 = ClassifierWrapper(
             load_custom_model(model_name, num_classes), num_classes=num_classes
         )
         model_p1.load_state_dict(model_p0_loaded.state_dict())
-        print(f"开始训练 M_p1 ({dataset_name})...")
+
+        print(f"开始训练 M_p1 on ({dataset_name})...")
         model_p1 = train_model(
             model_p1,
             D_train_data,
@@ -408,23 +409,13 @@ def train_step(
             weight_decay=weight_decay,
             writer=writer,
         )
+
+        # save model p1
         model_p1_path = os.path.join(ckpt_subdir, "model_p1.pth")
         torch.save(model_p1.state_dict(), model_p1_path)
         print(f"M_p1 训练完毕并保存至 {model_p1_path}")
 
     elif step >= 2:  # 从外部加载通过命令行指定的某个模型
-        if load_model_path:
-            model_prev = load_model(load_model_path, num_classes)
-            print(f"加载指定模型: {load_model_path}")
-        else:  # 如果 step>=2 且用户通过命令行没有提供外部模型，则加载前一个模型
-            prev_model_path = os.path.join(ckpt_subdir, f"model_p{step-1}.pth")
-            if not os.path.exists(prev_model_path):
-                raise FileNotFoundError(
-                    f"模型文件 {prev_model_path} 未找到。请先训练 M_p{step-1}。"
-                )
-            model_prev = load_model(prev_model_path, num_classes)
-            print(f"加载模型: {prev_model_path}")
-
         # 加载当前步骤的训练数据
         D_train_data = load_dataset(
             subdir, dataset_name, f"D_tr_data_version_{step}.npy", is_data=True
@@ -439,15 +430,32 @@ def train_step(
         )
         print(f"用于训练的模型: M_p{step-1}")
 
-        # 训练当前模型
-        model_current = ClassifierWrapper(
+        if load_model_path:  # 只能是 M_p0 模型
+            if "model_p" not in load_model_path:
+                raise ValueError("加载的模型名称必须是 M_px(x表示序号1,2...)。")
+                return
+
+        prev_model_path = os.path.join(ckpt_subdir, f"model_p{step-1}.pth")
+        print(f"加载模型: {prev_model_path}")
+
+        if not os.path.exists(prev_model_path):
+            raise FileNotFoundError(
+                f"模型文件 {prev_model_path} 未找到。请先训练 M_p{step-1}。"
+            )
+
+        prev_model_loaded = load_custom_model(
+            model_name=model_name, num_classes=num_classes, ckpt_path=prev_model_path
+        )
+        prev_model_loaded = ClassifierWrapper(prev_model_loaded, num_classes)
+
+        current_model = ClassifierWrapper(
             load_custom_model(model_name, num_classes), num_classes=num_classes
         )
-        model_current.load_state_dict(model_prev.state_dict())
+        current_model.load_state_dict(prev_model_loaded.state_dict())
         print(f"开始训练 M_p{step} ({dataset_name})...")
 
-        model_current = train_model(
-            model_current,
+        current_model = train_model(
+            current_model,
             D_train_data,
             D_train_labels,
             D_test_data,
@@ -460,9 +468,10 @@ def train_step(
             writer=writer,
         )
 
-        model_current_path = os.path.join(ckpt_subdir, f"model_p{step}.pth")
-        torch.save(model_current.state_dict(), model_current_path)
-        print(f"M_p{step} 训练完毕并保存至 {model_current_path}")
+        # save current model
+        current_model_path = os.path.join(ckpt_subdir, f"model_p{step}.pth")
+        torch.save(current_model.state_dict(), current_model_path)
+        print(f"M_p{step} 训练完毕并保存至 {current_model_path}")
 
 
 def main():
