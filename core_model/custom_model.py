@@ -5,16 +5,20 @@ from core_model.wideresidual import wideresnet
 from core_model.resnet import resnet18
 
 
-def load_custom_model(model_name, num_classes, load_pretrained=False, ckpt_path=None):
+def load_custom_model(model_name, num_classes, load_pretrained=True, ckpt_path=None):
     weights = None
     if model_name == "resnet18":
         if load_pretrained:
             weights = models.ResNet18_Weights.DEFAULT
-        model = models.resnet18(weights=weights, num_classes=num_classes)
+            model = models.resnet18(weights=weights)
+        else:
+            model = models.resnet18(num_classes=num_classes)
     elif model_name == "vgg19":
         if load_pretrained:
             weights = models.VGG19_BN_Weights.DEFAULT
-        model = models.vgg19_bn(weights=weights, num_classes=num_classes)
+            model = models.vgg19_bn(weights=weights)
+        else:
+            model = models.vgg19_bn(num_classes=num_classes)
     elif model_name == "cifar-resnet18":
         model = resnet18(num_classes=num_classes)
     elif model_name == "cifar-wideresnet40":
@@ -57,9 +61,9 @@ class ClassifierWrapper(nn.Module):
             self.apply(self.add_spectral_norm_)
 
         if bypass:
-            self.fc = nn.Linear(features, num_classes)
-        else:
             self.fc = all_modules[-1]
+        else:
+            self.fc = nn.Linear(features, num_classes)
 
     def forward(self, x, output_emb=False):
         emb = self.feature_model(x)

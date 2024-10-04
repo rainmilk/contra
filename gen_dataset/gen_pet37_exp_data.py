@@ -2,6 +2,8 @@ import torch
 import numpy as np
 import os
 import argparse
+
+import torchvision.models
 from torchvision import datasets, transforms
 import json
 
@@ -135,19 +137,23 @@ def create_cifar100_npy_files(
     #     ]
     # )
 
+    weights = torchvision.models.ResNet18_Weights.DEFAULT
+
     data_transform = transforms.Compose(
         [
-            transforms.ToTensor(),
-            transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
+            # transforms.Resize((224,224)),
+            weights.transforms(),
+            # transforms.ToTensor(),
+            # transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
         ]
     )
 
     # 加载 CIFAR-100 数据集
-    train_dataset = datasets.CIFAR100(
-        root=data_dir, train=True, download=True, transform=data_transform
+    train_dataset = datasets.OxfordIIITPet(
+        root=data_dir, download=True, transform=data_transform
     )
-    test_dataset = datasets.CIFAR100(
-        root=data_dir, train=False, download=True, transform=data_transform
+    test_dataset = datasets.OxfordIIITPet(
+        root=data_dir, split='test', download=True, transform=data_transform
     )
 
     train_data, train_labels = zip(*train_dataset)
@@ -247,17 +253,17 @@ def create_cifar100_npy_files(
     # 定义非对称噪声映射
 
     # 读取 CIFAR-100 类别
-    cifar100_classes_file = "./configs/classes/cifar_100_classes.txt"
+    cifar100_classes_file = "./configs/classes/pets_classes.txt"
     cifar100_classes = load_classes_from_file(cifar100_classes_file)
 
     # 读取 CIFAR-100 的 superclass 和 child class 映射
-    cifar100_mapping_file = "./configs/classes/cifar_100_mapping.json"
+    cifar100_mapping_file = "./configs/classes/pets_mapping.json"
     cifar100_superclass_mapping = load_cifar100_superclass_mapping(
         cifar100_mapping_file
     )
 
     # 打印读取到的类别信息
-    print("CIFAR-100 Classes:", cifar100_classes)
+    print("PETS Classes:", cifar100_classes)
 
     # 构建非对称映射，如果选择了非对称噪声
     if noise_type == "asymmetric":
@@ -349,18 +355,18 @@ def main():
     torch.manual_seed(42)
 
     parser = argparse.ArgumentParser(
-        description="Generate CIFAR-100 incremental datasets."
+        description="Generate CIFAR-PETS incremental datasets."
     )
     parser.add_argument(
         "--data_dir",
         type=str,
-        default="./data/cifar-100/normal",
-        help="原始 CIFAR-100 数据集的目录",
+        default="./data/pets-37/normal",
+        help="原始 PETS 数据集的目录",
     )
     parser.add_argument(
         "--gen_dir",
         type=str,
-        default="./data/cifar-100/gen/",
+        default="./data/pets-37/gen/",
         help="生成数据集的保存目录",
     )
     parser.add_argument(
