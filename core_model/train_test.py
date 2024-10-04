@@ -3,6 +3,7 @@ from tqdm import tqdm
 import numpy as np
 import torch
 import torch.nn as nn
+from torchvision.transforms import v2
 
 
 def model_train(
@@ -11,10 +12,13 @@ def model_train(
     optimizer,
     lr_scheduler,
     criterion,
-    alpha,
-    args,
+    alpha=1,
+    args=None,
     device="cuda",
     save_path="",
+    mix_classes=0,
+    test_loader=None,
+    test_per_it=1
 ):
     # todo opt 重置
     # 训练模型并显示进度
@@ -23,7 +27,10 @@ def model_train(
     model = model.to(device)  # 确保模型移动到正确的设备
     model.train()
 
-    iters = len(train_loader)
+    if mix_classes > 0:
+        cutmix_transform = v2.CutMix(alpha=1.0, num_classes=mix_classes)
+        mixup_transform = v2.MixUp(alpha=0.5, num_classes=mix_classes)
+
     for epoch in tqdm(range(args.num_epochs), desc="Training Progress"):
         running_loss = 0.0
         correct = 0
@@ -36,6 +43,10 @@ def model_train(
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for i, (inputs, labels) in enumerate(train_loader):
                 inputs, labels = inputs.to(device), labels.to(device)
+                if mix_classes > 0:
+                    transform = np.random.choice([cutmix_transform, mixup_transform])
+                    inputs, labels = transform(inputs, labels)
+
                 optimizer.zero_grad()  # 清除上一步的梯度
                 outputs = model(inputs)
 
@@ -61,6 +72,10 @@ def model_train(
         )
         torch.cuda.empty_cache()
 
+        if test_loader is not None and epoch % test_per_it == 0:
+            model_test(test_loader, model, device)
+
+
         # 仅在最后一次保存模型，避免每个 epoch 都保存
         if epoch == args.num_epochs - 1:
             os.makedirs(save_path, exist_ok=True)
@@ -73,13 +88,10 @@ def model_train(
             )
 
 
-def model_test(labels, data_loader, model, device="cuda", teacher_model=False):
+def model_test(data_loader, model, device="cuda"):
     eval_results = {}
 
-    if teacher_model:
-        predicts, probs, embeds = teacher_model_forward(data_loader, model, device)
-    else:
-        predicts, probs = working_model_forward(data_loader, model, device)
+    predicts, probs, labels = model_forward(data_loader, model, device, output_targets=True)
 
     # global acc
     global_acc = np.mean(predicts == labels)
@@ -97,38 +109,26 @@ def model_test(labels, data_loader, model, device="cuda", teacher_model=False):
     return eval_results
 
 
-def working_model_forward(data_loader, model, device="cuda"):
+def model_forward(test_loader, model, device="cuda",
+                          output_embedding=False, output_targets=False):
     model = model.to(device)
     model.eval()
 
     output_probs, output_predicts = [], []
+    if output_embedding:
+        embed_outs = []
 
-    for i, (image, target) in enumerate(data_loader):
-        image = image.to(device)
-        logics = model(image)
-
-        probs = nn.functional.softmax(logics, dim=-1)
-        probs = probs.data.cpu().numpy()
-        output_probs.append(probs)
-
-        predicts = np.argmax(probs, axis=1)
-        output_predicts.append(predicts)
-
-    return np.concatenate(output_predicts, axis=0), np.concatenate(output_probs, axis=0)
-
-
-def teacher_model_forward(test_loader, model, device="cuda"):
-    model = model.to(device)
-    model.eval()
-
-    embed_outs, output_probs, output_predicts = [], [], []
+    if output_targets:
+        targets = []
 
     for i, (image, target) in enumerate(test_loader):
         image = image.to(device)  # 数据移动到设备
 
-        embed_out, logics = model(image)  # embedding out [batch, 512]
-
-        embed_outs.append(embed_out.data.cpu().numpy())
+        if output_embedding:
+            logics, embed_out = model(image, output_embedding)
+            embed_outs.append(embed_out.data.cpu().numpy())
+        else:
+            logics = model(image)
 
         probs = nn.functional.softmax(logics, dim=-1)
         probs = probs.data.cpu().numpy()
@@ -137,8 +137,19 @@ def teacher_model_forward(test_loader, model, device="cuda"):
         predicts = np.argmax(probs, axis=1)
         output_predicts.append(predicts)
 
-    return (
-        np.concatenate(output_predicts, axis=0),
-        np.concatenate(output_probs, axis=0),
-        np.concatenate(embed_outs, axis=0),
-    )
+        if output_targets:
+            targets.append(target.data.cpu().numpy())
+
+    output_predicts = np.concatenate(output_predicts, axis=0)
+    output_probs = np.concatenate(output_probs, axis=0)
+
+    ret = [output_predicts, output_probs]
+
+    if output_embedding:
+        ret.append(np.concatenate(embed_outs, axis=0))
+
+    if output_targets:
+        ret.append(np.concatenate(targets, axis=0))
+
+    return tuple(ret)
+

@@ -60,10 +60,10 @@ def parse_args():
     parser.add_argument(
         "--model",
         type=str,
-        required=True,
+        choices=["cifar-resnet18", "cifar-wideresnet40", "resnet18", "vgg19"],
         default="resnet18",
-        choices=["resnet18", "vgg16"],
-        help="Model name, choose from: resnet18, vgg16",
+        required=True,
+        help="Select in (cifar-resnet18, cifar-wideresnet40, resnet18, vgg19)",
     )
 
     # 在 parse_args 函数中添加 --pretrained 参数
@@ -77,7 +77,7 @@ def parse_args():
     parser.add_argument(
         "--condition",
         type=str,
-        required=True,
+        required=False,
         default="original_data",
         choices=["original_data", "remove_data", "noisy_data", "all_perturbations"],
         help="Condition for the experiment: original_data, remove_data, noisy_data, all_perturbations",

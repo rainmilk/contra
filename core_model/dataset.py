@@ -23,26 +23,31 @@ class BaseTensorDataset(Dataset):
         return data, self.labels[index]
 
 
-def normalize_dataset(dataset, mean, std):
+def normalize_dataset(dataset, mean=None, std=None):
     shape = dataset.shape
     channel_idx = np.where(np.array(shape) == 3)[0]
-    if channel_idx == 1:
-        dataset = np.transpose(dataset, [0, 2, 3, 1])
+
+    # modify shape to [N, C, H, W]
     if channel_idx == 2:
-        dataset = np.transpose(dataset, [0, 1, 3, 2])
+        dataset = np.transpose(dataset, [0, 2, 1, 3])
+    if channel_idx == 3:
+        dataset = np.transpose(dataset, [0, 3, 1, 2])
 
     # normalize
     if (dataset[0] > 1).any():
         dataset = dataset / 255.
 
     # gaussian normalize
-    mean = np.array(mean, dtype=np.float32)
-    std = np.array(std, dtype=np.float32)
-    return (dataset - mean) / std
+    if mean is not None:
+        mean = np.array(mean, dtype=np.float32)
+        std = np.array(std, dtype=np.float32)
+        dataset = (dataset - mean) / std
+
+    return dataset
 
 
 def transform_data(data):
-    shape = data.shape[:2]
+    shape = data.shape[1:]
     data_mod = random_crop(data, shape)
     data_mod = random_horiz_flip(data_mod)
     return data_mod
@@ -54,9 +59,8 @@ class MixupDataset(Dataset):
         # modify shape to [N, H, W, C]
         self.data_first = data_pair[0]
         self.data_second = data_pair[1]
-        if mean is not None:
-            self.data_first = normalize_dataset(self.data_first, mean, std)
-            self.data_second = normalize_dataset(self.data_second, mean, std)
+        self.data_first = normalize_dataset(self.data_first, mean, std)
+        self.data_second = normalize_dataset(self.data_second, mean, std)
         self.label_first = label_pair[0]
         self.label_second = label_pair[1]
         self.mixup_alpha = mixup_alpha
@@ -82,15 +86,14 @@ class MixupDataset(Dataset):
 
         mixed_data = lbd * data_first + (1 - lbd) * data_rnd_ax
         mixed_labels = lbd * label_first + (1 - lbd) * label_rnd_ax
-        return np.transpose(mixed_data, [2, 0, 1]), mixed_labels
+        return mixed_data, mixed_labels
 
 
 class CustomDataset(Dataset):
-    def __init__(self, data, label, transform=True, mean=None, std=None):
+    def __init__(self, data, label, transform=False, mean=None, std=None):
         # modify shape to [N, H, W, C]
         self.data = data
-        if mean is not None:
-            self.data = normalize_dataset(data, mean, std)
+        self.data = normalize_dataset(data, mean, std)
         self.label = label
         self.transform = transform
 
@@ -98,29 +101,24 @@ class CustomDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, index):
+        data = self.data[index]
         if self.transform:
-            data = self.data[index]
-            shape = data.shape[:2]
-            data_crop = random_crop(data, shape)
-            data_flip = random_horiz_flip(data_crop)
-            # modify shape to [N, C, H, W]
-            data_flip = np.transpose(data_flip, [2, 0, 1])
+            data = transform_data(data)
 
-            return data_flip.copy(), self.label[index]
-
-        return np.transpose(self.data[index], [2, 0, 1]), self.label[index]
+        return data, self.label[index]
 
 
 def get_dataset_loader(
     dataset_name,
     loader_name,
     data_dir,
-    mean,
-    std,
-    batch_size,
+    mean=None,
+    std=None,
+    batch_size=64,
     num_classes=0,
     drop_last=False,
     shuffle=False,
+    onehot_enc=False,
 ):
     """
     根据 loader_name 加载相应的数据集：支持增量训练 (inc)、辅助数据 (aux) 、测试数据 (test)和 D0数据集(train)
@@ -144,10 +142,10 @@ def get_dataset_loader(
     labels = np.load(label_path)
 
     transform = False
-    if loader_name == "train":
-        transform = True
+    # if loader_name == "train":
+    #     transform = True
 
-    if loader_name == "train":  # train label change to onehot for teacher model
+    if onehot_enc:  # train label change to onehot for teacher model
         labels = np.eye(num_classes)[labels]
 
     # 构建自定义数据集
