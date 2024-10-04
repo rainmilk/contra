@@ -130,9 +130,10 @@ def train_model(
     train_losses = []
     test_accuracies = []
 
+    num_classes = len(set(labels.tolist()))
     from torchvision.transforms import v2
-    cutmix_transform = v2.CutMix(alpha=1.0, num_classes=len(set(labels.tolist())))
-    mixup_transform = v2.MixUp(alpha=0.5, num_classes=len(set(labels.tolist())))
+    cutmix_transform = v2.CutMix(alpha=1.0, num_classes=num_classes)
+    mixup_transform = v2.MixUp(alpha=0.5, num_classes=num_classes)
     for epoch in tqdm(range(epochs), desc="Training Progress"):
         running_loss = 0.0
         correct = 0
