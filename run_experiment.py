@@ -26,6 +26,7 @@ class BaseTensorDataset(Dataset):
 
     def __len__(self) -> int:
         return len(self.data)
+
     def __getitem__(self, index):
         data = self.data[index]
         if self.transforms is not None:
@@ -38,7 +39,7 @@ def get_num_of_classes(dataset_name):
     # 根据 dataset_name 设置分类类别数
     if dataset_name == "cifar-10":
         num_classes = 10
-    elif dataset_name == 'pet-37':
+    elif dataset_name == "pet-37":
         num_classes = 37
     elif dataset_name == "cifar-100":
         num_classes = 100
@@ -113,14 +114,18 @@ def train_model(
     )
 
     # weights = torchvision.models.ResNet18_Weights.DEFAULT
-    transform_train = transforms.Compose([
-        transforms.RandomCrop(32, padding=4),
-        transforms.RandomHorizontalFlip(),
-        # transforms.RandomRotation(15)
-    ])
-    transform_test = transforms.Compose([
-        # weights.transforms()
-    ])
+    transform_train = transforms.Compose(
+        [
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+            # transforms.RandomRotation(15)
+        ]
+    )
+    transform_test = transforms.Compose(
+        [
+            # weights.transforms()
+        ]
+    )
 
     dataset = BaseTensorDataset(data.to(device), labels.to(device))
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
@@ -134,6 +139,7 @@ def train_model(
 
     num_classes = len(set(labels.tolist()))
     from torchvision.transforms import v2
+
     cutmix_transform = v2.CutMix(alpha=1.0, num_classes=num_classes)
     mixup_transform = v2.MixUp(alpha=0.5, num_classes=num_classes)
     for epoch in tqdm(range(epochs), desc="Training Progress"):
@@ -188,7 +194,9 @@ def train_model(
         correct_test = 0
         total_test = 0
         with torch.no_grad():
-            with tqdm(total=len(test_loader), desc=f"Epoch {epoch + 1} Testing") as pbar:
+            with tqdm(
+                total=len(test_loader), desc=f"Epoch {epoch + 1} Testing"
+            ) as pbar:
                 for test_inputs, test_targets in test_loader:
                     test_inputs, test_targets = test_inputs.to(device), test_targets.to(
                         device
@@ -228,8 +236,11 @@ def load_model(model_path, num_classes):
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"模型文件 {model_path} 未找到。")
 
-    model = load_model()
-    model.load_state_dict(torch.load(model_path))
+    # model = load_model()
+    model = ClassifierWrapper(
+        load_custom_model(model_name, num_classes), num_classes=num_classes
+    )
+    # model.load_state_dict(torch.load(model_path))
     return model
 
 
@@ -246,7 +257,7 @@ def train_step(
     learning_rate=0.001,
     weight_decay=1e-4,
     writer=None,
-    args=None
+    args=None,
 ):
     """
     根据步骤训练模型
@@ -296,7 +307,9 @@ def train_step(
         print("用于训练的模型: ResNet18 初始化")
 
         model_raw = load_custom_model(model_name, num_classes)
-        model_raw = ClassifierWrapper(model_raw, num_classes=num_classes, spectral_norm=False)
+        model_raw = ClassifierWrapper(
+            model_raw, num_classes=num_classes, spectral_norm=False
+        )
         print(f"开始训练 M_p0 ({dataset_name})...")
 
         model_raw = train_model(
@@ -360,12 +373,16 @@ def train_step(
         if load_model_path:  # 只能是 M_p0 模型
             if "model_p0" not in load_model_path:
                 raise ValueError("加载的模型必须是 M_p0 模型。")
-            model_p0_loaded = load_model(load_model_path, num_classes)
-            print(f"加载指定模型: {load_model_path}")
-        else:  # 只能是 M_p0 模型
-            model_p0_path = os.path.join(ckpt_subdir, "model_p0.pth")
-            model_p0_loaded = load_model(model_p0_path, num_classes)
-            print(f"加载模型: {model_p0_path}")
+                return
+
+        model_p0_path = os.path.join(ckpt_subdir, "model_p0.pth")
+        model_p0_loaded = load_custom_model(
+            model_name=model_name, num_classes=num_classes, ckpt_path=model_p0_path
+        )
+
+        model_p0_loaded = ClassifierWrapper(model_p0_loaded, num_classes)
+
+        print(f"加载模型: {model_p0_path}")
 
         # 打印用于训练的模型和数据
         print(
@@ -373,7 +390,9 @@ def train_step(
         )
         print("用于训练的模型: M_p0")
 
-        model_p1 = ClassifierWrapper(load_custom_model(model_name, num_classes), num_classes=num_classes)
+        model_p1 = ClassifierWrapper(
+            load_custom_model(model_name, num_classes), num_classes=num_classes
+        )
         model_p1.load_state_dict(model_p0_loaded.state_dict())
         print(f"开始训练 M_p1 ({dataset_name})...")
         model_p1 = train_model(
@@ -421,7 +440,9 @@ def train_step(
         print(f"用于训练的模型: M_p{step-1}")
 
         # 训练当前模型
-        model_current = ClassifierWrapper(load_custom_model(model_name, num_classes), num_classes=num_classes)
+        model_current = ClassifierWrapper(
+            load_custom_model(model_name, num_classes), num_classes=num_classes
+        )
         model_current.load_state_dict(model_prev.state_dict())
         print(f"开始训练 M_p{step} ({dataset_name})...")
 
@@ -494,7 +515,7 @@ def main():
         help="训练好的模型的保存目录。",
     )
     parser.add_argument(
-        "--load_model",
+        "--load_model_path",
         type=str,
         default=None,
         help="指定要加载的模型文件路径（可选）。",
@@ -581,13 +602,13 @@ def main():
         ckpt_subdir,
         output_dir=ckpt_subdir,
         dataset_name=args.dataset_name,
-        load_model_path=args.load_model,
+        load_model_path=args.load_model_path,
         epochs=args.epochs,
         batch_size=args.batch_size,
         optimizer_type=args.optimizer,
         learning_rate=args.learning_rate,
         writer=writer,
-        args=args
+        args=args,
     )
 
     if writer:

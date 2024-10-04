@@ -19,6 +19,8 @@ def load_custom_model(model_name, num_classes, load_pretrained=False, ckpt_path=
         model = resnet18(num_classes=num_classes)
     elif model_name == "cifar-wideresnet40":
         model = wideresnet(num_classes=num_classes)
+    else:
+        model = None
 
     if model and ckpt_path:
         checkpoint = torch.load(ckpt_path)
