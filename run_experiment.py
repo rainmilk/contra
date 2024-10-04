@@ -120,7 +120,7 @@ def train_model(
         # weights.transforms()
     ])
 
-    dataset = BaseTensorDataset(data.to(device), labels.to(device), transforms=transform_train)
+    dataset = BaseTensorDataset(data.to(device), labels.to(device))
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
     test_dataset = BaseTensorDataset(test_data.to(device), test_labels.to(device))
@@ -131,7 +131,8 @@ def train_model(
     test_accuracies = []
 
     from torchvision.transforms import v2
-    mixup_transform = v2.MixUp(alpha=0.25, num_classes=len(set(labels.tolist())))
+    cutmix_transform = v2.MixUp(alpha=1, num_classes=len(set(labels.tolist())))
+    mixup_transform = v2.MixUp(alpha=0.5, num_classes=len(set(labels.tolist())))
     for epoch in tqdm(range(epochs), desc="Training Progress"):
         running_loss = 0.0
         correct = 0
@@ -144,18 +145,22 @@ def train_model(
         with tqdm(total=len(dataloader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for inputs, targets in dataloader:
                 inputs, targets = inputs.to(device), targets.to(device)
-                mix_input, mix_target = mixup_transform(inputs, targets)
+                if np.random.rand() < 0.5:
+                    inputs, targets = mixup_transform(inputs, targets)
+                else:
+                    inputs, targets = cutmix_transform(inputs, targets)
 
                 optimizer.zero_grad()
-                outputs = model(mix_input)
-                loss = criterion(outputs, mix_target)
+                outputs = model(inputs)
+                loss = criterion(outputs, targets)
                 loss.backward()
                 optimizer.step()
 
                 running_loss += loss.item()
                 _, predicted = torch.max(outputs.data, 1)
+                _, mixed_max = torch.max(targets.data, 1)
                 total += targets.size(0)
-                correct += (predicted == targets).sum().item()
+                correct += (predicted == mixed_max).sum().item()
 
                 # 更新进度条
                 pbar.set_postfix({"Loss": f"{loss.item():.4f}"})
@@ -193,7 +198,7 @@ def train_model(
                     correct_test += (predicted_test == test_targets).sum().item()
 
                     # 更新进度条
-                    pbar.set_postfix({"Loss": f"{test_loss.item():.4f}"})
+                    pbar.set_postfix({"Loss": f"{loss.item():.4f}"})
                     pbar.update(1)
 
         test_loss /= len(test_loader)
@@ -519,7 +524,7 @@ def main():
     parser.add_argument(
         "--weight_decay",
         type=float,
-        default=1e-4,
+        default=5e-4,
         help="权重衰减系数",
     )
     parser.add_argument(
