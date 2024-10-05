@@ -4,13 +4,14 @@ import os
 import argparse
 
 import torchvision.models
+import torchvision
 from torchvision import datasets, transforms
 import json
 
 import collections
 
 
-def split_by_class(data, labels, num_classes=100):
+def split_by_class(data, labels, num_classes=37):
     """按类别划分数据集"""
     class_data = {i: [] for i in range(num_classes)}
     for i, label in enumerate(labels):
@@ -85,11 +86,11 @@ def load_classes_from_file(file_path):
     return classes
 
 
-def load_cifar100_superclass_mapping(file_path):
-    """从JSON文件中加载 CIFAR-100 的 superclass 与 child class 的映射"""
+def load_pet37_superclass_mapping(file_path):
+    """从JSON文件中加载 PET-37 的 superclass 与 child class 的映射"""
     with open(file_path, "r") as f:
-        cifar100_superclass_to_child = json.load(f)
-    return cifar100_superclass_to_child
+        pet37_superclass_to_child = json.load(f)
+    return pet37_superclass_to_child
 
 
 def build_asymmetric_mapping(superclass_mapping, classes):
@@ -119,7 +120,7 @@ def build_asymmetric_mapping(superclass_mapping, classes):
     return asymmetric_mapping
 
 
-def create_cifar100_npy_files(
+def create_pet37_npy_files(
     data_dir,
     gen_dir,
     noise_type="symmetric",
@@ -128,14 +129,6 @@ def create_cifar100_npy_files(
     retention_ratios=[0.5, 0.3, 0.1],
     balanced=False,
 ):
-    # transform = transforms.Compose([transforms.ToTensor()])
-
-    # data_transform = transforms.Compose(
-    #     [
-    #         transforms.ToTensor(),
-    #         transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
-    #     ]
-    # )
 
     weights = torchvision.models.ResNet18_Weights.DEFAULT
 
@@ -151,23 +144,21 @@ def create_cifar100_npy_files(
     # 加载 CIFAR-100 数据集
     train_dataset = datasets.OxfordIIITPet(
         root=data_dir, download=True, transform=data_transform
+    # 加载 PET-37 数据集
+    train_dataset = datasets.OxfordIIITPet(
+        root=data_dir, download=False, transform=data_transform
     )
     test_dataset = datasets.OxfordIIITPet(
-        root=data_dir, split='test', download=True, transform=data_transform
+        root=data_dir, split="test", download=False, transform=data_transform
     )
 
     train_data, train_labels = zip(*train_dataset)
     train_data = torch.stack(train_data)
     train_labels = torch.tensor(train_labels)
-    # train_data = torch.stack([train_dataset[i][0] for i in range(len(train_dataset))])
-    # train_labels = torch.tensor(
-    #     [train_dataset[i][1] for i in range(len(train_dataset))]
-    # )
+
     test_data, test_labels = zip(*test_dataset)
     test_data = torch.stack(test_data)
     test_labels = torch.tensor(test_labels)
-    # test_data = torch.stack([test_dataset[i][0] for i in range(len(test_dataset))])
-    # test_labels = torch.tensor([test_dataset[i][1] for i in range(len(test_dataset))])
 
     # 根据 balanced 参数调整存储路径
     if balanced:
@@ -189,6 +180,7 @@ def create_cifar100_npy_files(
     else:
         print("使用随机的数据划分方式...")
         subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}")
+
         # 随机划分初始数据集 D_0 和增量数据集 D_inc^(0)
         num_samples = len(train_data)
         indices = np.random.permutation(num_samples)
@@ -252,23 +244,21 @@ def create_cifar100_npy_files(
 
     # 定义非对称噪声映射
 
-    # 读取 CIFAR-100 类别
-    cifar100_classes_file = "./configs/classes/pets_classes.txt"
-    cifar100_classes = load_classes_from_file(cifar100_classes_file)
+    # 读取 PET-37 类别
+    pet37_classes_file = "./configs/classes/pet_37_classes.txt"
+    pet37_classes = load_classes_from_file(pet37_classes_file)
 
-    # 读取 CIFAR-100 的 superclass 和 child class 映射
-    cifar100_mapping_file = "./configs/classes/pets_mapping.json"
-    cifar100_superclass_mapping = load_cifar100_superclass_mapping(
-        cifar100_mapping_file
-    )
+    # 读取 PET-37 的 superclass 和 child class 映射
+    pet37_mapping_file = "./configs/classes/pet_37_mapping.json"
+    pet37_superclass_mapping = load_pet37_superclass_mapping(pet37_mapping_file)
 
     # 打印读取到的类别信息
-    print("PETS Classes:", cifar100_classes)
+    print("PET-37 Classes:", pet37_classes)
 
     # 构建非对称映射，如果选择了非对称噪声
     if noise_type == "asymmetric":
         asymmetric_mapping = build_asymmetric_mapping(
-            cifar100_superclass_mapping, cifar100_classes
+            pet37_superclass_mapping, pet37_classes
         )
 
     # 生成增量版本数据集
@@ -307,7 +297,7 @@ def create_cifar100_npy_files(
         for idx_in_D_n, D_inc_idx in enumerate(noise_sample_indices):
             if D_inc_idx in noisy_indices:
                 original_label = D_n_labels[idx_in_D_n].item()
-                original_class_name = cifar100_classes[original_label]
+                original_class_name = pet37_classes[original_label]
 
                 if noise_type == "symmetric":
                     new_label = original_label
@@ -317,16 +307,13 @@ def create_cifar100_npy_files(
                 elif noise_type == "asymmetric":
                     if original_class_name in asymmetric_mapping:
                         new_class_name = asymmetric_mapping[original_class_name]
-                        new_label = cifar100_classes.index(new_class_name)
+                        new_label = pet37_classes.index(new_class_name)
                         D_n_labels[idx_in_D_n] = new_label
                 else:
                     raise ValueError("Invalid noise type.")
             else:
                 # 未被选中注入噪声的样本标签保持不变
                 pass
-
-        # D_tr_data = torch.cat([D_f_data, D_n_data], dim=0)
-        # D_tr_labels = torch.cat([D_f_labels, D_n_labels], dim=0)
 
         D_tr_data = np.concatenate([D_f_data, D_n_data], axis=0)
         D_tr_labels = np.concatenate([D_f_labels, D_n_labels], axis=0)
@@ -336,10 +323,6 @@ def create_cifar100_npy_files(
         perm = np.random.permutation(len(D_tr_data))  # 使用 numpy 的随机打乱
         D_tr_data = D_tr_data[perm]
         D_tr_labels = D_tr_labels[perm]
-
-        # 保存训练数据集
-        # torch.save(D_tr_data, os.path.join(subdir, f"D_tr_data_version_{t+1}.npy"))
-        # torch.save(D_tr_labels, os.path.join(subdir, f"D_tr_labels_version_{t+1}.npy"))
 
         # 保存训练数据集
         np.save(os.path.join(subdir, f"D_tr_data_version_{t+1}.npy"), D_tr_data)
@@ -355,18 +338,18 @@ def main():
     torch.manual_seed(42)
 
     parser = argparse.ArgumentParser(
-        description="Generate CIFAR-PETS incremental datasets."
+        description="Generate PET-37 incremental datasets."
     )
     parser.add_argument(
         "--data_dir",
         type=str,
-        default="./data/pets-37/normal",
-        help="原始 PETS 数据集的目录",
+        default="./data/pet-37/normal/oxford-pets",
+        help="原始 PET-37 数据集的目录",
     )
     parser.add_argument(
         "--gen_dir",
         type=str,
-        default="./data/pets-37/gen/",
+        default="./data/pet-37/gen",
         help="生成数据集的保存目录",
     )
     parser.add_argument(
@@ -397,7 +380,7 @@ def main():
 
     args = parser.parse_args()
 
-    create_cifar100_npy_files(
+    create_pet37_npy_files(
         data_dir=args.data_dir,
         gen_dir=args.gen_dir,
         noise_type=args.noise_type,
