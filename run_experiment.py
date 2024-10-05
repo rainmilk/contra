@@ -3,18 +3,17 @@ import warnings
 import numpy as np
 import argparse
 
-import torchvision.models
 from tqdm import tqdm
 import torch
 import torch.nn as nn
 from torchvision import transforms
-import torchvision.models as models
-from torch.utils.data import DataLoader
 from core_model.optimizer import create_optimizer_scheduler
 from core_model.custom_model import ClassifierWrapper, load_custom_model
 
 from torch.utils.data import DataLoader, Dataset
 from torch.utils.tensorboard import SummaryWriter
+
+from torchvision.transforms import v2
 
 
 class BaseTensorDataset(Dataset):
@@ -39,7 +38,7 @@ def get_num_of_classes(dataset_name):
     # 根据 dataset_name 设置分类类别数
     if dataset_name == "cifar-10":
         num_classes = 10
-    elif dataset_name == "pet-37":
+    elif dataset_name == "pets-37":
         num_classes = 37
     elif dataset_name == "cifar-100":
         num_classes = 100
@@ -138,10 +137,13 @@ def train_model(
     test_accuracies = []
 
     num_classes = len(set(labels.tolist()))
-    from torchvision.transforms import v2
 
-    cutmix_transform = v2.CutMix(alpha=1.0, num_classes=num_classes)
-    mixup_transform = v2.MixUp(alpha=0.5, num_classes=num_classes)
+    use_data_aug = True
+
+    if use_data_aug:
+        cutmix_transform = v2.CutMix(alpha=1.0, num_classes=num_classes)
+        mixup_transform = v2.MixUp(alpha=0.5, num_classes=num_classes)
+
     for epoch in tqdm(range(epochs), desc="Training Progress"):
         running_loss = 0.0
         correct = 0
@@ -154,10 +156,9 @@ def train_model(
         with tqdm(total=len(dataloader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for inputs, targets in dataloader:
                 inputs, targets = inputs.to(device), targets.to(device)
-                if np.random.rand() < 0.5:
-                    inputs, targets = mixup_transform(inputs, targets)
-                else:
-                    inputs, targets = cutmix_transform(inputs, targets)
+                if use_data_aug:
+                    transform = np.random.choice([mixup_transform, cutmix_transform])
+                    inputs, targets = transform(inputs, targets)
 
                 optimizer.zero_grad()
                 outputs = model(inputs)
@@ -167,7 +168,7 @@ def train_model(
 
                 running_loss += loss.item()
                 _, predicted = torch.max(outputs.data, 1)
-                _, mixed_max = torch.max(targets.data, 1)
+                mixed_max = torch.argmax(targets.data, 1) if use_data_aug else targets
                 total += targets.size(0)
                 correct += (predicted == mixed_max).sum().item()
 
@@ -308,7 +309,7 @@ def train_step(
 
         model_raw = load_custom_model(model_name, num_classes)
         model_raw = ClassifierWrapper(
-            model_raw, num_classes=num_classes, spectral_norm=False
+            model_raw, num_classes=num_classes, freeze_weights=False
         )
         print(f"开始训练 M_raw on ({dataset_name})...")
 
@@ -494,7 +495,7 @@ def main():
     parser.add_argument(
         "--dataset_name",
         type=str,
-        choices=["cifar-10", "cifar-100", "food-101"],
+        choices=["cifar-10", "cifar-100", "food-101", "pets-37"],
         required=True,
         help="选择数据集类型 (cifar-10 或 cifar-100 或 food-101)",
     )

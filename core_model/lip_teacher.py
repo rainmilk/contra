@@ -44,13 +44,14 @@ class SimpleLipNet(nn.Module):
             nn.init.constant_(m.bias, 0)
             nn.init.constant_(m.weight, 1.0)
 
-    def forward(self, inputs):  # [N,C,H,W]
+    def forward(self, inputs, out_embed=False):  # [N,C,H,W]
         x = self.backbone(inputs)
         embedding = self.flatten(x)
         out = self.fc(embedding)
-        if self.training:
-            return out
-        return embedding, out
+        if out_embed:
+            return out, embedding
+
+        return out
 
 
 if __name__ == "__main__":

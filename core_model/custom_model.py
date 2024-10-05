@@ -5,16 +5,20 @@ from core_model.wideresidual import wideresnet
 from core_model.resnet import resnet18
 
 
-def load_custom_model(model_name, num_classes, load_pretrained=False, ckpt_path=None):
+def load_custom_model(model_name, num_classes, load_pretrained=True, ckpt_path=None):
     weights = None
     if model_name == "resnet18":
         if load_pretrained:
             weights = models.ResNet18_Weights.DEFAULT
-        model = models.resnet18(weights=weights, num_classes=num_classes)
+            model = models.resnet18(weights=weights)
+        else:
+            model = models.resnet18(num_classes=num_classes)
     elif model_name == "vgg19":
         if load_pretrained:
             weights = models.VGG19_BN_Weights.DEFAULT
-        model = models.vgg19_bn(weights=weights, num_classes=num_classes)
+            model = models.vgg19_bn(weights=weights)
+        else:
+            model = models.vgg19_bn(num_classes=num_classes)
     elif model_name == "cifar-resnet18":
         model = resnet18(num_classes=num_classes)
     elif model_name == "cifar-wideresnet40":
@@ -30,8 +34,11 @@ def load_custom_model(model_name, num_classes, load_pretrained=False, ckpt_path=
 
 
 class ClassifierWrapper(nn.Module):
-    def __init__(self, backbone, num_classes, freeze_weights=False,
-                 batchnorm_blocks=-1, spectral_norm=False):
+    def __init__(self, backbone, num_classes,
+                 freeze_weights=False,
+                 bypass=False,
+                 batchnorm_blocks=-1,
+                 spectral_norm=False):
         super(ClassifierWrapper, self).__init__()
 
         # Freezing the weights
@@ -39,20 +46,24 @@ class ClassifierWrapper(nn.Module):
             for param in backbone.parameters():
                 param.requires_grad = False
 
-        # Remove the final layer
         all_modules = list(backbone.children())
         features = all_modules[-1].in_features
-
         modules = [*all_modules[:-1], nn.Flatten()]
-        if batchnorm_blocks >= 0:
+
+        if not bypass and batchnorm_blocks >= 0:
             modules += [
                 *[nn.ReLU(), nn.BatchNorm1d(features), nn.Linear(features, features)] * batchnorm_blocks,
                 nn.ReLU(), nn.BatchNorm1d(features)]
+
         self.feature_model = nn.Sequential(*modules)
+
         if spectral_norm:
             self.apply(self.add_spectral_norm_)
 
-        self.fc = nn.Linear(features, num_classes)
+        if bypass:
+            self.fc = all_modules[-1]
+        else:
+            self.fc = nn.Linear(features, num_classes)
 
     def forward(self, x, output_emb=False):
         emb = self.feature_model(x)

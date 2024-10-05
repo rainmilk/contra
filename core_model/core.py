@@ -10,7 +10,6 @@ import numpy as np
 import sys
 
 from main import parse_args, parse_kwargs
-from nets.VGG_LTH import vgg16_bn_lth
 from lip_teacher import SimpleLipNet
 from dataset import MixupDataset, get_dataset_loader
 from optimizer import create_optimizer_scheduler
@@ -18,8 +17,7 @@ from custom_model import load_custom_model, ClassifierWrapper
 from train_test import (
     model_train,
     model_test,
-    working_model_forward,
-    teacher_model_forward,
+    model_forward
 )
 from configs.dataset import cifar10_config, cifar100_config, food101_config
 
@@ -39,6 +37,40 @@ num_classes_dict = {
     # "flowers-102": 102,
     # "tiny-imagenet-200": 200,
 }
+
+def train_teacher_model(args, data_dir, num_classes,
+                        teacher_model, teacher_opt,
+                        teacher_lr_scheduler, teacher_criterion, save_path,
+                        mean=None, std=None, alpha=1,
+                        test_dataloader=None, test_per_it=1):
+
+    train_data, train_labels, train_dataloader = get_dataset_loader(
+        args.dataset,
+        "train",
+        data_dir,
+        mean,
+        std,
+        args.batch_size,
+        num_classes=num_classes,
+        drop_last=False,
+        shuffle=True,
+        onehot_enc=False
+    )
+
+    lip_teacher_model_dir = os.path.dirname(save_path)
+    model_train(
+        train_dataloader,
+        teacher_model,
+        teacher_opt,
+        teacher_lr_scheduler,
+        teacher_criterion,
+        alpha,
+        args,
+        save_path=lip_teacher_model_dir,
+        mix_classes=num_classes,
+        test_loader = test_dataloader,
+        test_per_it=test_per_it
+    )
 
 
 def iterate_repair_model(
@@ -69,11 +101,11 @@ def iterate_repair_model(
 
     # 1. 通过 Mt 获取 D_mix=Da+Ds+Dc,  Train Pp=Mp(Xp_mix), Loss=CrossEntropy(Pp, Yp_mix)
     # (1) 获取Ds: 通过 Yp=Mp(Xtr), Yt=Mt(Xtr) 两个模型预测分类标签，其中Yp=Yt=Ytr的数据为Ds, Ys为预测相同的标签
-    working_inc_predicts, working_inc_probs = working_model_forward(
+    working_inc_predicts, working_inc_probs = model_forward(
         inc_dataloader, working_model
     )
     teacher_inc_predicts, teacher_inc_probs, teacher_inc_embeddings = (
-        teacher_model_forward(inc_dataloader, teacher_model)
+        model_forward(inc_dataloader, teacher_model, output_embedding=True)
     )
 
     agree_idx = working_inc_predicts == teacher_inc_predicts
@@ -86,8 +118,8 @@ def iterate_repair_model(
     # (2) 获取Dc: 通过 Mt(Xa+Xs) 计算class embedding centroids (i.e. Class mean): E_centroid
     # 通过 Mt(Das)获取 E_centroid(Das=Da+Ds)
     # 获取 Embedding_disa(D_disa=Dtr-D_agree) 距离离每个类c的中心 E_centroid[class=c]最近的Top 10% 的数据为 Dc (通过Lipschitz性质预测的伪标签)
-    aux_predicts, aux_probs, aux_embeddings = teacher_model_forward(
-        aux_dataloader, teacher_model
+    aux_predicts, aux_probs, aux_embeddings = model_forward(
+        aux_dataloader, teacher_model, output_embedding=True
     )
 
     teacher_agree_embeddings = np.concatenate(
@@ -203,7 +235,7 @@ def iterate_adapt_model(
 ):
     # 1. 构造Dts融合数据集 Dt_mix: (Dts, D_aug), 进行mix up
     # (1) 构造 Dts: Dt={Xts, Pts}, Pt = Mt(Xts)
-    test_predicts, test_probs, _ = teacher_model_forward(test_dataloader, teacher_model)
+    test_predicts, test_probs = model_forward(test_dataloader, teacher_model)
 
     # (2) 构造 Dt_mix: Dt_mix = mix_up(Dts, D_aug), Xt_mix = {a*Xts+(1-a)*X_aug}, Yt_mix = {a*Pts+(1-a)*Y_aug}
     test_probs_sharpen = sharpen(test_probs)
@@ -226,7 +258,7 @@ def iterate_adapt_model(
 
     # 3. 重新构造 Dts融合数据集 Dp_mix
     # (1) 构造 Dts: Dt={Xts, Pts}, Pt = Mt(Xts)
-    test_predicts_new, test_probs_new, _ = teacher_model_forward(
+    test_predicts_new, test_probs_new = model_forward(
         test_dataloader, teacher_model
     )
 
@@ -257,7 +289,7 @@ def mix_up_dataloader(inc_data, inc_probs, aug_data, aug_probs, mean, std, batch
     return DataLoader(mixed_dataset, batch_size, drop_last=True, shuffle=True)
 
 
-def get_model_paths(args, dataset):
+def get_model_paths(model, dataset):
     """Generate and return model paths dynamically."""
     curr_dir = os.path.dirname(os.path.abspath(__file__))
     par_dir = os.path.dirname(curr_dir)
@@ -265,14 +297,14 @@ def get_model_paths(args, dataset):
 
     return {
         "working_model_path": os.path.join(
-            ckpt_dir, "working_model_1", "%s_%s_final.pth" % (args.model, args.dataset)
+            ckpt_dir, "working_model_1", "%s_%s_final.pth" % (model, dataset)
         ),
         "working_model_repair_save_path": os.path.join(
             ckpt_dir, "working_model_repair"
         ),
         "working_model_adapt_save_path": os.path.join(ckpt_dir, "working_model_adapt"),
         "lip_teacher_model_path": os.path.join(
-            ckpt_dir, "teacher_model_0", "%s_%s_final.pth" % (args.model, args.dataset)
+            ckpt_dir, "teacher_model_0", "%s_%s_final.pth" % (model, dataset)
         ),
         "teacher_model_repair_save_path": os.path.join(
             ckpt_dir, "teacher_model_repair"
@@ -294,14 +326,13 @@ def execute(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     learning_rate = getattr(args, "learning_rate", 0.001)
-    weight_decay = getattr(args, "weight_decay", 1e-4)
+    weight_decay = getattr(args, "weight_decay", 5e-4)
     repair_iter_num = getattr(args, "repair_iter_num", 2)
     adapt_iter_num = getattr(args, "adapt_iter_num", 2)
     optimizer_type = getattr(args, "optimizer", "adam")
     num_epochs = getattr(args, "num_epochs", 50)
-    step_size = getattr(args, "step_size", max(num_epochs//10, 1))
 
-    model_paths = get_model_paths(args, args.dataset)
+    model_paths = get_model_paths(args.model, args.dataset)
 
     working_model_path = model_paths["working_model_path"]
     working_model_repair_save_path = model_paths["working_model_repair_save_path"]
@@ -311,15 +342,15 @@ def execute(args):
     teacher_model_adapt_save_path = model_paths["teacher_model_adapt_save_path"]
 
     mean, std = None, None
-    if args.dataset == "cifar-10":
-        mean = cifar10_config["mean"]
-        std = cifar10_config["std"]
-    elif args.dataset == "cifar-100":
-        mean = cifar100_config["mean"]
-        std = cifar100_config["std"]
-    elif args.dataset == "food-101":
-        mean = food101_config["mean"]
-        std = food101_config["std"]
+    # if args.dataset == "cifar-10":
+    #     mean = cifar10_config["mean"]
+    #     std = cifar10_config["std"]
+    # elif args.dataset == "cifar-100":
+    #     mean = cifar100_config["mean"]
+    #     std = cifar100_config["std"]
+    # elif args.dataset == "food-101":
+    #     mean = food101_config["mean"]
+    #     std = food101_config["std"]
 
     working_model, lip_teacher_model = None, None
 
@@ -330,8 +361,7 @@ def execute(args):
     working_model = ClassifierWrapper(working_model, num_classes)
 
     working_opt, working_lr_scheduler = create_optimizer_scheduler(
-        optimizer_type, working_model.parameters(), learning_rate, weight_decay,
-        epochs=num_epochs
+        optimizer_type, working_model.parameters(), num_epochs, learning_rate, weight_decay
     )
 
     working_criterion = nn.CrossEntropyLoss()
@@ -343,44 +373,13 @@ def execute(args):
 
     # 根据用户选择的优化器初始化
     teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(
-        optimizer_type, lip_teacher_model.parameters(), learning_rate, weight_decay,
-        epochs=num_epochs
+        optimizer_type, lip_teacher_model.parameters(), num_epochs, learning_rate, weight_decay
     )
     teacher_criterion = nn.CrossEntropyLoss()
 
     if os.path.exists(lip_teacher_model_path):
         checkpoint = torch.load(lip_teacher_model_path)
         lip_teacher_model.load_state_dict(checkpoint, strict=False)
-    else:
-        # t0 的情况下，使用D0数据重新训练 lip_teacher model
-        print(
-            "Teacher model pth: %s not exist, only train T0, if not T0 then stop!"
-            % lip_teacher_model_path
-        )
-        data_dir = dataset_paths[args.dataset]
-        train_data, train_labels, train_dataloader = get_dataset_loader(
-            args.dataset,
-            "train",
-            data_dir,
-            mean,
-            std,
-            args.batch_size,
-            num_classes=num_classes,
-            drop_last=False,
-            shuffle=True,
-        )
-
-        lip_teacher_model_dir = os.path.dirname(lip_teacher_model_path)
-        model_train(
-            train_dataloader,
-            lip_teacher_model,
-            teacher_opt,
-            teacher_lr_scheduler,
-            teacher_criterion,
-            alpha,
-            args,
-            save_path=lip_teacher_model_dir,
-        )
 
     # 3. 迭代修复过程
     # (1) 构造修复过程数据集: Dtr、 Da、Dts
@@ -395,22 +394,32 @@ def execute(args):
         args.dataset, "test", data_dir, mean, std, args.batch_size, shuffle=False
     )
 
+    if not os.path.exists(lip_teacher_model_path):
+        # t0 的情况下，使用D0数据重新训练 lip_teacher model
+        print(
+            "Teacher model pth: %s not exist, only train T0, if not T0 then stop!"
+            % lip_teacher_model_path
+        )
+        data_dir = dataset_paths[args.dataset]
+        lip_teacher_model_dir = os.path.dirname(lip_teacher_model_path)
+        train_teacher_model(args, data_dir, lip_teacher_model, teacher_opt,
+                            teacher_lr_scheduler, teacher_criterion, lip_teacher_model_dir,
+                            test_dataloader=test_dataloader, test_per_it=1)
+
     # (2) 测试修复前 Dts 在 Mp 的表现
     print(
         "---------------------working model test before------------------------------"
     )
     working_model_test_before = model_test(
-        test_labels, test_dataloader, working_model, device=device
+        test_dataloader, working_model, device=device
     )
     print(
         "---------------------teacher model test before------------------------------"
     )
     teacher_model_test_before = model_test(
-        test_labels,
         test_dataloader,
         lip_teacher_model,
-        device=device,
-        teacher_model=True,
+        device=device
     )
 
     # (3) 迭代修复过程：根据 Dtr 迭代 Mp 、 Mt
@@ -444,14 +453,12 @@ def execute(args):
 
     # 4. 测试修复后 Dts 在 Mp 的表现
     working_model_after_repair = model_test(
-        test_labels, test_dataloader, working_model, device=device
+        test_dataloader, working_model, device=device
     )
     teacher_model_after_repair = model_test(
-        test_labels,
         test_dataloader,
         lip_teacher_model,
-        device=device,
-        teacher_model=True,
+        device=device
     )
 
     # 5. 迭代测试数据适应过程
@@ -488,14 +495,12 @@ def execute(args):
 
     # 6. 测试适应后 Dts 在 Mp 的表现
     working_model_after_adapt = model_test(
-        test_labels, test_dataloader, working_model, device=device
+        test_dataloader, working_model, device=device
     )
     teacher_model_after_adapt = model_test(
-        test_labels,
         test_dataloader,
         lip_teacher_model,
-        device=device,
-        teacher_model=True,
+        device=device
     )
 
     print(

@@ -7,13 +7,7 @@ from torch.utils.data import DataLoader
 
 MODEL_NAME = "resnet18"
 
-RESCALE_SIZE = 256
-CROP_SIZE = 224
-
-if MODEL_NAME == "resnet18":
-    RESCALE_SIZE = 256
-    CROP_SIZE = 224
-
+RESCALE_SIZE = (224, 224)
 
 def generate_food101_cache(data_dir, gen_dir, batch_size=64, num_workers=4):
 
@@ -34,10 +28,10 @@ def generate_food101_cache(data_dir, gen_dir, batch_size=64, num_workers=4):
     # 加载 FOOD-101 数据集
     print("Loading Food101 training and test datasets...")
     train_dataset = datasets.Food101(
-        root=data_dir, split="train", transform=data_transforms
+        root=data_dir, split="train", transform=data_transforms, download=True
     )
     test_dataset = datasets.Food101(
-        root=data_dir, split="test", transform=data_transforms
+        root=data_dir, split="test", transform=data_transforms, download=True
     )
 
     # 使用 DataLoader 进行批量加载
@@ -50,46 +44,22 @@ def generate_food101_cache(data_dir, gen_dir, batch_size=64, num_workers=4):
 
     # 提取训练数据和标签并保存
     print("Extracting and saving training data and labels...")
-    train_data, train_labels = [], []
-    for inputs, labels in tqdm(train_loader):
-        train_data.append(inputs)  # 保留为张量
-        train_labels.append(labels)  # 保留为张量
-    train_data = torch.cat(train_data, dim=0)  # 将数据连接起来
-    train_labels = torch.cat(train_labels, dim=0)  # 将标签连接起来
+    train_data, train_labels = zip(*train_dataset)
+    train_data = torch.stack(train_data)
+    train_labels = torch.tensor(train_labels)
 
-    # 转换为 uint8 数据类型
-    train_data_uint8 = (
-        (train_data * 255).byte().numpy()
-    )  # 将图像数据转为 uint8 并转换为 numpy 数组
-    train_labels_uint8 = (
-        train_labels.byte().numpy()
-    )  # 将标签转为 uint8 并转换为 numpy 数组
+    test_data, test_labels = zip(*test_dataset)
+    test_data = torch.stack(test_data)
+    test_labels = torch.tensor(test_labels)
 
     # 保存到 gen 目录，使用 numpy.save
     os.makedirs(gen_dir, exist_ok=True)
-    np.save(os.path.join(gen_dir, "train_data.npy"), train_data_uint8)
-    np.save(os.path.join(gen_dir, "train_labels.npy"), train_labels_uint8)
-
-    # 提取测试数据和标签并保存
-    print("Extracting and saving test data and labels...")
-    test_data, test_labels = [], []
-    for inputs, labels in tqdm(test_loader):
-        test_data.append(inputs)  # 保留为张量
-        test_labels.append(labels)  # 保留为张量
-    test_data = torch.cat(test_data, dim=0)  # 将数据连接起来
-    test_labels = torch.cat(test_labels, dim=0)  # 将标签连接起来
-
-    # 转换为 uint8 数据类型
-    test_data_uint8 = (
-        (test_data * 255).byte().numpy()
-    )  # 将图像数据转为 uint8 并转换为 numpy 数组
-    test_labels_uint8 = (
-        test_labels.byte().numpy()
-    )  # 将标签转为 uint8 并转换为 numpy 数组
+    np.save(os.path.join(gen_dir, "train_data.npy"), train_data)
+    np.save(os.path.join(gen_dir, "train_labels.npy"), train_labels)
 
     # 保存到 gen 目录，使用 numpy.save
-    np.save(os.path.join(gen_dir, "test_data.npy"), test_data_uint8)
-    np.save(os.path.join(gen_dir, "test_labels.npy"), test_labels_uint8)
+    np.save(os.path.join(gen_dir, "test_data.npy"), test_data)
+    np.save(os.path.join(gen_dir, "test_labels.npy"), test_labels)
 
     print("Data caching complete.")
 

@@ -2,6 +2,8 @@ import torch
 import numpy as np
 import os
 import argparse
+
+import torchvision.models
 import torchvision
 from torchvision import datasets, transforms
 import json
@@ -128,13 +130,20 @@ def create_pet37_npy_files(
     balanced=False,
 ):
 
+    weights = torchvision.models.ResNet18_Weights.DEFAULT
+
     data_transform = transforms.Compose(
         [
-            transforms.ToTensor(),
-            transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
+            # transforms.Resize((224,224)),
+            weights.transforms(),
+            # transforms.ToTensor(),
+            # transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
         ]
     )
 
+    # 加载 CIFAR-100 数据集
+    train_dataset = datasets.OxfordIIITPet(
+        root=data_dir, download=True, transform=data_transform
     # 加载 PET-37 数据集
     train_dataset = datasets.OxfordIIITPet(
         root=data_dir, download=False, transform=data_transform
