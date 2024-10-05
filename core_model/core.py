@@ -14,11 +14,7 @@ from lip_teacher import SimpleLipNet
 from dataset import MixupDataset, get_dataset_loader
 from optimizer import create_optimizer_scheduler
 from custom_model import load_custom_model, ClassifierWrapper
-from train_test import (
-    model_train,
-    model_test,
-    model_forward
-)
+from train_test import model_train, model_test, model_forward
 from configs.dataset import cifar10_config, cifar100_config, food101_config
 
 
@@ -35,16 +31,28 @@ num_classes_dict = {
     "cifar-10": 10,
     "cifar-100": 100,
     "food-101": 101,
-    "pet-37": 37
+    "pet-37": 37,
     # "flowers-102": 102,
     # "tiny-imagenet-200": 200,
 }
 
-def train_teacher_model(args, data_dir, num_classes,
-                        teacher_model, teacher_opt,
-                        teacher_lr_scheduler, teacher_criterion, save_path,
-                        mean=None, std=None, alpha=1,
-                        train_dataloader=None, test_dataloader=None, test_per_it=1):
+
+def train_teacher_model(
+    args,
+    data_dir,
+    num_classes,
+    teacher_model,
+    teacher_opt,
+    teacher_lr_scheduler,
+    teacher_criterion,
+    save_path,
+    mean=None,
+    std=None,
+    alpha=1,
+    train_dataloader=None,
+    test_dataloader=None,
+    test_per_it=1,
+):
 
     if train_dataloader is None:
         _, _, train_dataloader = get_dataset_loader(
@@ -57,13 +65,18 @@ def train_teacher_model(args, data_dir, num_classes,
             num_classes=num_classes,
             drop_last=False,
             shuffle=True,
-            onehot_enc=False
+            onehot_enc=False,
         )
 
     if test_dataloader is None:
         _, _, test_dataloader = get_dataset_loader(
-            args.dataset, "test", data_dir,
-            mean=None, std=None, batch_size=args.batch_size, shuffle=False
+            args.dataset,
+            "test",
+            data_dir,
+            mean=None,
+            std=None,
+            batch_size=args.batch_size,
+            shuffle=False,
         )
 
     lip_teacher_model_dir = os.path.dirname(save_path)
@@ -77,8 +90,8 @@ def train_teacher_model(args, data_dir, num_classes,
         args,
         save_path=lip_teacher_model_dir,
         mix_classes=num_classes,
-        test_loader = test_dataloader,
-        test_per_it=test_per_it
+        test_loader=test_dataloader,
+        test_per_it=test_per_it,
     )
 
 
@@ -113,8 +126,8 @@ def iterate_repair_model(
     working_inc_predicts, working_inc_probs = model_forward(
         inc_dataloader, working_model
     )
-    teacher_inc_predicts, teacher_inc_probs, teacher_inc_embeddings = (
-        model_forward(inc_dataloader, teacher_model, output_embedding=True)
+    teacher_inc_predicts, teacher_inc_probs, teacher_inc_embeddings = model_forward(
+        inc_dataloader, teacher_model, output_embedding=True
     )
 
     agree_idx = working_inc_predicts == teacher_inc_predicts
@@ -179,8 +192,16 @@ def iterate_repair_model(
         [aux_labels_onehot, selected_labels_onehot, centroid_probs_sharpen], axis=0
     )
     mix_dataloader_shuffled = mix_up_dataloader(
-        mix_data, mix_labels_onehot, mix_data, mix_labels_onehot,
-        mean=mean, std=std, batch_size = args.batch_size, alpha=0.25, transform=True)
+        mix_data,
+        mix_labels_onehot,
+        mix_data,
+        mix_labels_onehot,
+        mean=mean,
+        std=std,
+        batch_size=args.batch_size,
+        alpha=0.25,
+        transform=True,
+    )
 
     model_train(
         mix_dataloader_shuffled,
@@ -249,8 +270,16 @@ def iterate_adapt_model(
     # (2) 构造 Dt_mix: Dt_mix = mix_up(Dts, D_aug), Xt_mix = {a*Xts+(1-a)*X_aug}, Yt_mix = {a*Pts+(1-a)*Y_aug}
     test_probs_sharpen = sharpen(test_probs)
     ts_mixed_dataloader_shuffled = mix_up_dataloader(
-        test_data, test_probs_sharpen, aug_data, aug_probs,
-        mean=mean, std=std, batch_size=args.batch_size, alpha=0.15, transform=False)
+        test_data,
+        test_probs_sharpen,
+        aug_data,
+        aug_probs,
+        mean=mean,
+        std=std,
+        batch_size=args.batch_size,
+        alpha=0.15,
+        transform=False,
+    )
 
     # 2. train Mt: Pt=Mt(Xt_max), Update Mt: Loss=CrossEntropy(Pt, Yp_mix)
     model_train(
@@ -267,15 +296,21 @@ def iterate_adapt_model(
 
     # 3. 重新构造 Dts融合数据集 Dp_mix
     # (1) 构造 Dts: Dt={Xts, Pts}, Pt = Mt(Xts)
-    test_predicts_new, test_probs_new = model_forward(
-        test_dataloader, teacher_model
-    )
+    test_predicts_new, test_probs_new = model_forward(test_dataloader, teacher_model)
 
     # (2) 构造 Dp_mix: Dp_mix = mix_up(Dts, D_aug), Xp_mix = {a*Xts+(1-a)*X_aug}, Yt_mix = {a*Pts+(1-a)*Y_aug}
     test_probs_new_sharpen = sharpen(test_probs_new)
     ts_mixed_dataloader_shuffled_new = mix_up_dataloader(
-        test_data, test_probs_new_sharpen, aug_data, aug_probs,
-        mean=mean, std=std, batch_size=args.batch_size, alpha=0.15, transform=False)
+        test_data,
+        test_probs_new_sharpen,
+        aug_data,
+        aug_probs,
+        mean=mean,
+        std=std,
+        batch_size=args.batch_size,
+        alpha=0.15,
+        transform=False,
+    )
 
     # 4. train Mp: Pp=Mp(Xp_max), Update Mp: Loss=CrossEntropy(Pp, Yp_mix)
     model_train(
@@ -291,10 +326,25 @@ def iterate_adapt_model(
     )
 
 
-def mix_up_dataloader(inc_data, inc_probs, aug_data, aug_probs, mean, std, batch_size,
-                      alpha=0.2, transform=False):
-    mixed_dataset = MixupDataset(data_pair=(inc_data, aug_data), label_pair=(inc_probs, aug_probs),
-                                 mixup_alpha=alpha, transform=transform, mean=mean, std=std)
+def mix_up_dataloader(
+    inc_data,
+    inc_probs,
+    aug_data,
+    aug_probs,
+    mean,
+    std,
+    batch_size,
+    alpha=0.2,
+    transform=False,
+):
+    mixed_dataset = MixupDataset(
+        data_pair=(inc_data, aug_data),
+        label_pair=(inc_probs, aug_probs),
+        mixup_alpha=alpha,
+        transform=transform,
+        mean=mean,
+        std=std,
+    )
     return DataLoader(mixed_dataset, batch_size, drop_last=True, shuffle=True)
 
 
@@ -365,12 +415,18 @@ def execute(args):
 
     # 2. load model
     # (1) load working model
-    working_model = load_custom_model(args.model, num_classes, ckpt_path=working_model_path)
+    working_model = load_custom_model(
+        args.model, num_classes, ckpt_path=working_model_path
+    )
 
     working_model = ClassifierWrapper(working_model, num_classes)
 
     working_opt, working_lr_scheduler = create_optimizer_scheduler(
-        optimizer_type, working_model.parameters(), num_epochs, learning_rate, weight_decay
+        optimizer_type,
+        working_model.parameters(),
+        num_epochs,
+        learning_rate,
+        weight_decay,
     )
 
     working_criterion = nn.CrossEntropyLoss()
@@ -383,7 +439,11 @@ def execute(args):
 
     # 根据用户选择的优化器初始化
     teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(
-        optimizer_type, lip_teacher_model.parameters(), num_epochs, learning_rate, weight_decay
+        optimizer_type,
+        lip_teacher_model.parameters(),
+        num_epochs,
+        learning_rate,
+        weight_decay,
     )
     teacher_criterion = nn.CrossEntropyLoss()
 
@@ -412,9 +472,17 @@ def execute(args):
         )
         data_dir = dataset_paths[args.dataset]
         lip_teacher_model_dir = os.path.dirname(lip_teacher_model_path)
-        train_teacher_model(args, data_dir, lip_teacher_model, teacher_opt,
-                            teacher_lr_scheduler, teacher_criterion, lip_teacher_model_dir,
-                            test_dataloader=test_dataloader, test_per_it=1)
+        train_teacher_model(
+            args,
+            data_dir,
+            lip_teacher_model,
+            teacher_opt,
+            teacher_lr_scheduler,
+            teacher_criterion,
+            lip_teacher_model_dir,
+            test_dataloader=test_dataloader,
+            test_per_it=1,
+        )
 
     # (2) 测试修复前 Dts 在 Mp 的表现
     print(
@@ -427,9 +495,7 @@ def execute(args):
         "---------------------teacher model test before------------------------------"
     )
     teacher_model_test_before = model_test(
-        test_dataloader,
-        lip_teacher_model,
-        device=device
+        test_dataloader, lip_teacher_model, device=device
     )
 
     # (3) 迭代修复过程：根据 Dtr 迭代 Mp 、 Mt
@@ -466,9 +532,7 @@ def execute(args):
         test_dataloader, working_model, device=device
     )
     teacher_model_after_repair = model_test(
-        test_dataloader,
-        lip_teacher_model,
-        device=device
+        test_dataloader, lip_teacher_model, device=device
     )
 
     # 5. 迭代测试数据适应过程
@@ -508,9 +572,7 @@ def execute(args):
         test_dataloader, working_model, device=device
     )
     teacher_model_after_adapt = model_test(
-        test_dataloader,
-        lip_teacher_model,
-        device=device
+        test_dataloader, lip_teacher_model, device=device
     )
 
     print(
