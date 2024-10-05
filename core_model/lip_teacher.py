@@ -9,17 +9,19 @@ class SimpleLipNet(nn.Module):
     Implementation of Lipschitz regularized network
     """
 
-    def __init__(self, backbone, input_sz, output_sz):
+    def __init__(self, backbone, in_features, out_features,
+                 spectral_norm=True, spectral_init=False):
         super(SimpleLipNet, self).__init__()
 
         self.backbone = backbone
-        self.flatten = nn.Flatten()
-        self.apply(self.add_spectral_norm_)
-        self.fc = nn.Linear(input_sz, output_sz)
-        self.apply(self._spectral_init)
+        if spectral_norm:
+            self.apply(self._add_spectral_norm)
+        self.fc = nn.Linear(in_features, out_features)
+        if spectral_init:
+            self.apply(self._spectral_init)
 
     # 使用谱归一化 (spectral_norm) 来规范化线性层和卷积层的权重
-    def add_spectral_norm_(self, m):
+    def _add_spectral_norm(self, m):
         if isinstance(m, (nn.Linear, nn.Conv2d)):
             torch.nn.utils.spectral_norm(m)
 
@@ -45,8 +47,7 @@ class SimpleLipNet(nn.Module):
             nn.init.constant_(m.weight, 1.0)
 
     def forward(self, inputs, out_embed=False):  # [N,C,H,W]
-        x = self.backbone(inputs)
-        embedding = self.flatten(x)
+        embedding = self.backbone(inputs)
         out = self.fc(embedding)
         if out_embed:
             return out, embedding

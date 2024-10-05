@@ -58,7 +58,7 @@ class ClassifierWrapper(nn.Module):
         self.feature_model = nn.Sequential(*modules)
 
         if spectral_norm:
-            self.apply(self.add_spectral_norm_)
+            self.apply(self._add_spectral_norm)
 
         if bypass:
             self.fc = all_modules[-1]
@@ -73,6 +73,6 @@ class ClassifierWrapper(nn.Module):
 
         return outputs
 
-    def add_spectral_norm_(self, m):
+    def _add_spectral_norm(self, m):
         if isinstance(m, (nn.Linear, nn.Conv2d)):
             torch.nn.utils.spectral_norm(m)

@@ -53,7 +53,7 @@ def parse_args():
         type=str,
         required=True,
         default="cifar-10",
-        choices=["cifar-10", "cifar-100", "flowers-102", "tiny-imagenet-200", "food-101"],
+        choices=["cifar-10", "cifar-100", "flowers-102", "tiny-imagenet-200", "food-101", "pets-37"],
         help="Dataset name, choose from: cifar-10, cifar-100, flowers-102, tiny-imagenet-200, food-101"
     )
 
