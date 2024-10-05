@@ -34,7 +34,8 @@ def evaluate(description):
     num_classes_dict = {
         "cifar10": 10,
         "cifar100": 100,
-        "food-101": 101,
+        "pet-37": 37,
+        # "food-101": 101,
         # "flowers102": 102,
         # "tiny-imagenet-200": 200,
     }
@@ -42,8 +43,9 @@ def evaluate(description):
     dataset_paths = {
         "cifar-10": "../../data/cifar-10",
         "cifar-100": "../../data/cifar-100",
-        "flowers-102": "../../data/flowers-102",
-        "tiny-imagenet-200": "../../data/tiny-imagenet-200",
+        "pet-37": "../../data/pet-37",
+        # "flowers-102": "../../data/flowers-102",
+        # "tiny-imagenet-200": "../../data/tiny-imagenet-200",
     }
     dataset = "cifar-10"
 
