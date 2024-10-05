@@ -44,20 +44,27 @@ def train_teacher_model(args, data_dir, num_classes,
                         teacher_model, teacher_opt,
                         teacher_lr_scheduler, teacher_criterion, save_path,
                         mean=None, std=None, alpha=1,
-                        test_dataloader=None, test_per_it=1):
+                        train_dataloader=None, test_dataloader=None, test_per_it=1):
 
-    train_data, train_labels, train_dataloader = get_dataset_loader(
-        args.dataset,
-        "train",
-        data_dir,
-        mean,
-        std,
-        args.batch_size,
-        num_classes=num_classes,
-        drop_last=False,
-        shuffle=True,
-        onehot_enc=False
-    )
+    if train_dataloader is None:
+        _, _, train_dataloader = get_dataset_loader(
+            args.dataset,
+            "train",
+            data_dir,
+            mean,
+            std,
+            args.batch_size,
+            num_classes=num_classes,
+            drop_last=False,
+            shuffle=True,
+            onehot_enc=False
+        )
+
+    if test_dataloader is None:
+        _, _, test_dataloader = get_dataset_loader(
+            args.dataset, "test", data_dir,
+            mean=None, std=None, batch_size=args.batch_size, shuffle=False
+        )
 
     lip_teacher_model_dir = os.path.dirname(save_path)
     model_train(
