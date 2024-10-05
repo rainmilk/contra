@@ -135,10 +135,10 @@ def create_pet37_npy_files(
 
     # 加载 PET-37 数据集
     train_dataset = datasets.OxfordIIITPet(
-        root=data_dir, download=False, transform=data_transform
+        root=data_dir, download=True, transform=data_transform
     )
     test_dataset = datasets.OxfordIIITPet(
-        root=data_dir, split="test", download=False, transform=data_transform
+        root=data_dir, split="test", download=True, transform=data_transform
     )
 
     train_data, train_labels = zip(*train_dataset)
@@ -329,7 +329,7 @@ def main():
     parser.add_argument(
         "--data_dir",
         type=str,
-        default="./data/pet-37/normal/oxford-pets",
+        default="./data/pet-37/normal/",
         help="原始 PET-37 数据集的目录",
     )
     parser.add_argument(

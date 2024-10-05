@@ -27,7 +27,7 @@ dataset_paths = {
     "cifar-10": "../data/cifar-10",
     "cifar-100": "../data/cifar-100",
     "food-101": "../data/food-101",
-    "pets-37": "../data/pets-37",
+    "pet-37": "../data/pet-37",
 }
 
 
@@ -35,7 +35,7 @@ num_classes_dict = {
     "cifar-10": 10,
     "cifar-100": 100,
     "food-101": 101,
-    "pets-37": 37
+    "pet-37": 37
     # "flowers-102": 102,
     # "tiny-imagenet-200": 200,
 }
