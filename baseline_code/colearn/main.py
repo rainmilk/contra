@@ -77,28 +77,28 @@ def main():
         # "flowers-102": "../data/flowers-102",
         # "tiny-imagenet-200": "../data/tiny-imagenet-200",
     }
-    # model_paths = {
-    #     "cifar-10": "../../ckpt/cifar-10/p1_checkpoint.pth",
-    #     "cifar-100": "../../ckpt/cifar-100/p1_checkpoint.pth",
-    #     "pet-37": "../../ckpt/pet-37/p1_checkpoint.pth",
-    # }
-    
-    data_dir = dataset_paths[config["dataset"]]
+    model_paths = {
+        "cifar-10": "../../ckpt/cifar-10/p1_checkpoint.pth",
+        "cifar-100": "../../ckpt/cifar-100/p1_checkpoint.pth",
+        "pet-37": "../../ckpt/pet-37/p1_checkpoint.pth",
+    }
 
-    mode_path = r"../../ckpt/cifar-10/p1_checkpoint.pth"
+    # mode_path = r"../../ckpt/cifar-10/p1_checkpoint.pth"
 
+    dataset_path = dataset_paths[config["dataset"]]
+    mode_path = mode_paths["cifar-10"]
 
     _, trainloader = get_dataset_loader(
         config["dataset"],
         "inc",
-        data_dir,
+        dataset_path,
         config["batch_size"],
         drop_last=True,
         shuffle=True,
     )
 
     _, testloader = get_dataset_loader(
-        config["dataset"], "test", data_dir, config["batch_size"], shuffle=False
+        config["dataset"], "test", dataset_path, config["batch_size"], shuffle=False
     )
     num_test_images = len(testloader.dataset)
 
