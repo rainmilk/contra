@@ -38,7 +38,7 @@ def get_num_of_classes(dataset_name):
     # 根据 dataset_name 设置分类类别数
     if dataset_name == "cifar-10":
         num_classes = 10
-    elif dataset_name == "pets-37":
+    elif dataset_name == "pet-37":
         num_classes = 37
     elif dataset_name == "cifar-100":
         num_classes = 100
@@ -495,7 +495,7 @@ def main():
     parser.add_argument(
         "--dataset_name",
         type=str,
-        choices=["cifar-10", "cifar-100", "food-101", "pets-37"],
+        choices=["cifar-10", "cifar-100", "food-101", "pet-37"],
         required=True,
         help="选择数据集类型 (cifar-10 或 cifar-100 或 food-101)",
     )
