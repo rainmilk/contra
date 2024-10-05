@@ -60,10 +60,9 @@ def parse_args():
     parser.add_argument(
         "--model",
         type=str,
-        choices=["cifar-resnet18", "cifar-wideresnet40", "resnet18", "vgg19"],
-        default="resnet18",
+        choices=["cifar-resnet18", "cifar-wideresnet40", "resnet18", "resnet50", "resnet101", "vgg19", "wideresnet50"],
         required=True,
-        help="Select in (cifar-resnet18, cifar-wideresnet40, resnet18, vgg19)",
+        help="Select in (cifar-resnet18, cifar-wideresnet40, resnet18, resnet50, resnet101, vgg19, wideresnet50)",
     )
 
     # 在 parse_args 函数中添加 --pretrained 参数

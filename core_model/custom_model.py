@@ -13,10 +13,16 @@ def load_custom_model(model_name, num_classes, load_pretrained=True, ckpt_path=N
             model = models.resnet18(weights=weights)
         else:
             model = models.resnet18(num_classes=num_classes)
-    if model_name == "resnet50":
+    elif model_name == "resnet50":
         if load_pretrained:
             weights = models.ResNet50_Weights.DEFAULT
             model = models.resnet50(weights=weights)
+        else:
+            model = models.resnet18(num_classes=num_classes)
+    elif model_name == "resnet101":
+        if load_pretrained:
+            weights = models.ResNet101_Weights.DEFAULT
+            model = models.resnet101(weights=weights)
         else:
             model = models.resnet18(num_classes=num_classes)
     elif model_name == "wideresnet50":
