@@ -481,9 +481,9 @@ def main():
     parser.add_argument(
         "--model",
         type=str,
-        choices=["cifar-resnet18", "cifar-wideresnet40", "resnet18", "vgg19"],
+        choices=["cifar-resnet18", "cifar-wideresnet40", "resnet18", "resnet50", "vgg19", "wideresnet50"],
         required=True,
-        help="Select in (cifar-resnet18, cifar-wideresnet40, resnet18, vgg19)",
+        help="Select in (cifar-resnet18, cifar-wideresnet40, resnet18, resnet50, vgg19, wideresnet50)",
     )
 
     parser.add_argument(
