@@ -41,11 +41,6 @@ def sample_class_balanced_data(class_data, split_ratio=0.5):
         D_inc_data.extend([samples[i] for i in shuffled_indices[split_idx:]])
         D_inc_labels.extend([class_label] * (num_samples - split_idx))
 
-    # D_0_data = torch.stack(D_0_data)
-    # D_0_labels = torch.tensor(D_0_labels)
-    # D_inc_data = torch.stack(D_inc_data)
-    # D_inc_labels = torch.tensor(D_inc_labels)
-
     D_0_data = np.stack(D_0_data)
     D_0_labels = np.array(D_0_labels)
     D_inc_data = np.stack(D_inc_data)
@@ -70,9 +65,6 @@ def sample_replay_data(D_0_data, D_0_labels, replay_ratio=0.1):
         D_a_data.extend([samples[i] for i in replay_indices])
         D_a_labels.extend([class_label] * num_replay_samples)
 
-    # D_a_data = torch.stack(D_a_data)
-    # D_a_labels = torch.tensor(D_a_labels)
-
     D_a_data = np.stack(D_a_data)
     D_a_labels = np.array(D_a_labels)
 
@@ -87,7 +79,7 @@ def load_classes_from_file(file_path):
 
 
 def load_pet37_superclass_mapping(file_path):
-    """从JSON文件中加载 PET-37 的 superclass 与 child class 的映射"""
+    """从JSON文件中加载 Oxford-Pets 的类别映射"""
     with open(file_path, "r") as f:
         pet37_superclass_to_child = json.load(f)
     return pet37_superclass_to_child
@@ -137,13 +129,10 @@ def create_pet37_npy_files(
             # transforms.Resize((224,224)),
             weights.transforms(),
             # transforms.ToTensor(),
-            # transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
+            # transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
         ]
     )
 
-    # 加载 CIFAR-100 数据集
-    train_dataset = datasets.OxfordIIITPet(
-        root=data_dir, download=True, transform=data_transform
     # 加载 PET-37 数据集
     train_dataset = datasets.OxfordIIITPet(
         root=data_dir, download=False, transform=data_transform
@@ -164,6 +153,7 @@ def create_pet37_npy_files(
     if balanced:
         print("使用类均衡的数据划分方式...")
         subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}_balanced")
+
         # 按类别划分训练数据
         class_data = split_by_class(train_data, train_labels)
 
@@ -228,11 +218,22 @@ def create_pet37_npy_files(
     np.save(os.path.join(subdir, "test_data.npy"), test_data)
     np.save(os.path.join(subdir, "test_labels.npy"), test_labels)
 
-    num_classes = 100
+    num_classes = 37
 
     # 定义遗忘类别和噪声类别
-    forget_classes = list(range(50))  # 前50个类别作为遗忘类别
-    noise_classes = list(range(50, 75))  # 后面的25个类别作为噪声类别
+    forget_classes = list(range(18))  # 前18个类别作为遗忘类别
+    noise_classes = list(range(18, 28))  # 接下来的10个类别作为噪声类别
+
+    # 读取 Oxford-Pets 类别
+    pet37_classes_file = "./configs/classes/pet_37_classes.txt"
+    pet37_classes = load_classes_from_file(pet37_classes_file)
+
+    # 打印读取到的类别信息
+    print("PET-37 Classes:", pet37_classes)
+
+    # 读取 Oxford-Pets 的 superclass 和 child class 映射
+    pet37_mapping_file = "./configs/classes/pet_37_mapping.json"
+    pet37_superclass_mapping = load_pet37_superclass_mapping(pet37_mapping_file)
 
     # 获取增量数据集中的遗忘类别和噪声类别的索引
     D_inc_forget_indices = [
@@ -241,19 +242,6 @@ def create_pet37_npy_files(
     D_inc_noise_indices = [
         i for i in range(len(D_inc_labels)) if D_inc_labels[i] in noise_classes
     ]
-
-    # 定义非对称噪声映射
-
-    # 读取 PET-37 类别
-    pet37_classes_file = "./configs/classes/pet_37_classes.txt"
-    pet37_classes = load_classes_from_file(pet37_classes_file)
-
-    # 读取 PET-37 的 superclass 和 child class 映射
-    pet37_mapping_file = "./configs/classes/pet_37_mapping.json"
-    pet37_superclass_mapping = load_pet37_superclass_mapping(pet37_mapping_file)
-
-    # 打印读取到的类别信息
-    print("PET-37 Classes:", pet37_classes)
 
     # 构建非对称映射，如果选择了非对称噪声
     if noise_type == "asymmetric":
@@ -275,7 +263,8 @@ def create_pet37_npy_files(
             D_f_data = D_inc_data[forget_sample_indices]
             D_f_labels = D_inc_labels[forget_sample_indices]
         else:
-            D_f_data = torch.empty(0, 3, 32, 32)
+            # D_f_data = torch.empty(0, 3, 32, 32)
+            D_f_data = torch.empty(0, 3, 224, 224)
             D_f_labels = torch.empty(0, dtype=torch.long)
 
         # 噪声注入：对噪声类别的样本注入噪声
@@ -290,7 +279,6 @@ def create_pet37_npy_files(
             noisy_indices = []
 
         D_n_data = D_inc_data[noise_sample_indices]
-        # D_n_labels = D_inc_labels[noise_sample_indices].clone()
         D_n_labels = D_inc_labels[noise_sample_indices]
 
         # 在 D_n_labels 中注入噪声
@@ -312,14 +300,12 @@ def create_pet37_npy_files(
                 else:
                     raise ValueError("Invalid noise type.")
             else:
-                # 未被选中注入噪声的样本标签保持不变
                 pass
 
         D_tr_data = np.concatenate([D_f_data, D_n_data], axis=0)
         D_tr_labels = np.concatenate([D_f_labels, D_n_labels], axis=0)
 
         # 打乱训练数据集
-        # perm = torch.randperm(len(D_tr_data))
         perm = np.random.permutation(len(D_tr_data))  # 使用 numpy 的随机打乱
         D_tr_data = D_tr_data[perm]
         D_tr_labels = D_tr_labels[perm]
