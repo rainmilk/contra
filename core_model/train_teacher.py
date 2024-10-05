@@ -33,13 +33,8 @@ if __name__ == '__main__':
     teacher_criterion = nn.CrossEntropyLoss()
     data_dir = dataset_paths[dataset]
     model_paths = get_model_paths(model_name, dataset)
-    lip_teacher_model_path = model_paths["lip_teacher_model_path"]
-    lip_teacher_model_dir = os.path.dirname(lip_teacher_model_path)
+    lip_teacher_model_dir = os.path.dirname(model_paths["lip_teacher_model_path"])
 
-    test_data, test_labels, test_dataloader = get_dataset_loader(
-        dataset, "test", data_dir,
-        mean=None, std=None, batch_size=batch_size, shuffle=False
-    )
     train_teacher_model(args, data_dir, num_classes, lip_teacher_model, teacher_opt,
                         teacher_lr_scheduler, teacher_criterion, lip_teacher_model_dir,
-                        test_dataloader=test_dataloader, test_per_it=1)
+                        test_per_it=1)
