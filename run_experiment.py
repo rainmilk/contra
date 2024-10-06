@@ -259,6 +259,7 @@ def train_step(
     model_name = args.model
     step = args.step
     case = settings.get_case(args.noise_ratio, args.noise_type, args.balanced)
+    uni_name = args.uni_name
     if step < 0:
 
         D_train_data = np.load(settings.get_dataset_path(dataset_name, case, "train_data"))
@@ -288,7 +289,8 @@ def train_step(
             weight_decay=args.weight_decay,
             writer=writer,
         )
-        model_raw_path = settings.get_ckpt_path(dataset_name, case, model_name, "worker_restore")
+        model_raw_path = settings.get_ckpt_path(dataset_name, case, model_name,
+                                                "worker_restore", unique_name=uni_name)
         subdir = os.path.dirname(model_raw_path)
         os.makedirs(subdir, exist_ok=True)
         torch.save(model_raw.state_dict(), model_raw_path)
@@ -321,7 +323,8 @@ def train_step(
             writer=writer,
         )
         model_p0_path = settings.get_ckpt_path(dataset_name, case,
-                                               model_name, "worker_restore", step=step)
+                                               model_name, "worker_restore",
+                                               step=step, unique_name=uni_name)
         subdir = os.path.dirname(model_p0_path)
         os.makedirs(subdir, exist_ok=True)
         torch.save(model_p0.state_dict(), model_p0_path)
@@ -337,7 +340,8 @@ def train_step(
         print(f"用于训练的模型: M_p{step-1}")
 
         prev_model_path = settings.get_ckpt_path(dataset_name, case, model_name,
-                                                 "worker_restore", step-1)
+                                                 "worker_restore",
+                                                 step=step-1, unique_name=uni_name)
         print(f"加载模型: {prev_model_path}")
 
         if not os.path.exists(prev_model_path):
@@ -369,7 +373,8 @@ def train_step(
 
         # save current model
         current_model_path = settings.get_ckpt_path(dataset_name, case,
-                                               model_name, "working_restore", step=step)
+                                               model_name, "working_restore",
+                                               step=step, unique_name=uni_name)
         subdir = os.path.dirname(current_model_path)
         os.makedirs(subdir, exist_ok=True)
         torch.save(current_model.state_dict(), current_model_path)

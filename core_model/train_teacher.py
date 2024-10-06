@@ -16,15 +16,17 @@ if __name__ == '__main__':
     optimizer_type = getattr(args, "optimizer", "adam")
     num_epochs = getattr(args, "num_epochs", 50)
     model_name = getattr(args, "model", 'resnet18')
-    batch_size = getattr(args, "batch_size", 256)
-    dataset = getattr(args, "dataset", "cifar-10")
+    batch_size = getattr(args, "batch_size", 64)
     model_suffix = getattr(args, "model_suffix", "teacher_restore")
-    noise_ratio = getattr(args, "noise_ratio", 0.2)
-    noise_type = getattr(args, "noise_type", "symmetric")
     step = getattr(args, "step", 0)
 
-    num_classes = settings.num_classes_dict[dataset]
+    noise_ratio = args.noise_ratio
+    noise_type = args.noise_type
+    balanced = args.balanced
+    dataset = args.dataset
+    uni_name = args.uni_name
 
+    num_classes = settings.num_classes_dict[dataset]
     backbone = load_custom_model(model_name, num_classes, load_pretrained=True)
     features = backbone.fc.in_features
     backbone = nn.Sequential(*list(backbone.children())[:-1], nn.Flatten())
@@ -36,8 +38,9 @@ if __name__ == '__main__':
         optimizer_type, lip_teacher_model.parameters(), num_epochs, learning_rate, weight_decay
     )
     teacher_criterion = nn.CrossEntropyLoss()
-    case = settings.get_case(noise_ratio, noise_type)
-    model_paths = settings.get_ckpt_path(dataset, case, model_name, model_suffix=model_suffix, step=step)
+    case = settings.get_case(noise_ratio, noise_type, balanced)
+    model_paths = settings.get_ckpt_path(dataset, case, model_name, model_suffix=model_suffix,
+                                         step=step, unique_name=uni_name)
 
     train_teacher_model(args, step, num_classes, lip_teacher_model, teacher_opt,
                         teacher_lr_scheduler, teacher_criterion, model_paths,

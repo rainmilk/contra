@@ -40,11 +40,13 @@ def get_case(noise_ratio, noise_type, balanced=False):
     return f"nr_{noise_ratio}_nt_{noise_type}"
 
 
-def get_ckpt_path(dataset, case, model, model_suffix, step=None):
+def get_ckpt_path(dataset, case, model, model_suffix, step=None, unique_name=None):
     """Generate and return model paths dynamically."""
     path = os.path.join(root_dir, "ckpt", dataset, case)
     if step is not None and step >= 0:
         path = os.path.join(path, f"step_{step}")
+    if unique_name is not None:
+        path = os.path.join(path, unique_name)
 
     return os.path.join(path, f"{model}_{model_suffix}.pth")
 
