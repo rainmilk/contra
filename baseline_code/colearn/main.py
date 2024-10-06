@@ -86,7 +86,7 @@ def main():
     # mode_path = r"../../ckpt/cifar-10/p1_checkpoint.pth"
 
     dataset_path = dataset_paths[config["dataset"]]
-    mode_path = mode_paths["cifar-10"]
+    model_path = model_paths["cifar-10"]
 
     _, trainloader = get_dataset_loader(
         config["dataset"],
