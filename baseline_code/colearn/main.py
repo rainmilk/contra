@@ -70,27 +70,35 @@ def main():
 
     # todo get corrected dataset and model path
     dataset_paths = {
-        "cifar-10": "../data/cifar-10",
+        "cifar-10": "../../data/cifar-10",
         "cifar-100": "../data/cifar-100",
-        "food-101": "../data/food-101",
+        "pet-37": "../../data/pet-37",
+        # "food-101": "../data/food-101",
         # "flowers-102": "../data/flowers-102",
         # "tiny-imagenet-200": "../data/tiny-imagenet-200",
     }
-    model_path = r"../ckpt/cifar-10/p1_checkpoint.pth"
+    model_paths = {
+        "cifar-10": "../../ckpt/cifar-10/p1_checkpoint.pth",
+        "cifar-100": "../../ckpt/cifar-100/p1_checkpoint.pth",
+        "pet-37": "../../ckpt/pet-37/p1_checkpoint.pth",
+    }
 
-    data_dir = dataset_paths[config["dataset"]]
+    # mode_path = r"../../ckpt/cifar-10/p1_checkpoint.pth"
+
+    dataset_path = dataset_paths[config["dataset"]]
+    model_path = model_paths["cifar-10"]
 
     _, trainloader = get_dataset_loader(
         config["dataset"],
         "inc",
-        data_dir,
+        dataset_path,
         config["batch_size"],
         drop_last=True,
         shuffle=True,
     )
 
     _, testloader = get_dataset_loader(
-        config["dataset"], "test", data_dir, config["batch_size"], shuffle=False
+        config["dataset"], "test", dataset_path, config["batch_size"], shuffle=False
     )
     num_test_images = len(testloader.dataset)
 
