@@ -183,7 +183,7 @@ def iterate_repair_model(
         std=std,
         batch_size=args.batch_size,
         alpha=0.25,
-        transform=False,
+        transforms=None,
     )
 
     model_train(
@@ -261,7 +261,7 @@ def iterate_adapt_model(
         std=std,
         batch_size=args.batch_size,
         alpha=0.15,
-        transform=False,
+        transforms=None,
     )
 
     # 2. train Mt: Pt=Mt(Xt_max), Update Mt: Loss=CrossEntropy(Pt, Yp_mix)
@@ -292,7 +292,7 @@ def iterate_adapt_model(
         std=std,
         batch_size=args.batch_size,
         alpha=0.15,
-        transform=False,
+        transforms=None,
     )
 
     # 4. train Mp: Pp=Mp(Xp_max), Update Mp: Loss=CrossEntropy(Pp, Yp_mix)
@@ -318,13 +318,13 @@ def mix_up_dataloader(
     std,
     batch_size,
     alpha=0.2,
-    transform=False,
+    transforms=None,
 ):
     mixed_dataset = MixupDataset(
         data_pair=(inc_data, aug_data),
         label_pair=(inc_probs, aug_probs),
         mixup_alpha=alpha,
-        transform=transform,
+        transforms=transforms,
         mean=mean,
         std=std,
     )
@@ -532,7 +532,7 @@ def execute(args):
     # 5. 迭代测试数据适应过程
     # (1) 构造适应过程数据：Dts, D_aug:  = Da + Dconf
     aux_labels_onehot = np.eye(num_classes)[aux_labels]
-    
+
     if tta_only:
         conf_data = np.load(conf_data_path)
         conf_labels = np.load(conf_label_path)

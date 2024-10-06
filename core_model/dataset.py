@@ -1,3 +1,4 @@
+import torchvision
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
 import random
@@ -53,7 +54,7 @@ def transform_data(data):
 
 
 class MixupDataset(Dataset):
-    def __init__(self, data_pair, label_pair, mixup_alpha=0.2, transform=False,
+    def __init__(self, data_pair, label_pair, mixup_alpha=0.2, transforms=None,
                  mean=None, std=None):
         # modify shape to [N, H, W, C]
         self.data_first = data_pair[0]
@@ -63,7 +64,7 @@ class MixupDataset(Dataset):
         self.label_first = label_pair[0]
         self.label_second = label_pair[1]
         self.mixup_alpha = mixup_alpha
-        self.transform = transform
+        self.transforms = transforms
 
     def __len__(self):
         return len(self.label_first)
@@ -79,32 +80,19 @@ class MixupDataset(Dataset):
         data_rnd_ax = self.data_second[rnd_idx]
         label_rnd_ax = self.label_second[rnd_idx]
 
-        if self.transform:
-            data_first = transform_data(data_first)
-            data_rnd_ax = transform_data(data_rnd_ax)
+        if self.transforms is not None:
+            data_first = self.transforms(data_first)
+            data_rnd_ax = self.transforms(data_rnd_ax)
 
         mixed_data = lbd * data_first + (1 - lbd) * data_rnd_ax
         mixed_labels = lbd * label_first + (1 - lbd) * label_rnd_ax
         return mixed_data, mixed_labels
 
 
-class CustomDataset(Dataset):
-    def __init__(self, data, label, transform=False, mean=None, std=None):
-        # modify shape to [N, H, W, C]
-        self.data = data
+class NormalizeDataset(BaseTensorDataset):
+    def __init__(self, data, labels, transforms=None, mean=None, std=None):
+        super().__init__(data, labels, transforms)
         self.data = normalize_dataset(data, mean, std)
-        self.label = label
-        self.transform = transform
-
-    def __len__(self):
-        return len(self.data)
-
-    def __getitem__(self, index):
-        data = self.data[index]
-        if self.transform:
-            data = transform_data(data)
-
-        return data, self.label[index]
 
 
 def get_dataset_loader(
@@ -129,7 +117,7 @@ def get_dataset_loader(
     data = np.load(data_path)
     labels = np.load(label_path)
 
-    transform = False
+    transforms = None # torchvision.transforms.Compose([])
     # if loader_name == "train":
     #     transform = True
 
@@ -137,7 +125,7 @@ def get_dataset_loader(
         labels = np.eye(num_classes)[labels]
 
     # 构建自定义数据集
-    dataset = CustomDataset(data, labels, transform=transform, mean=mean, std=std)
+    dataset = NormalizeDataset(data, labels, transforms=transforms, mean=mean, std=std)
 
     data_loader = DataLoader(
         dataset, batch_size=batch_size, drop_last=drop_last, shuffle=shuffle
