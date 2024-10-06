@@ -15,7 +15,7 @@ def model_train(
     alpha=1,
     args=None,
     device="cuda",
-    save_path="",
+    save_path=".",
     mix_classes=0,
     test_loader=None,
     test_per_it=1
@@ -78,13 +78,10 @@ def model_train(
 
         # 仅在最后一次保存模型，避免每个 epoch 都保存
         if epoch == args.num_epochs - 1:
-            os.makedirs(save_path, exist_ok=True)
-            torch.save(
-                model.state_dict(),
-                os.path.join(save_path, f"{args.model}_{args.dataset}_final.pth"),
-            )
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            torch.save(model.state_dict(), save_path)
             print(
-                f"Final model saved to {os.path.join(save_path, f'{args.model}_{args.dataset}_final.pth')}"
+                f"Model has saved to {save_path}."
             )
 
 

@@ -1,8 +1,7 @@
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
-import os
 import random
-import torch
+from configs import settings
 
 
 class BaseTensorDataset(Dataset):
@@ -111,7 +110,8 @@ class CustomDataset(Dataset):
 def get_dataset_loader(
     dataset_name,
     loader_name,
-    data_dir,
+    case,
+    step=None,
     mean=None,
     std=None,
     batch_size=64,
@@ -123,20 +123,8 @@ def get_dataset_loader(
     """
     根据 loader_name 加载相应的数据集：支持增量训练 (inc)、辅助数据 (aux) 、测试数据 (test)和 D0数据集(train)
     """
-    if loader_name in ["inc", "aux", "test", "train"]:
-        data_name = "%s_%s_data.npy" % (dataset_name, loader_name)
-        label_name = "%s_%s_labels.npy" % (dataset_name, loader_name)
-    else:
-        raise ValueError(
-            f"Invalid loader_name {loader_name}. Choose from 'inc', 'aux', or 'test'."
-        )
-
-    data_path = os.path.join(data_dir, data_name)
-    label_path = os.path.join(data_dir, label_name)
-
-    # 检查文件是否存在
-    if not os.path.exists(data_path) or not os.path.exists(label_path):
-        raise FileNotFoundError(f"{data_name} or {label_name} not found in {data_dir}")
+    data_path = settings.get_dataset_path(dataset_name, case, f"{loader_name}_data", step)
+    label_path = settings.get_dataset_path(dataset_name, case,f"{loader_name}_label", step)
 
     data = np.load(data_path)
     labels = np.load(label_path)
@@ -160,7 +148,7 @@ def get_dataset_loader(
 
 def random_crop(img, img_size, padding=4):
     img = np.pad(img, ((padding, padding), (padding, padding), (0, 0)), "constant")
-    h, w = img.shape[:2]
+    h, w = img.shape[1:]
 
     new_h, new_w = img_size
     start_x = np.random.randint(0, w - new_w)
@@ -184,32 +172,32 @@ if __name__ == "__main__":
     # data_dir = "../data/flowers-102/noise/"
     batch_size = 32
 
-    # 测试加载增量数据集
-    print("Loading Incremental Training Dataset (inc)")
-    inc_dataset, inc_loader = get_dataset_loader("inc", data_dir, batch_size)
-    print(f"Incremental Dataset Size: {len(inc_dataset)}")
-
-    # 遍历一批增量数据并查看形状
-    for images, labels in inc_loader:
-        print(f"Batch Image Shape: {images.shape}, Batch Label Shape: {labels.shape}")
-        break  # 只打印第一批
-
-    # 测试加载辅助数据集
-    print("\nLoading Auxiliary Dataset (aux)")
-    aux_dataset, aux_loader = get_dataset_loader("aux", data_dir, batch_size)
-    print(f"Auxiliary Dataset Size: {len(aux_dataset)}")
-
-    # 遍历一批辅助数据并查看形状
-    for images, labels in aux_loader:
-        print(f"Batch Image Shape: {images.shape}, Batch Label Shape: {labels.shape}")
-        break
-
-    # 测试加载测试数据集
-    print("\nLoading Test Dataset (test)")
-    test_dataset, test_loader = get_dataset_loader("test", data_dir, batch_size)
-    print(f"Test Dataset Size: {len(test_dataset)}")
-
-    # 遍历一批测试数据并查看形状
-    for images, labels in test_loader:
-        print(f"Batch Image Shape: {images.shape}, Batch Label Shape: {labels.shape}")
-        break
+    # # 测试加载增量数据集
+    # print("Loading Incremental Training Dataset (inc)")
+    # inc_dataset, inc_loader = get_dataset_loader("inc", data_dir, batch_size)
+    # print(f"Incremental Dataset Size: {len(inc_dataset)}")
+    #
+    # # 遍历一批增量数据并查看形状
+    # for images, labels in inc_loader:
+    #     print(f"Batch Image Shape: {images.shape}, Batch Label Shape: {labels.shape}")
+    #     break  # 只打印第一批
+    #
+    # # 测试加载辅助数据集
+    # print("\nLoading Auxiliary Dataset (aux)")
+    # aux_dataset, aux_loader = get_dataset_loader("aux", data_dir, batch_size)
+    # print(f"Auxiliary Dataset Size: {len(aux_dataset)}")
+    #
+    # # 遍历一批辅助数据并查看形状
+    # for images, labels in aux_loader:
+    #     print(f"Batch Image Shape: {images.shape}, Batch Label Shape: {labels.shape}")
+    #     break
+    #
+    # # 测试加载测试数据集
+    # print("\nLoading Test Dataset (test)")
+    # test_dataset, test_loader = get_dataset_loader("test", data_dir, batch_size)
+    # print(f"Test Dataset Size: {len(test_dataset)}")
+    #
+    # # 遍历一批测试数据并查看形状
+    # for images, labels in test_loader:
+    #     print(f"Batch Image Shape: {images.shape}, Batch Label Shape: {labels.shape}")
+    #     break

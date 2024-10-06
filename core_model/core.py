@@ -4,42 +4,23 @@ import argparse
 
 import torch
 import torch.nn as nn
-from torchvision import models
 from torch.utils.data import DataLoader
 import numpy as np
 import sys
 
-from main import parse_args, parse_kwargs
+from args_paser import parse_args, parse_kwargs
 from lip_teacher import SimpleLipNet
 from dataset import MixupDataset, get_dataset_loader
 from optimizer import create_optimizer_scheduler
 from custom_model import load_custom_model, ClassifierWrapper
 from train_test import model_train, model_test, model_forward
-from configs.dataset import cifar10_config, cifar100_config, food101_config
+from configs import settings
 
-
-# todo 数据集路径和类别数量
-dataset_paths = {
-    "cifar-10": "../data/cifar-10",
-    "cifar-100": "../data/cifar-100",
-    "food-101": "../data/food-101",
-    "pet-37": "../data/pet-37",
-}
-
-
-num_classes_dict = {
-    "cifar-10": 10,
-    "cifar-100": 100,
-    "food-101": 101,
-    "pet-37": 37,
-    # "flowers-102": 102,
-    # "tiny-imagenet-200": 200,
-}
 
 
 def train_teacher_model(
     args,
-    data_dir,
+    step,
     num_classes,
     teacher_model,
     teacher_opt,
@@ -54,11 +35,13 @@ def train_teacher_model(
     test_per_it=1,
 ):
 
+    case = settings.get_case(args.noise_ratio, args.noise_type, args.balanced)
     if train_dataloader is None:
         _, _, train_dataloader = get_dataset_loader(
             args.dataset,
             "train",
-            data_dir,
+            case,
+            step,
             mean,
             std,
             args.batch_size,
@@ -72,14 +55,14 @@ def train_teacher_model(
         _, _, test_dataloader = get_dataset_loader(
             args.dataset,
             "test",
-            data_dir,
+            case,
+            None,
             mean=None,
             std=None,
             batch_size=args.batch_size,
             shuffle=False,
         )
 
-    lip_teacher_model_dir = os.path.dirname(save_path)
     model_train(
         train_dataloader,
         teacher_model,
@@ -88,7 +71,7 @@ def train_teacher_model(
         teacher_criterion,
         alpha,
         args,
-        save_path=lip_teacher_model_dir,
+        save_path=save_path,
         mix_classes=num_classes,
         test_loader=test_dataloader,
         test_per_it=test_per_it,
@@ -200,7 +183,7 @@ def iterate_repair_model(
         std=std,
         batch_size=args.batch_size,
         alpha=0.25,
-        transform=True,
+        transform=False,
     )
 
     model_train(
@@ -348,41 +331,23 @@ def mix_up_dataloader(
     return DataLoader(mixed_dataset, batch_size, drop_last=True, shuffle=True)
 
 
-def get_model_paths(model, dataset):
-    """Generate and return model paths dynamically."""
-    curr_dir = os.path.dirname(os.path.abspath(__file__))
-    par_dir = os.path.dirname(curr_dir)
-    ckpt_dir = os.path.join(par_dir, "ckpt", dataset)
-
-    return {
-        "working_model_path": os.path.join(
-            ckpt_dir, "working_model_1", "%s_%s_final.pth" % (model, dataset)
-        ),
-        "working_model_repair_save_path": os.path.join(
-            ckpt_dir, "working_model_repair"
-        ),
-        "working_model_adapt_save_path": os.path.join(ckpt_dir, "working_model_adapt"),
-        "lip_teacher_model_path": os.path.join(
-            ckpt_dir, "teacher_model_0", "%s_%s_final.pth" % (model, dataset)
-        ),
-        "teacher_model_repair_save_path": os.path.join(
-            ckpt_dir, "teacher_model_repair"
-        ),
-        "teacher_model_adapt_save_path": os.path.join(ckpt_dir, "teacher_model_adapt"),
-    }
-
-
 def sharpen(prob_max, T=1, axis=-1):
-    prob_max = np.pow(prob_max, 1.0 / T)
+    prob_max = prob_max ** (1.0 / T)
     return prob_max / np.sum(prob_max, axis=-1, keepdims=True)
 
 
 def execute(args):
     # 1. 获取公共参数
-    num_classes = num_classes_dict[args.dataset]
+    num_classes = settings.num_classes_dict[args.dataset]
     kwargs = parse_kwargs(args.kwargs)
+    case = settings.get_case(args.noise_ratio, args.noise_type, args.balanced)
     alpha, beta = kwargs.get("alpha", 1), kwargs.get("beta", 0.1)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    log_path = os.path.join(settings.root_dir, "logs")
+    os.makedirs(log_path, exist_ok=True)
+    log_path = os.path.join(log_path, "core_execution.log")
+    logging.basicConfig(filename=log_path, level=logging.INFO)
 
     learning_rate = getattr(args, "learning_rate", 0.001)
     weight_decay = getattr(args, "weight_decay", 5e-4)
@@ -390,15 +355,15 @@ def execute(args):
     adapt_iter_num = getattr(args, "adapt_iter_num", 2)
     optimizer_type = getattr(args, "optimizer", "adam")
     num_epochs = getattr(args, "num_epochs", 50)
+    step = getattr(args, "step", 1)
+    tta_only = getattr(args, "tta_only", False)
 
-    model_paths = get_model_paths(args.model, args.dataset)
-
-    working_model_path = model_paths["working_model_path"]
-    working_model_repair_save_path = model_paths["working_model_repair_save_path"]
-    working_model_adapt_save_path = model_paths["working_model_adapt_save_path"]
-    lip_teacher_model_path = model_paths["lip_teacher_model_path"]
-    teacher_model_repair_save_path = model_paths["teacher_model_repair_save_path"]
-    teacher_model_adapt_save_path = model_paths["teacher_model_adapt_save_path"]
+    working_model_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="worker_restore", step=step-1) # model_paths["working_model_path"]
+    working_model_repair_save_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="worker_restore", step=step)
+    working_model_adapt_save_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="worker_tta", step=step)
+    lip_teacher_model_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="teacher_restore", step=step-1)
+    teacher_model_repair_save_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="teacher_restore", step=step)
+    teacher_model_adapt_save_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="teacher_tta", step=step)
 
     mean, std = None, None
     # if args.dataset == "cifar-10":
@@ -447,97 +412,135 @@ def execute(args):
     )
     teacher_criterion = nn.CrossEntropyLoss()
 
-    if os.path.exists(lip_teacher_model_path):
-        checkpoint = torch.load(lip_teacher_model_path)
-        lip_teacher_model.load_state_dict(checkpoint, strict=False)
-
-    # 3. 迭代修复过程
-    # (1) 构造修复过程数据集: Dtr、 Da、Dts
-    data_dir = dataset_paths[args.dataset]
-    inc_data, inc_labels, inc_dataloader = get_dataset_loader(
-        args.dataset, "inc", data_dir, mean, std, args.batch_size, shuffle=False
-    )
     aux_data, aux_labels, aux_dataloader = get_dataset_loader(
-        args.dataset, "aux", data_dir, mean, std, args.batch_size, shuffle=False
+        args.dataset, "aux", case, None, mean, std, args.batch_size, shuffle=False
     )
+
     test_data, test_labels, test_dataloader = get_dataset_loader(
-        args.dataset, "test", data_dir, mean, std, args.batch_size, shuffle=False
+        args.dataset, "test", case, None, mean, std, args.batch_size, shuffle=False
     )
 
-    if not os.path.exists(lip_teacher_model_path):
-        # t0 的情况下，使用D0数据重新训练 lip_teacher model
+    conf_data_path = settings.get_dataset_path(args.dataset, case, "conf_data", step)
+    conf_label_path = settings.get_dataset_path(args.dataset, case, "conf_label", step)
+    subdir = os.path.dirname(conf_data_path)
+    os.makedirs(subdir, exist_ok=True)
+
+    if not tta_only:
+        if os.path.exists(lip_teacher_model_path):
+            checkpoint = torch.load(lip_teacher_model_path)
+            lip_teacher_model.load_state_dict(checkpoint, strict=False)
+        else:
+            # t0 的情况下，使用D0数据重新训练 lip_teacher model
+            print(
+                "Teacher model pth: %s not exist, only train T0, if not T0 then stop!"
+                % lip_teacher_model_path
+            )
+
+            train_teacher_model(
+                args,
+                0,
+                lip_teacher_model,
+                teacher_opt,
+                teacher_lr_scheduler,
+                teacher_criterion,
+                lip_teacher_model_path,
+                test_dataloader=None,
+                test_per_it=1,
+            )
+
+        # 3. 迭代修复过程
+        # (1) 构造修复过程数据集: Dtr、 Da、Dts
+        inc_data, inc_labels, inc_dataloader = get_dataset_loader(
+            args.dataset, "train", case, step, mean, std, args.batch_size, shuffle=False
+        )
+
+        # (2) 测试修复前 Dts 在 Mp 的表现
         print(
-            "Teacher model pth: %s not exist, only train T0, if not T0 then stop!"
-            % lip_teacher_model_path
+            "---------------------working model test before------------------------------"
         )
-        data_dir = dataset_paths[args.dataset]
-        lip_teacher_model_dir = os.path.dirname(lip_teacher_model_path)
-        train_teacher_model(
-            args,
-            data_dir,
-            lip_teacher_model,
-            teacher_opt,
-            teacher_lr_scheduler,
-            teacher_criterion,
-            lip_teacher_model_dir,
-            test_dataloader=test_dataloader,
-            test_per_it=1,
+        working_model_test_before = model_test(
+            test_dataloader, working_model, device=device
+        )
+        print(
+            "---------------------teacher model test before------------------------------"
+        )
+        teacher_model_test_before = model_test(
+            test_dataloader, lip_teacher_model, device=device
         )
 
-    # (2) 测试修复前 Dts 在 Mp 的表现
-    print(
-        "---------------------working model test before------------------------------"
-    )
-    working_model_test_before = model_test(
-        test_dataloader, working_model, device=device
-    )
-    print(
-        "---------------------teacher model test before------------------------------"
-    )
-    teacher_model_test_before = model_test(
-        test_dataloader, lip_teacher_model, device=device
-    )
+        # (3) 迭代修复过程：根据 Dtr 迭代 Mp 、 Mt
+        conf_data, conf_labels = None, None
+        for i in range(repair_iter_num):
+            print("-----------repair iterate %d ----------------------" % i)
+            conf_data, conf_labels = iterate_repair_model(
+                working_model,
+                working_opt,
+                working_lr_scheduler,
+                working_criterion,
+                working_model_repair_save_path,
+                lip_teacher_model,
+                teacher_opt,
+                teacher_lr_scheduler,
+                teacher_criterion,
+                teacher_model_repair_save_path,
+                alpha,
+                inc_data,
+                inc_labels,
+                inc_dataloader,
+                aux_data,
+                aux_labels,
+                aux_dataloader,
+                num_classes,
+                mean,
+                std,
+                device,
+                args,
+            )
 
-    # (3) 迭代修复过程：根据 Dtr 迭代 Mp 、 Mt
-    conf_data, conf_labels = None, None
-    for i in range(repair_iter_num):
-        print("-----------repair iterate %d ----------------------" % i)
-        conf_data, conf_labels = iterate_repair_model(
-            working_model,
-            working_opt,
-            working_lr_scheduler,
-            working_criterion,
-            working_model_repair_save_path,
-            lip_teacher_model,
-            teacher_opt,
-            teacher_lr_scheduler,
-            teacher_criterion,
-            teacher_model_repair_save_path,
-            alpha,
-            inc_data,
-            inc_labels,
-            inc_dataloader,
-            aux_data,
-            aux_labels,
-            aux_dataloader,
-            num_classes,
-            mean,
-            std,
-            device,
-            args,
+        np.save(conf_data_path, conf_data)
+        np.save(conf_label_path, conf_labels)
+
+        # 4. 测试修复后 Dts 在 Mp 的表现
+        working_model_after_repair = model_test(
+            test_dataloader, working_model, device=device
+        )
+        teacher_model_after_repair = model_test(
+            test_dataloader, lip_teacher_model, device=device
         )
 
-    # 4. 测试修复后 Dts 在 Mp 的表现
-    working_model_after_repair = model_test(
-        test_dataloader, working_model, device=device
-    )
-    teacher_model_after_repair = model_test(
-        test_dataloader, lip_teacher_model, device=device
-    )
+        logging.info(f"Test results before repair: {working_model_test_before}")
+        logging.info(f"Test results after repair: {working_model_after_repair}")
+
+        print(
+            "---------------------working model test before------------------------------"
+        )
+        print(working_model_test_before)
+        print(
+            "---------------------teacher model test before------------------------------"
+        )
+        print(teacher_model_test_before)
+
+        print(
+            "---------------------working model test after repair------------------------------"
+        )
+        print(working_model_after_repair)
+        print(
+            "---------------------teacher model test after repair------------------------------"
+        )
+        print(teacher_model_after_repair)
 
     # 5. 迭代测试数据适应过程
     # (1) 构造适应过程数据：Dts, D_aug:  = Da + Dconf
     aux_labels_onehot = np.eye(num_classes)[aux_labels]
+    
+    if tta_only:
+        conf_data = np.load(conf_data_path)
+        conf_labels = np.load(conf_label_path)
+
+        checkpoint = torch.load(teacher_model_repair_save_path)
+        lip_teacher_model.load_state_dict(checkpoint, strict=False)
+        checkpoint = torch.load(working_model_repair_save_path)
+        working_model.load_state_dict(checkpoint, strict=False)
 
     aug_data = np.concatenate([aux_data, conf_data], axis=0)
     aug_labels = np.concatenate([aux_labels_onehot, conf_labels], axis=0)
@@ -576,24 +579,6 @@ def execute(args):
     )
 
     print(
-        "---------------------working model test before------------------------------"
-    )
-    print(working_model_test_before)
-    print(
-        "---------------------teacher model test before------------------------------"
-    )
-    print(teacher_model_test_before)
-
-    print(
-        "---------------------working model test after repair------------------------------"
-    )
-    print(working_model_after_repair)
-    print(
-        "---------------------teacher model test after repair------------------------------"
-    )
-    print(teacher_model_after_repair)
-
-    print(
         "---------------------working model test after adapt-------------------------------"
     )
     print(working_model_after_adapt)
@@ -602,9 +587,6 @@ def execute(args):
     )
     print(teacher_model_after_adapt)
 
-    logging.basicConfig(filename="../logs/core_execution.log", level=logging.INFO)
-    logging.info(f"Test results before repair: {working_model_test_before}")
-    logging.info(f"Test results after repair: {working_model_after_repair}")
     logging.info(f"Test results after adaptation: {working_model_after_adapt}")
 
 

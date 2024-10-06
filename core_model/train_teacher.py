@@ -1,9 +1,9 @@
 import os
-from core import train_teacher_model, dataset_paths, get_model_paths
+from core import train_teacher_model
 from torch import nn
-from dataset import get_dataset_loader
+from configs import settings
 
-from main import parse_args, parse_kwargs
+from args_paser import parse_args, parse_kwargs
 from lip_teacher import SimpleLipNet
 from optimizer import create_optimizer_scheduler
 from custom_model import load_custom_model, ClassifierWrapper
@@ -15,10 +15,15 @@ if __name__ == '__main__':
     weight_decay = getattr(args, "weight_decay", 5e-4)
     optimizer_type = getattr(args, "optimizer", "adam")
     num_epochs = getattr(args, "num_epochs", 50)
-    num_classes = getattr(args, "num_classes", 37)
     model_name = getattr(args, "model", 'resnet18')
     batch_size = getattr(args, "batch_size", 256)
     dataset = getattr(args, "dataset", "cifar-10")
+    model_suffix = getattr(args, "model_suffix", "teacher_restore")
+    noise_ratio = getattr(args, "noise_ratio", 0.2)
+    noise_type = getattr(args, "noise_type", "symmetric")
+    step = getattr(args, "step", 0)
+
+    num_classes = settings.num_classes_dict[dataset]
 
     backbone = load_custom_model(model_name, num_classes, load_pretrained=True)
     features = backbone.fc.in_features
@@ -31,10 +36,9 @@ if __name__ == '__main__':
         optimizer_type, lip_teacher_model.parameters(), num_epochs, learning_rate, weight_decay
     )
     teacher_criterion = nn.CrossEntropyLoss()
-    data_dir = dataset_paths[dataset]
-    model_paths = get_model_paths(model_name, dataset)
-    lip_teacher_model_dir = os.path.dirname(model_paths["lip_teacher_model_path"])
+    case = settings.get_case(noise_ratio, noise_type)
+    model_paths = settings.get_ckpt_path(dataset, case, model_name, model_suffix=model_suffix, step=step)
 
-    train_teacher_model(args, data_dir, num_classes, lip_teacher_model, teacher_opt,
-                        teacher_lr_scheduler, teacher_criterion, lip_teacher_model_dir,
+    train_teacher_model(args, step, num_classes, lip_teacher_model, teacher_opt,
+                        teacher_lr_scheduler, teacher_criterion, model_paths,
                         test_per_it=1)

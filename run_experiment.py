@@ -1,7 +1,7 @@
 import os
 import warnings
 import numpy as np
-import argparse
+from args_paser import parse_args
 
 from tqdm import tqdm
 import torch
@@ -9,6 +9,7 @@ import torch.nn as nn
 from torchvision import transforms
 from core_model.optimizer import create_optimizer_scheduler
 from core_model.custom_model import ClassifierWrapper, load_custom_model
+from configs import settings
 
 from torch.utils.data import DataLoader, Dataset
 from torch.utils.tensorboard import SummaryWriter
@@ -18,9 +19,9 @@ from torchvision.transforms import v2
 
 class BaseTensorDataset(Dataset):
 
-    def __init__(self, data, labels, transforms=None):
-        self.data = data
-        self.labels = labels
+    def __init__(self, data, labels, transforms=None, device=None):
+        self.data = torch.as_tensor(data, device=device)
+        self.labels = torch.as_tensor(labels, device=device)
         self.transforms = transforms
 
     def __len__(self) -> int:
@@ -126,10 +127,10 @@ def train_model(
         ]
     )
 
-    dataset = BaseTensorDataset(data.to(device), labels.to(device))
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    dataset = BaseTensorDataset(data, labels, device=device)
+    dataloader = DataLoader(dataset, batch_size=batch_size, drop_last=True, shuffle=True)
 
-    test_dataset = BaseTensorDataset(test_data.to(device), test_labels.to(device))
+    test_dataset = BaseTensorDataset(test_data, test_labels, device=device)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     # 用于存储训练和测试的损失和准确率
@@ -227,38 +228,9 @@ def train_model(
     return model
 
 
-def load_model(model_path, num_classes):
-    """
-    加载训练好的模型
-    :param model_path: 模型文件路径
-    :param num_classes: 分类类别数
-    :return: 加载的模型
-    """
-    if not os.path.exists(model_path):
-        raise FileNotFoundError(f"模型文件 {model_path} 未找到。")
-
-    # model = load_model()
-    model = ClassifierWrapper(
-        load_custom_model(model_name, num_classes), num_classes=num_classes
-    )
-    # model.load_state_dict(torch.load(model_path))
-    return model
-
-
 def train_step(
-    step,
-    subdir,
-    ckpt_subdir,
-    output_dir="ckpt",
-    dataset_name="cifar-10",
-    load_model_path=None,
-    epochs=50,
-    batch_size=256,
-    optimizer_type="adam",
-    learning_rate=0.001,
-    weight_decay=1e-4,
+    args,
     writer=None,
-    args=None,
 ):
     """
     根据步骤训练模型
@@ -275,33 +247,24 @@ def train_step(
     """
     warnings.filterwarnings("ignore")
 
-    os.makedirs(output_dir, exist_ok=True)
-    os.makedirs(ckpt_subdir, exist_ok=True)
-
     # num_classes = 10 if dataset_name == "cifar-10" else 100
+    dataset_name = args.dataset
     num_classes = get_num_of_classes(dataset_name)
 
-    # 加载训练和测试数据集
-    D_test_data = load_dataset(subdir, dataset_name, "test_data.npy", is_data=True)
-    D_test_labels = load_dataset(subdir, dataset_name, "test_labels.npy", is_data=False)
-
     # 打印当前执行的参数
-    print(f"===== 执行步骤: {step} =====")
-    print(f"数据子目录: {subdir}")
-    print(f"检查点目录: {ckpt_subdir}")
-    print(f"输出目录: {output_dir}")
+    print(f"===== 执行步骤: {args.step} =====")
     print(f"数据集类型: {dataset_name}")
-    print(f"Epochs: {epochs}, Batch Size: {batch_size}, Learning Rate: {learning_rate}")
+    print(f"Epochs: {args.num_epochs}, Batch Size: {args.batch_size}, Learning Rate: {args.learning_rate}")
 
     model_name = args.model
-    if step == (-1):
+    step = args.step
+    case = settings.get_case(args.noise_ratio, args.noise_type, args.balanced)
+    if step < 0:
 
-        D_train_data = load_dataset(
-            subdir, dataset_name, f"train_data.npy", is_data=True
-        )
-        D_train_labels = load_dataset(
-            subdir, dataset_name, f"train_labels.npy", is_data=False
-        )
+        D_train_data = np.load(settings.get_dataset_path(dataset_name, case, "train_data"))
+        D_train_labels = np.load(settings.get_dataset_path(dataset_name, case, "train_label"))
+        D_test_data = np.load(settings.get_dataset_path(dataset_name, case, "test_data"))
+        D_test_labels = np.load(settings.get_dataset_path(dataset_name, case, "test_label"))
 
         # 打印用于训练的模型和数据
         print("用于训练的数据: train_data.npy 和 train_labels.npy")
@@ -319,22 +282,23 @@ def train_step(
             D_train_labels,
             D_test_data,
             D_test_labels,
-            epochs=epochs,
-            batch_size=batch_size,
-            learning_rate=learning_rate,
-            weight_decay=weight_decay,
+            epochs=args.num_epochs,
+            batch_size=args.batch_size,
+            learning_rate=args.learning_rate,
+            weight_decay=args.weight_decay,
             writer=writer,
         )
-        model_raw_path = os.path.join(ckpt_subdir, "model_raw.pth")
+        model_raw_path = settings.get_ckpt_path(dataset_name, case, model_name, "worker_restore")
+        subdir = os.path.dirname(model_raw_path)
+        os.makedirs(subdir, exist_ok=True)
         torch.save(model_raw.state_dict(), model_raw_path)
         print(f"M_raw 训练完毕并保存至 {model_raw_path}")
         return
-
-    if step == 0:  # 基于$D_0$数据集和原始的resnet网络训练一个模型 M_p0
-        D_train_data = load_dataset(subdir, dataset_name, f"D_0.npy", is_data=True)
-        D_train_labels = load_dataset(
-            subdir, dataset_name, f"D_0_labels.npy", is_data=False
-        )
+    elif step == 0:  # 基于$D_0$数据集和原始的resnet网络训练一个模型 M_p0
+        D_train_data = np.load(settings.get_dataset_path(dataset_name, case, "train_data", step=step))
+        D_train_labels = np.load(settings.get_dataset_path(dataset_name, case, "train_label", step=step))
+        D_test_data = np.load(settings.get_dataset_path(dataset_name, case, "test_data"))
+        D_test_labels = np.load(settings.get_dataset_path(dataset_name, case, "test_label"))
 
         # 打印用于训练的模型和数据
         print("用于训练的数据: D_0.npy 和 D_0_labels.npy")
@@ -350,93 +314,30 @@ def train_step(
             D_train_labels,
             D_test_data,
             D_test_labels,
-            epochs=epochs,
-            batch_size=batch_size,
-            learning_rate=learning_rate,
-            weight_decay=weight_decay,
+            epochs=args.num_epochs,
+            batch_size=args.batch_size,
+            learning_rate=args.learning_rate,
+            weight_decay=args.weight_decay,
             writer=writer,
         )
-        model_p0_path = os.path.join(ckpt_subdir, "model_p0.pth")
+        model_p0_path = settings.get_ckpt_path(dataset_name, case,
+                                               model_name, "worker_restore", step=step)
+        subdir = os.path.dirname(model_p0_path)
+        os.makedirs(subdir, exist_ok=True)
         torch.save(model_p0.state_dict(), model_p0_path)
         print(f"M_p0 训练完毕并保存至 {model_p0_path}")
-
-    elif (
-        step == 1
-    ):  # load上一步训练好的M_p0模型，然后基于 D_tr_data_version_1 和 D_tr_labels_version_1 进行训练，得到M_p1
-        D_train_data = load_dataset(
-            subdir, dataset_name, f"D_tr_data_version_{step}.npy", is_data=True
-        )
-        D_train_labels = load_dataset(
-            subdir, dataset_name, f"D_tr_labels_version_{step}.npy", is_data=False
-        )
-
-        # 打印用于训练的模型和数据
-        print(
-            f"用于训练的数据: D_tr_data_version_{step}.npy 和 D_tr_labels_version_{step}.npy"
-        )
-        print("用于训练的模型: M_p0")
-
-        if load_model_path:  # 只能是 M_p0 模型
-            if "model_p0" not in load_model_path:
-                raise ValueError("加载的模型必须是 M_p0 模型。")
-                return
-
-        model_p0_path = os.path.join(ckpt_subdir, "model_p0.pth")
-        print(f"加载模型: {model_p0_path}")
-
-        # load model p0
-        model_p0_loaded = load_custom_model(
-            model_name=model_name, num_classes=num_classes, ckpt_path=model_p0_path
-        )
-        model_p0_loaded = ClassifierWrapper(model_p0_loaded, num_classes)
-
-        # prepare model p1
-        model_p1 = ClassifierWrapper(
-            load_custom_model(model_name, num_classes), num_classes=num_classes
-        )
-        model_p1.load_state_dict(model_p0_loaded.state_dict())
-
-        print(f"开始训练 M_p1 on ({dataset_name})...")
-        model_p1 = train_model(
-            model_p1,
-            D_train_data,
-            D_train_labels,
-            D_test_data,
-            D_test_labels,
-            epochs=epochs,
-            batch_size=batch_size,
-            optimizer_type=optimizer_type,
-            learning_rate=learning_rate,
-            weight_decay=weight_decay,
-            writer=writer,
-        )
-
-        # save model p1
-        model_p1_path = os.path.join(ckpt_subdir, "model_p1.pth")
-        torch.save(model_p1.state_dict(), model_p1_path)
-        print(f"M_p1 训练完毕并保存至 {model_p1_path}")
-
-    elif step >= 2:  # 从外部加载通过命令行指定的某个模型
+    else:  # 从外部加载通过命令行指定的某个模型
         # 加载当前步骤的训练数据
-        D_train_data = load_dataset(
-            subdir, dataset_name, f"D_tr_data_version_{step}.npy", is_data=True
-        )
-        D_train_labels = load_dataset(
-            subdir, dataset_name, f"D_tr_labels_version_{step}.npy", is_data=False
-        )
+        D_train_data = np.load(settings.get_dataset_path(dataset_name, case, "train_data", step=step))
+        D_train_labels = np.load(settings.get_dataset_path(dataset_name, case, "train_label", step=step))
+        D_test_data = np.load(settings.get_dataset_path(dataset_name, case, "test_data"))
+        D_test_labels = np.load(settings.get_dataset_path(dataset_name, case, "test_label"))
 
         # 打印用于训练的模型和数据
-        print(
-            f"用于训练的数据: D_tr_data_version_{step}.npy 和 D_tr_labels_version_{step}.npy"
-        )
         print(f"用于训练的模型: M_p{step-1}")
 
-        if load_model_path:  # 只能是 M_p0 模型
-            if "model_p" not in load_model_path:
-                raise ValueError("加载的模型名称必须是 M_px(x表示序号1,2...)。")
-                return
-
-        prev_model_path = os.path.join(ckpt_subdir, f"model_p{step-1}.pth")
+        prev_model_path = settings.get_ckpt_path(dataset_name, case, model_name,
+                                                 "worker_restore", step-1)
         print(f"加载模型: {prev_model_path}")
 
         if not os.path.exists(prev_model_path):
@@ -444,15 +345,12 @@ def train_step(
                 f"模型文件 {prev_model_path} 未找到。请先训练 M_p{step-1}。"
             )
 
-        prev_model_loaded = load_custom_model(
-            model_name=model_name, num_classes=num_classes, ckpt_path=prev_model_path
+        model_loaded = load_custom_model(
+            model_name=model_name, num_classes=num_classes, load_pretrained=False
         )
-        prev_model_loaded = ClassifierWrapper(prev_model_loaded, num_classes)
+        current_model = ClassifierWrapper(model_loaded, num_classes)
+        current_model.load_state_dict(torch.load(prev_model_path))
 
-        current_model = ClassifierWrapper(
-            load_custom_model(model_name, num_classes), num_classes=num_classes
-        )
-        current_model.load_state_dict(prev_model_loaded.state_dict())
         print(f"开始训练 M_p{step} on ({dataset_name})...")
 
         current_model = train_model(
@@ -461,164 +359,31 @@ def train_step(
             D_train_labels,
             D_test_data,
             D_test_labels,
-            epochs=epochs,
-            batch_size=batch_size,
-            optimizer_type=optimizer_type,
-            learning_rate=learning_rate,
-            weight_decay=weight_decay,
+            epochs=args.num_epochs,
+            batch_size=args.batch_size,
+            optimizer_type=args.optimizer,
+            learning_rate=args.learning_rate,
+            weight_decay=args.weight_decay,
             writer=writer,
         )
 
         # save current model
-        current_model_path = os.path.join(ckpt_subdir, f"model_p{step}.pth")
+        current_model_path = settings.get_ckpt_path(dataset_name, case,
+                                               model_name, "working_restore", step=step)
+        subdir = os.path.dirname(current_model_path)
+        os.makedirs(subdir, exist_ok=True)
         torch.save(current_model.state_dict(), current_model_path)
         print(f"M_p{step} 训练完毕并保存至 {current_model_path}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Train models step by step.")
-
-    parser.add_argument(
-        "--model",
-        type=str,
-        choices=["cifar-resnet18", "cifar-wideresnet40", "resnet18", "resnet50", "resnet101", "vgg19", "wideresnet50"],
-        required=True,
-        help="Select in (cifar-resnet18, cifar-wideresnet40, resnet18, resnet50, resnet101, vgg19, wideresnet50)",
-    )
-
-    parser.add_argument(
-        "--step",
-        type=int,
-        required=True,
-        help="Specify the step to execute: 0 for M_p0, 1 for M_p1, etc.",
-    )
-    parser.add_argument(
-        "--dataset_name",
-        type=str,
-        choices=["cifar-10", "cifar-100", "food-101", "pet-37"],
-        required=True,
-        help="选择数据集类型 (cifar-10 或 cifar-100 或 food-101)",
-    )
-    parser.add_argument(
-        "--noise_ratio",
-        type=float,
-        default=0.2,
-        help="噪声比例，与生成数据时使用的参数相匹配。",
-    )
-    parser.add_argument(
-        "--noise_type",
-        type=str,
-        choices=["symmetric", "asymmetric"],
-        default="symmetric",
-        help="标签噪声类型，与生成数据时使用的参数相匹配。",
-    )
-    parser.add_argument(
-        "--gen_dir",
-        type=str,
-        default="./data",
-        help="生成数据集的根目录。",
-    )
-    parser.add_argument(
-        "--output_dir",
-        type=str,
-        default="ckpt",
-        help="训练好的模型的保存目录。",
-    )
-    parser.add_argument(
-        "--load_model_path",
-        type=str,
-        default=None,
-        help="指定要加载的模型文件路径（可选）。",
-    )
-    parser.add_argument(
-        "--epochs",
-        type=int,
-        default=50,
-        help="训练的轮数",
-    )
-    parser.add_argument(
-        "--batch_size",
-        type=int,
-        default=256,
-        help="每批训练样本数",
-    )
-    parser.add_argument(
-        "--optimizer",
-        type=str,
-        choices=["adam", "sgd"],
-        default="adam",
-        help="选择优化器 (adam 或 sgd)",
-    )
-    parser.add_argument(
-        "--learning_rate",
-        type=float,
-        default=0.001,
-        help="学习率",
-    )
-    parser.add_argument(
-        "--weight_decay",
-        type=float,
-        default=5e-4,
-        help="权重衰减系数",
-    )
-    parser.add_argument(
-        "--balanced",
-        action="store_true",
-        help="是否使用类均衡的数据划分方式。如果不指定，则使用随机划分。",
-    )
-    parser.add_argument(
-        "--use_tensorboard", action="store_true", help="Use TensorBoard for logging."
-    )
-
-    args = parser.parse_args()
-
-    if args.balanced == True:
-        # 构建数据子目录路径
-        subdir = os.path.join(
-            args.gen_dir,
-            args.dataset_name,
-            "gen",
-            f"nr_{args.noise_ratio}_nt_{args.noise_type}_balanced",
-        )
-    else:
-        # 构建数据子目录路径
-        subdir = os.path.join(
-            args.gen_dir,
-            args.dataset_name,
-            "gen",
-            f"nr_{args.noise_ratio}_nt_{args.noise_type}",
-        )
-
-    if not os.path.exists(subdir):
-        raise FileNotFoundError(
-            f"数据子目录 {subdir} 不存在。请确保已生成相应的数据集。"
-        )
-
-    # 构建模型检查点子目录路径
-    ckpt_subdir = os.path.join(
-        args.output_dir,
-        args.dataset_name,
-        f"nr_{args.noise_ratio}_nt_{args.noise_type}",
-    )
-
-    print(f"使用数据子目录: {subdir}")
-    print(f"模型将保存至: {ckpt_subdir}")
+    args = parse_args()
 
     writer = SummaryWriter(log_dir="runs/experiment") if args.use_tensorboard else None
 
     train_step(
-        args.step,
-        subdir,
-        ckpt_subdir,
-        output_dir=ckpt_subdir,
-        dataset_name=args.dataset_name,
-        load_model_path=args.load_model_path,
-        epochs=args.epochs,
-        batch_size=args.batch_size,
-        optimizer_type=args.optimizer,
-        learning_rate=args.learning_rate,
+        args,
         writer=writer,
-        args=args,
     )
 
     if writer:

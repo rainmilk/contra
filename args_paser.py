@@ -110,16 +110,37 @@ def parse_args():
     parser.add_argument(
         "--noise_type",
         type=str,
-        default="gaussian",
-        choices=["gaussian", "salt_pepper"],
-        help="Type of noise to add to the selected classes, e.g., --noise_type gaussian or --noise_type salt_pepper (default: gaussian)",
+        choices=["symmetric", "asymmetric"],
+        default="symmetric",
+        help="Noise type to use, e.g., symmetric or asymmetric",
     )
 
     parser.add_argument(
-        "--noise_fraction",
+        "--balanced",
+        default=False,
+        action="store_true",
+        help="是否使用类均衡的数据划分方式。如果不指定，则使用随机划分。",
+    )
+
+    parser.add_argument(
+        "--tta_only",
+        default=False,
+        action="store_true",
+        help="TTA Only after model restoration",
+    )
+
+    parser.add_argument(
+        "--step",
+        type=int,
+        default=None,
+        help="Continual learning step",
+    )
+
+    parser.add_argument(
+        "--noise_ratio",
         type=float,
-        default=0.8,
-        help="Fraction of samples in the selected classes to add noise to, e.g., --noise_fraction 0.1 for 10%% noise injection (default: 0.8)",
+        default=0.2,
+        help="Noise ratio",
     )
 
     parser.add_argument(
@@ -220,6 +241,18 @@ def parse_args():
     # 捕获其他 kwargs
     parser.add_argument(
         "--kwargs", nargs="*", help="Additional key=value arguments for hyperparameters"
+    )
+
+    # 捕获其他 kwargs
+    parser.add_argument(
+        "--model_sufixx",
+        type=str,
+        default="unknown_suffix",
+        help="Suffix to save model name"
+    )
+
+    parser.add_argument(
+        "--use_tensorboard", action="store_true", help="Use TensorBoard for logging."
     )
 
     # 返回解析的参数
