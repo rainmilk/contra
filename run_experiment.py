@@ -302,8 +302,9 @@ def train_step(
             weight_decay=args.weight_decay,
             writer=writer,
         )
-        model_raw_path = settings.get_ckpt_path(dataset_name, case, model_name,
-                                                "worker_restore", unique_name=uni_name)
+        model_raw_path = settings.get_ckpt_path(
+            dataset_name, case, model_name, "worker_restore", unique_name=uni_name
+        )
         subdir = os.path.dirname(model_raw_path)
         os.makedirs(subdir, exist_ok=True)
         torch.save(model_raw.state_dict(), model_raw_path)
@@ -373,9 +374,14 @@ def train_step(
         # 打印用于训练的模型和数据
         print(f"用于训练的模型: M_p{step-1}")
 
-        prev_model_path = settings.get_ckpt_path(dataset_name, case, model_name,
-                                                 'worker_restore',
-                                                 step=step-1, unique_name=uni_name)
+        prev_model_path = settings.get_ckpt_path(
+            dataset_name,
+            case,
+            model_name,
+            "worker_restore",
+            step=step - 1,
+            unique_name=uni_name,
+        )
         print(f"加载模型: {prev_model_path}")
 
         if not os.path.exists(prev_model_path):
