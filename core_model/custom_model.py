@@ -47,7 +47,7 @@ def load_custom_model(model_name, num_classes, load_pretrained=True, ckpt_path=N
     if model and ckpt_path:
         checkpoint = torch.load(ckpt_path)
         model.load_state_dict(checkpoint, strict=False)
-
+        print('load worker model from :', ckpt_path)
     return model
 
 

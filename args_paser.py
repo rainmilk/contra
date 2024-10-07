@@ -267,7 +267,7 @@ def parse_args():
         help="Suffix to save model name",
     )
 
-    parser.add_argument("--uni_name", type=str, default=None, help="Model unique name")
+    parser.add_argument("--uni_name", type=str, default='contra', help="Model unique name")
 
     parser.add_argument(
         "--use_tensorboard", action="store_true", help="Use TensorBoard for logging."

@@ -374,7 +374,7 @@ def train_step(
         print(f"用于训练的模型: M_p{step-1}")
 
         prev_model_path = settings.get_ckpt_path(dataset_name, case, model_name,
-                                                 model_suffix,
+                                                 'worker_restore',
                                                  step=step-1, unique_name=uni_name)
         print(f"加载模型: {prev_model_path}")
 

@@ -429,6 +429,7 @@ def execute(args):
         if os.path.exists(lip_teacher_model_path):
             checkpoint = torch.load(lip_teacher_model_path)
             lip_teacher_model.load_state_dict(checkpoint, strict=False)
+            print('load teacher model from :', lip_teacher_model_path)
         else:
             # t0 的情况下，使用D0数据重新训练 lip_teacher model
             print(
@@ -471,7 +472,7 @@ def execute(args):
         # (3) 迭代修复过程：根据 Dtr 迭代 Mp 、 Mt
         conf_data, conf_labels = None, None
         for i in range(repair_iter_num):
-            print("-----------repair iterate %d ----------------------" % i)
+            print("-----------restore iterate %d ----------------------" % i)
             conf_data, conf_labels = iterate_repair_model(
                 working_model,
                 working_opt,
@@ -508,8 +509,8 @@ def execute(args):
             test_dataloader, lip_teacher_model, device=device
         )
 
-        logging.info(f"Test results before repair: {working_model_test_before}")
-        logging.info(f"Test results after repair: {working_model_after_repair}")
+        logging.info(f"Test results before restore: {working_model_test_before}")
+        logging.info(f"Test results after restore: {working_model_after_repair}")
 
         print(
             "---------------------working model test before------------------------------"
@@ -521,11 +522,11 @@ def execute(args):
         print(teacher_model_test_before)
 
         print(
-            "---------------------working model test after repair------------------------------"
+            "---------------------working model test after restore------------------------------"
         )
         print(working_model_after_repair)
         print(
-            "---------------------teacher model test after repair------------------------------"
+            "---------------------teacher model test after restore------------------------------"
         )
         print(teacher_model_after_repair)
 
@@ -547,7 +548,7 @@ def execute(args):
 
     # (2) 迭代测试数据适应过程：根据 混合的Dts 迭代 Mp 和 Mt
     for i in range(adapt_iter_num):
-        print("-----------adapt iterate %d ----------------------" % i)
+        print("-----------tta iterate %d ----------------------" % i)
         iterate_adapt_model(
             working_model,
             working_opt,
@@ -579,11 +580,11 @@ def execute(args):
     )
 
     print(
-        "---------------------working model test after adapt-------------------------------"
+        "---------------------working model test after tta-------------------------------"
     )
     print(working_model_after_adapt)
     print(
-        "---------------------teacher model test after adapt-------------------------------"
+        "---------------------teacher model test after tta-------------------------------"
     )
     print(teacher_model_after_adapt)
 

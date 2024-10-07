@@ -17,7 +17,7 @@ if __name__ == "__main__":
     num_epochs = getattr(args, "num_epochs", 50)
     model_name = getattr(args, "model", "resnet18")
     batch_size = getattr(args, "batch_size", 64)
-    model_suffix = getattr(args, "model_suffix", "teacher_restore")
+    model_suffix = "teacher_restore" if args.model_suffix is None else args.model_suffix
     step = getattr(args, "step", 0)
 
     noise_ratio = args.noise_ratio
