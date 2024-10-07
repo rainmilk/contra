@@ -423,7 +423,7 @@ def train_step(
             dataset_name,
             case,
             model_name,
-            "working_restore",
+            "worker_restore",
             step=step,
             unique_name=uni_name,
         )
