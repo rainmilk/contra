@@ -263,7 +263,7 @@ def parse_args():
     parser.add_argument(
         "--model_suffix",
         type=str,
-        default="unknown_suffix",
+        default=None,
         help="Suffix to save model name",
     )
 
