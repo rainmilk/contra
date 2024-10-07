@@ -36,11 +36,6 @@ def sample_class_balanced_data(class_data, split_ratio=0.5):
         D_inc_data.extend([samples[i] for i in shuffled_indices[split_idx:]])
         D_inc_labels.extend([class_label] * (num_samples - split_idx))
 
-    # D_0_data = torch.stack(D_0_data)
-    # D_0_labels = torch.tensor(D_0_labels)
-    # D_inc_data = torch.stack(D_inc_data)
-    # D_inc_labels = torch.tensor(D_inc_labels)
-
     D_0_data = np.stack(D_0_data)
     D_0_labels = np.array(D_0_labels)
     D_inc_data = np.stack(D_inc_data)
@@ -64,9 +59,6 @@ def sample_replay_data(D_0_data, D_0_labels, replay_ratio=0.1):
 
         D_a_data.extend([samples[i] for i in replay_indices])
         D_a_labels.extend([class_label] * num_replay_samples)
-
-    # D_a_data = torch.stack(D_a_data)
-    # D_a_labels = torch.tensor(D_a_labels)
 
     D_a_data = np.stack(D_a_data)
     D_a_labels = np.array(D_a_labels)
@@ -100,15 +92,10 @@ def create_cifar10_npy_files(
     train_data, train_labels = zip(*train_dataset)
     train_data = torch.stack(train_data)
     train_labels = torch.tensor(train_labels)
-    # train_data = torch.stack([train_dataset[i][0] for i in range(len(train_dataset))])
-    # train_labels = torch.tensor(
-    #     [train_dataset[i][1] for i in range(len(train_dataset))]
-    # )
+
     test_data, test_labels = zip(*test_dataset)
     test_data = torch.stack(test_data)
     test_labels = torch.tensor(test_labels)
-    # test_data = torch.stack([test_dataset[i][0] for i in range(len(test_dataset))])
-    # test_labels = torch.tensor([test_dataset[i][1] for i in range(len(test_dataset))])
 
     num_samples = len(train_data)
     indices = np.random.permutation(num_samples)
@@ -265,9 +252,6 @@ def create_cifar10_npy_files(
                 pass
 
         # 组合训练数据集 D_tr^{(t)}
-        # D_tr_data = torch.cat([D_f_data, D_n_data], dim=0)
-        # D_tr_labels = torch.cat([D_f_labels, D_n_labels], dim=0)
-
         D_tr_data = np.concatenate([D_f_data, D_n_data], axis=0)
         D_tr_labels = np.concatenate([D_f_labels, D_n_labels], axis=0)
 
@@ -276,13 +260,13 @@ def create_cifar10_npy_files(
         D_tr_data = D_tr_data[perm]
         D_tr_labels = D_tr_labels[perm]
 
-        # # 保存训练数据集
-        # torch.save(D_tr_data, os.path.join(subdir, f"D_tr_data_version_{t+1}.npy"))
-        # torch.save(D_tr_labels, os.path.join(subdir, f"D_tr_labels_version_{t+1}.npy"))
-
         # 保存训练数据集
-        train_data_path = settings.get_dataset_path(dataset_name, case, "train_data", t+1)
-        train_label_path = settings.get_dataset_path(dataset_name, case, "train_label", t+1)
+        train_data_path = settings.get_dataset_path(
+            dataset_name, case, "train_data", t + 1
+        )
+        train_label_path = settings.get_dataset_path(
+            dataset_name, case, "train_label", t + 1
+        )
 
         subdir = os.path.dirname(train_data_path)
         os.makedirs(subdir, exist_ok=True)

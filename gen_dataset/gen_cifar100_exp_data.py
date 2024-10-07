@@ -6,6 +6,7 @@ from torchvision import datasets, transforms
 import json
 
 import collections
+from configs import settings
 
 
 def split_by_class(data, labels, num_classes=100):
@@ -38,11 +39,6 @@ def sample_class_balanced_data(class_data, split_ratio=0.5):
         D_inc_data.extend([samples[i] for i in shuffled_indices[split_idx:]])
         D_inc_labels.extend([class_label] * (num_samples - split_idx))
 
-    # D_0_data = torch.stack(D_0_data)
-    # D_0_labels = torch.tensor(D_0_labels)
-    # D_inc_data = torch.stack(D_inc_data)
-    # D_inc_labels = torch.tensor(D_inc_labels)
-
     D_0_data = np.stack(D_0_data)
     D_0_labels = np.array(D_0_labels)
     D_inc_data = np.stack(D_inc_data)
@@ -66,9 +62,6 @@ def sample_replay_data(D_0_data, D_0_labels, replay_ratio=0.1):
 
         D_a_data.extend([samples[i] for i in replay_indices])
         D_a_labels.extend([class_label] * num_replay_samples)
-
-    # D_a_data = torch.stack(D_a_data)
-    # D_a_labels = torch.tensor(D_a_labels)
 
     D_a_data = np.stack(D_a_data)
     D_a_labels = np.array(D_a_labels)
@@ -153,20 +146,18 @@ def create_cifar100_npy_files(
     train_data, train_labels = zip(*train_dataset)
     train_data = torch.stack(train_data)
     train_labels = torch.tensor(train_labels)
-    # train_data = torch.stack([train_dataset[i][0] for i in range(len(train_dataset))])
-    # train_labels = torch.tensor(
-    #     [train_dataset[i][1] for i in range(len(train_dataset))]
-    # )
+
     test_data, test_labels = zip(*test_dataset)
     test_data = torch.stack(test_data)
     test_labels = torch.tensor(test_labels)
-    # test_data = torch.stack([test_dataset[i][0] for i in range(len(test_dataset))])
-    # test_labels = torch.tensor([test_dataset[i][1] for i in range(len(test_dataset))])
+
+    case = settings.get_case(noise_ratio, noise_type, balanced)
 
     # 根据 balanced 参数调整存储路径
     if balanced:
         print("使用类均衡的数据划分方式...")
-        subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}_balanced")
+        # subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}_balanced")
+        subdir = os.path.join(gen_dir, case)
         # 按类别划分训练数据
         class_data = split_by_class(train_data, train_labels)
 
@@ -182,7 +173,9 @@ def create_cifar100_npy_files(
 
     else:
         print("使用随机的数据划分方式...")
-        subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}")
+        # subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}")
+        subdir = os.path.join(gen_dir, case)
+
         # 随机划分初始数据集 D_0 和增量数据集 D_inc^(0)
         num_samples = len(train_data)
         indices = np.random.permutation(num_samples)
@@ -203,32 +196,67 @@ def create_cifar100_npy_files(
         D_a_data = D_0_data[D_a_indices]
         D_a_labels = D_0_labels[D_a_indices]
 
-    # 创建存储目录
+    dataset_name = "cifar-100"
+
+    aux_data_path = settings.get_dataset_path(dataset_name, case, "aux_data")
+    aux__label_path = settings.get_dataset_path(dataset_name, case, "aux_label")
+    train_data_path = settings.get_dataset_path(dataset_name, case, "train_data")
+    train_label_path = settings.get_dataset_path(dataset_name, case, "train_label")
+    test_data_path = settings.get_dataset_path(dataset_name, case, "test_data")
+    test_label_path = settings.get_dataset_path(dataset_name, case, "test_label")
+
+    subdir = os.path.dirname(train_data_path)
     os.makedirs(subdir, exist_ok=True)
 
-    # 检查 D_0 数据分布
-    print("D_0 Labels distribution:", collections.Counter(D_0_labels))
-
-    # 检查 D_inc 数据分布
-    print("D_inc Labels distribution:", collections.Counter(D_inc_labels))
-
-    # 保存初始数据集、初始增量数据集、重放数据集
-    np.save(os.path.join(subdir, "D_0.npy"), D_0_data)
-    np.save(os.path.join(subdir, "D_0_labels.npy"), D_0_labels)
-
-    np.save(os.path.join(subdir, "D_inc_0_data.npy"), D_inc_data)
-    np.save(os.path.join(subdir, "D_inc_0_labels.npy"), D_inc_labels)
-
-    np.save(os.path.join(subdir, "D_a.npy"), D_a_data)
-    np.save(os.path.join(subdir, "D_a_labels.npy"), D_a_labels)
+    np.save(aux_data_path, D_a_data)
+    np.save(aux__label_path, D_a_labels)
 
     # 保存训练数据集
-    np.save(os.path.join(subdir, "train_data.npy"), train_data)
-    np.save(os.path.join(subdir, "train_labels.npy"), train_labels)
+    np.save(train_data_path, train_data)
+    np.save(train_label_path, train_labels)
 
     # 保存测试数据集
-    np.save(os.path.join(subdir, "test_data.npy"), test_data)
-    np.save(os.path.join(subdir, "test_labels.npy"), test_labels)
+    np.save(test_data_path, test_data)
+    np.save(test_label_path, test_labels)
+
+    train_data_path = settings.get_dataset_path(dataset_name, case, "train_data", 0)
+    train_label_path = settings.get_dataset_path(dataset_name, case, "train_label", 0)
+    inc_data_path = settings.get_dataset_path(dataset_name, case, "inc_data")
+    inc_label_path = settings.get_dataset_path(dataset_name, case, "inc_label")
+
+    subdir = os.path.dirname(train_data_path)
+    os.makedirs(subdir, exist_ok=True)
+
+    # 保存初始数据集、初始增量数据集、重放数据集
+    np.save(train_data_path, D_0_data)
+    np.save(train_label_path, D_0_labels)
+
+    np.save(inc_data_path, D_inc_data)
+    np.save(inc_label_path, D_inc_labels)
+
+    # # 保存初始数据集、初始增量数据集、重放数据集
+    # np.save(os.path.join(subdir, "D_0.npy"), D_0_data)
+    # np.save(os.path.join(subdir, "D_0_labels.npy"), D_0_labels)
+
+    # np.save(os.path.join(subdir, "D_inc_0_data.npy"), D_inc_data)
+    # np.save(os.path.join(subdir, "D_inc_0_labels.npy"), D_inc_labels)
+
+    # np.save(os.path.join(subdir, "D_a.npy"), D_a_data)
+    # np.save(os.path.join(subdir, "D_a_labels.npy"), D_a_labels)
+
+    # # 保存训练数据集
+    # np.save(os.path.join(subdir, "train_data.npy"), train_data)
+    # np.save(os.path.join(subdir, "train_labels.npy"), train_labels)
+
+    # # 保存测试数据集
+    # np.save(os.path.join(subdir, "test_data.npy"), test_data)
+    # np.save(os.path.join(subdir, "test_labels.npy"), test_labels)
+
+    # # 检查 D_0 数据分布
+    # print("D_0 Labels distribution:", collections.Counter(D_0_labels))
+
+    # # 检查 D_inc 数据分布
+    # print("D_inc Labels distribution:", collections.Counter(D_inc_labels))
 
     num_classes = 100
 
@@ -247,11 +275,11 @@ def create_cifar100_npy_files(
     # 定义非对称噪声映射
 
     # 读取 CIFAR-100 类别
-    cifar100_classes_file = "./configs/classes/cifar_100_classes.txt"
+    cifar100_classes_file = "../configs/classes/cifar_100_classes.txt"
     cifar100_classes = load_classes_from_file(cifar100_classes_file)
 
     # 读取 CIFAR-100 的 superclass 和 child class 映射
-    cifar100_mapping_file = "./configs/classes/cifar_100_mapping.json"
+    cifar100_mapping_file = "../configs/classes/cifar_100_mapping.json"
     cifar100_superclass_mapping = load_cifar100_superclass_mapping(
         cifar100_mapping_file
     )
@@ -319,25 +347,31 @@ def create_cifar100_npy_files(
                 # 未被选中注入噪声的样本标签保持不变
                 pass
 
-        # D_tr_data = torch.cat([D_f_data, D_n_data], dim=0)
-        # D_tr_labels = torch.cat([D_f_labels, D_n_labels], dim=0)
-
         D_tr_data = np.concatenate([D_f_data, D_n_data], axis=0)
         D_tr_labels = np.concatenate([D_f_labels, D_n_labels], axis=0)
 
         # 打乱训练数据集
-        # perm = torch.randperm(len(D_tr_data))
         perm = np.random.permutation(len(D_tr_data))  # 使用 numpy 的随机打乱
         D_tr_data = D_tr_data[perm]
         D_tr_labels = D_tr_labels[perm]
 
         # 保存训练数据集
-        # torch.save(D_tr_data, os.path.join(subdir, f"D_tr_data_version_{t+1}.npy"))
-        # torch.save(D_tr_labels, os.path.join(subdir, f"D_tr_labels_version_{t+1}.npy"))
+        train_data_path = settings.get_dataset_path(
+            dataset_name, case, "train_data", t + 1
+        )
+        train_label_path = settings.get_dataset_path(
+            dataset_name, case, "train_label", t + 1
+        )
 
-        # 保存训练数据集
-        np.save(os.path.join(subdir, f"D_tr_data_version_{t+1}.npy"), D_tr_data)
-        np.save(os.path.join(subdir, f"D_tr_labels_version_{t+1}.npy"), D_tr_labels)
+        subdir = os.path.dirname(train_data_path)
+        os.makedirs(subdir, exist_ok=True)
+
+        np.save(train_data_path, D_tr_data)
+        np.save(train_label_path, D_tr_labels)
+
+        # # 保存训练数据集
+        # np.save(os.path.join(subdir, f"D_tr_data_version_{t+1}.npy"), D_tr_data)
+        # np.save(os.path.join(subdir, f"D_tr_labels_version_{t+1}.npy"), D_tr_labels)
 
         print(f"D_tr 版本 {t+1} 已保存到 {subdir}")
 
