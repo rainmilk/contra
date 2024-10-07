@@ -17,7 +17,6 @@ from train_test import model_train, model_test, model_forward
 from configs import settings
 
 
-
 def train_teacher_model(
     args,
     step,
@@ -359,12 +358,54 @@ def execute(args):
     tta_only = getattr(args, "tta_only", False)
     uni_name = getattr(args, "uni_name", None)
 
-    working_model_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="worker_restore", step=step-1, unique_name=uni_name) # model_paths["working_model_path"]
-    working_model_repair_save_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="worker_restore", step=step, unique_name=uni_name)
-    working_model_adapt_save_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="worker_tta", step=step, unique_name=uni_name)
-    lip_teacher_model_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="teacher_restore", step=step-1, unique_name=uni_name)
-    teacher_model_repair_save_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="teacher_restore", step=step, unique_name=uni_name)
-    teacher_model_adapt_save_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="teacher_tta", step=step, unique_name=uni_name)
+    working_model_path = settings.get_ckpt_path(
+        args.dataset,
+        case,
+        args.model,
+        model_suffix="worker_restore",
+        step=step - 1,
+        unique_name=uni_name,
+    )  # model_paths["working_model_path"]
+    working_model_repair_save_path = settings.get_ckpt_path(
+        args.dataset,
+        case,
+        args.model,
+        model_suffix="worker_restore",
+        step=step,
+        unique_name=uni_name,
+    )
+    working_model_adapt_save_path = settings.get_ckpt_path(
+        args.dataset,
+        case,
+        args.model,
+        model_suffix="worker_tta",
+        step=step,
+        unique_name=uni_name,
+    )
+    lip_teacher_model_path = settings.get_ckpt_path(
+        args.dataset,
+        case,
+        args.model,
+        model_suffix="teacher_restore",
+        step=step - 1,
+        unique_name=uni_name,
+    )
+    teacher_model_repair_save_path = settings.get_ckpt_path(
+        args.dataset,
+        case,
+        args.model,
+        model_suffix="teacher_restore",
+        step=step,
+        unique_name=uni_name,
+    )
+    teacher_model_adapt_save_path = settings.get_ckpt_path(
+        args.dataset,
+        case,
+        args.model,
+        model_suffix="teacher_tta",
+        step=step,
+        unique_name=uni_name,
+    )
 
     mean, std = None, None
     # if args.dataset == "cifar-10":

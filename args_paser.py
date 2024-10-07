@@ -57,10 +57,10 @@ def parse_args():
         choices=[
             "cifar-10",
             "cifar-100",
+            "pet-37",
             "flowers-102",
             "tiny-imagenet-200",
             "food-101",
-            "pet-37",
         ],
         help="Dataset name, choose from: cifar-10, cifar-100, flowers-102, tiny-imagenet-200, food-101",
     )
@@ -69,13 +69,13 @@ def parse_args():
         "--model",
         type=str,
         choices=[
-            "cifar-resnet18",
-            "cifar-wideresnet40",
+            "cifar-resnet18",  # default for cifar-10
+            "cifar-wideresnet40",  # default for cifar-100
+            "wideresnet50",  # default for pet-37
             "resnet18",
             "resnet50",
             "resnet101",
             "vgg19",
-            "wideresnet50",
         ],
         required=True,
         help="Select in (cifar-resnet18, cifar-wideresnet40, resnet18, resnet50, resnet101, vgg19, wideresnet50)",
