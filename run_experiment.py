@@ -260,6 +260,7 @@ def train_step(
     step = args.step
     case = settings.get_case(args.noise_ratio, args.noise_type, args.balanced)
     uni_name = args.uni_name
+    model_suffix = "worker_raw" if args.model_suffix is None else args.model_suffix
     if step < 0:
 
         D_train_data = np.load(settings.get_dataset_path(dataset_name, case, "train_data"))
@@ -290,7 +291,7 @@ def train_step(
             writer=writer,
         )
         model_raw_path = settings.get_ckpt_path(dataset_name, case, model_name,
-                                                "worker_restore", unique_name=uni_name)
+                                                model_suffix, unique_name=uni_name)
         subdir = os.path.dirname(model_raw_path)
         os.makedirs(subdir, exist_ok=True)
         torch.save(model_raw.state_dict(), model_raw_path)
@@ -340,7 +341,7 @@ def train_step(
         print(f"用于训练的模型: M_p{step-1}")
 
         prev_model_path = settings.get_ckpt_path(dataset_name, case, model_name,
-                                                 "worker_restore",
+                                                 model_suffix,
                                                  step=step-1, unique_name=uni_name)
         print(f"加载模型: {prev_model_path}")
 
@@ -373,7 +374,7 @@ def train_step(
 
         # save current model
         current_model_path = settings.get_ckpt_path(dataset_name, case,
-                                               model_name, "working_restore",
+                                               model_name, model_suffix,
                                                step=step, unique_name=uni_name)
         subdir = os.path.dirname(current_model_path)
         os.makedirs(subdir, exist_ok=True)
