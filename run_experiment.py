@@ -262,7 +262,15 @@ def train_step(
 
     model_name = args.model
     step = args.step
-    case = settings.get_case(args.noise_ratio, args.noise_type, args.balanced)
+    
+    if args.balanced == True:
+        case = settings.get_case(args.noise_ratio, args.noise_type, "balanced")
+        print(f"condition: ", case)
+    else:
+        case = settings.get_case(args.noise_ratio, args.noise_type)
+        print(f"condition: ", case)
+    
+
     uni_name = args.uni_name
     if step < 0:
 

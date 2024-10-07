@@ -272,8 +272,6 @@ def create_cifar100_npy_files(
         i for i in range(len(D_inc_labels)) if D_inc_labels[i] in noise_classes
     ]
 
-    # 定义非对称噪声映射
-
     # 读取 CIFAR-100 类别
     cifar100_classes_file = "../configs/classes/cifar_100_classes.txt"
     cifar100_classes = load_classes_from_file(cifar100_classes_file)
