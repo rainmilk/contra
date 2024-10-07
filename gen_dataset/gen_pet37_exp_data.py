@@ -9,6 +9,7 @@ from torchvision import datasets, transforms
 import json
 
 import collections
+from configs import settings
 
 
 def split_by_class(data, labels, num_classes=37):
@@ -149,10 +150,13 @@ def create_pet37_npy_files(
     test_data = torch.stack(test_data)
     test_labels = torch.tensor(test_labels)
 
+    case = settings.get_case(noise_ratio, noise_type, balanced)
+
     # 根据 balanced 参数调整存储路径
     if balanced:
         print("使用类均衡的数据划分方式...")
-        subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}_balanced")
+        # subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}_balanced")
+        subdir = os.path.join(gen_dir, case)
 
         # 按类别划分训练数据
         class_data = split_by_class(train_data, train_labels)
@@ -169,7 +173,7 @@ def create_pet37_npy_files(
 
     else:
         print("使用随机的数据划分方式...")
-        subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}")
+        subdir = os.path.join(gen_dir, case)
 
         # 随机划分初始数据集 D_0 和增量数据集 D_inc^(0)
         num_samples = len(train_data)
@@ -191,49 +195,76 @@ def create_pet37_npy_files(
         D_a_data = D_0_data[D_a_indices]
         D_a_labels = D_0_labels[D_a_indices]
 
-    # 创建存储目录
+    dataset_name = "pet-37"
+
+    aux_data_path = settings.get_dataset_path(dataset_name, case, "aux_data")
+    aux__label_path = settings.get_dataset_path(dataset_name, case, "aux_label")
+    train_data_path = settings.get_dataset_path(dataset_name, case, "train_data")
+    train_label_path = settings.get_dataset_path(dataset_name, case, "train_label")
+    test_data_path = settings.get_dataset_path(dataset_name, case, "test_data")
+    test_label_path = settings.get_dataset_path(dataset_name, case, "test_label")
+
+    subdir = os.path.dirname(train_data_path)
     os.makedirs(subdir, exist_ok=True)
 
-    # 检查 D_0 数据分布
-    print("D_0 Labels distribution:", collections.Counter(D_0_labels))
-
-    # 检查 D_inc 数据分布
-    print("D_inc Labels distribution:", collections.Counter(D_inc_labels))
-
-    # 保存初始数据集、初始增量数据集、重放数据集
-    np.save(os.path.join(subdir, "D_0.npy"), D_0_data)
-    np.save(os.path.join(subdir, "D_0_labels.npy"), D_0_labels)
-
-    np.save(os.path.join(subdir, "D_inc_0_data.npy"), D_inc_data)
-    np.save(os.path.join(subdir, "D_inc_0_labels.npy"), D_inc_labels)
-
-    np.save(os.path.join(subdir, "D_a.npy"), D_a_data)
-    np.save(os.path.join(subdir, "D_a_labels.npy"), D_a_labels)
+    np.save(aux_data_path, D_a_data)
+    np.save(aux__label_path, D_a_labels)
 
     # 保存训练数据集
-    np.save(os.path.join(subdir, "train_data.npy"), train_data)
-    np.save(os.path.join(subdir, "train_labels.npy"), train_labels)
+    np.save(train_data_path, train_data)
+    np.save(train_label_path, train_labels)
 
     # 保存测试数据集
-    np.save(os.path.join(subdir, "test_data.npy"), test_data)
-    np.save(os.path.join(subdir, "test_labels.npy"), test_labels)
+    np.save(test_data_path, test_data)
+    np.save(test_label_path, test_labels)
+
+    train_data_path = settings.get_dataset_path(dataset_name, case, "train_data", 0)
+    train_label_path = settings.get_dataset_path(dataset_name, case, "train_label", 0)
+    inc_data_path = settings.get_dataset_path(dataset_name, case, "inc_data")
+    inc_label_path = settings.get_dataset_path(dataset_name, case, "inc_label")
+
+    subdir = os.path.dirname(train_data_path)
+    os.makedirs(subdir, exist_ok=True)
+
+    # 保存初始数据集、初始增量数据集、重放数据集
+    np.save(train_data_path, D_0_data)
+    np.save(train_label_path, D_0_labels)
+
+    np.save(inc_data_path, D_inc_data)
+    np.save(inc_label_path, D_inc_labels)
+
+    # # 创建存储目录
+    # os.makedirs(subdir, exist_ok=True)
+
+    # # 检查 D_0 数据分布
+    # print("D_0 Labels distribution:", collections.Counter(D_0_labels))
+
+    # # 检查 D_inc 数据分布
+    # print("D_inc Labels distribution:", collections.Counter(D_inc_labels))
+
+    # # 保存初始数据集、初始增量数据集、重放数据集
+    # np.save(os.path.join(subdir, "D_0.npy"), D_0_data)
+    # np.save(os.path.join(subdir, "D_0_labels.npy"), D_0_labels)
+
+    # np.save(os.path.join(subdir, "D_inc_0_data.npy"), D_inc_data)
+    # np.save(os.path.join(subdir, "D_inc_0_labels.npy"), D_inc_labels)
+
+    # np.save(os.path.join(subdir, "D_a.npy"), D_a_data)
+    # np.save(os.path.join(subdir, "D_a_labels.npy"), D_a_labels)
+
+    # # 保存训练数据集
+    # np.save(os.path.join(subdir, "train_data.npy"), train_data)
+    # np.save(os.path.join(subdir, "train_labels.npy"), train_labels)
+
+    # # 保存测试数据集
+    # np.save(os.path.join(subdir, "test_data.npy"), test_data)
+    # np.save(os.path.join(subdir, "test_labels.npy"), test_labels)
 
     num_classes = 37
 
     # 定义遗忘类别和噪声类别
     forget_classes = list(range(18))  # 前18个类别作为遗忘类别
     noise_classes = list(range(18, 28))  # 接下来的10个类别作为噪声类别
-
-    # 读取 Oxford-Pets 类别
-    pet37_classes_file = "./configs/classes/pet_37_classes.txt"
-    pet37_classes = load_classes_from_file(pet37_classes_file)
-
-    # 打印读取到的类别信息
-    print("PET-37 Classes:", pet37_classes)
-
-    # 读取 Oxford-Pets 的 superclass 和 child class 映射
-    pet37_mapping_file = "./configs/classes/pet_37_mapping.json"
-    pet37_superclass_mapping = load_pet37_superclass_mapping(pet37_mapping_file)
 
     # 获取增量数据集中的遗忘类别和噪声类别的索引
     D_inc_forget_indices = [
@@ -242,6 +273,17 @@ def create_pet37_npy_files(
     D_inc_noise_indices = [
         i for i in range(len(D_inc_labels)) if D_inc_labels[i] in noise_classes
     ]
+
+    # 读取 Oxford-Pets 类别
+    pet37_classes_file = "../configs/classes/pet_37_classes.txt"
+    pet37_classes = load_classes_from_file(pet37_classes_file)
+
+    # 打印读取到的类别信息
+    print("PET-37 Classes:", pet37_classes)
+
+    # 读取 Oxford-Pets 的 superclass 和 child class 映射
+    pet37_mapping_file = "../configs/classes/pet_37_mapping.json"
+    pet37_superclass_mapping = load_pet37_superclass_mapping(pet37_mapping_file)
 
     # 构建非对称映射，如果选择了非对称噪声
     if noise_type == "asymmetric":
@@ -311,10 +353,24 @@ def create_pet37_npy_files(
         D_tr_labels = D_tr_labels[perm]
 
         # 保存训练数据集
-        np.save(os.path.join(subdir, f"D_tr_data_version_{t+1}.npy"), D_tr_data)
-        np.save(os.path.join(subdir, f"D_tr_labels_version_{t+1}.npy"), D_tr_labels)
+        train_data_path = settings.get_dataset_path(
+            dataset_name, case, "train_data", t + 1
+        )
+        train_label_path = settings.get_dataset_path(
+            dataset_name, case, "train_label", t + 1
+        )
 
-        print(f"D_tr 版本 {t+1} 已保存到 {subdir}")
+        subdir = os.path.dirname(train_data_path)
+        os.makedirs(subdir, exist_ok=True)
+
+        np.save(train_data_path, D_tr_data)
+        np.save(train_label_path, D_tr_labels)
+
+        # 保存训练数据集
+        # np.save(os.path.join(subdir, f"D_tr_data_version_{t+1}.npy"), D_tr_data)
+        # np.save(os.path.join(subdir, f"D_tr_labels_version_{t+1}.npy"), D_tr_labels)
+
+        # print(f"D_tr 版本 {t+1} 已保存到 {subdir}")
 
     print("所有数据集生成完毕。")
 

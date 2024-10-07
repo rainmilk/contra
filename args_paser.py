@@ -1,5 +1,6 @@
 import os
 import argparse
+
 # from run_experiment import run_experiment
 
 
@@ -53,14 +54,29 @@ def parse_args():
         type=str,
         required=True,
         default="cifar-10",
-        choices=["cifar-10", "cifar-100", "flowers-102", "tiny-imagenet-200", "food-101", "pet-37"],
-        help="Dataset name, choose from: cifar-10, cifar-100, flowers-102, tiny-imagenet-200, food-101"
+        choices=[
+            "cifar-10",
+            "cifar-100",
+            "pet-37",
+            "flowers-102",
+            "tiny-imagenet-200",
+            "food-101",
+        ],
+        help="Dataset name, choose from: cifar-10, cifar-100, flowers-102, tiny-imagenet-200, food-101",
     )
 
     parser.add_argument(
         "--model",
         type=str,
-        choices=["cifar-resnet18", "cifar-wideresnet40", "resnet18", "resnet50", "resnet101", "vgg19", "wideresnet50"],
+        choices=[
+            "cifar-resnet18",  # default for cifar-10
+            "cifar-wideresnet40",  # default for cifar-100
+            "wideresnet50",  # default for pet-37
+            "resnet18",
+            "resnet50",
+            "resnet101",
+            "vgg19",
+        ],
         required=True,
         help="Select in (cifar-resnet18, cifar-wideresnet40, resnet18, resnet50, resnet101, vgg19, wideresnet50)",
     )
@@ -248,15 +264,10 @@ def parse_args():
         "--model_sufixx",
         type=str,
         default="unknown_suffix",
-        help="Suffix to save model name"
+        help="Suffix to save model name",
     )
 
-    parser.add_argument(
-        "--uni_name",
-        type=str,
-        default=None,
-        help="Model unique name"
-    )
+    parser.add_argument("--uni_name", type=str, default=None, help="Model unique name")
 
     parser.add_argument(
         "--use_tensorboard", action="store_true", help="Use TensorBoard for logging."

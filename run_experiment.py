@@ -128,7 +128,9 @@ def train_model(
     )
 
     dataset = BaseTensorDataset(data, labels, device=device)
-    dataloader = DataLoader(dataset, batch_size=batch_size, drop_last=True, shuffle=True)
+    dataloader = DataLoader(
+        dataset, batch_size=batch_size, drop_last=True, shuffle=True
+    )
 
     test_dataset = BaseTensorDataset(test_data, test_labels, device=device)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
@@ -254,7 +256,9 @@ def train_step(
     # 打印当前执行的参数
     print(f"===== 执行步骤: {args.step} =====")
     print(f"数据集类型: {dataset_name}")
-    print(f"Epochs: {args.num_epochs}, Batch Size: {args.batch_size}, Learning Rate: {args.learning_rate}")
+    print(
+        f"Epochs: {args.num_epochs}, Batch Size: {args.batch_size}, Learning Rate: {args.learning_rate}"
+    )
 
     model_name = args.model
     step = args.step
@@ -263,10 +267,18 @@ def train_step(
     model_suffix = "worker_raw" if args.model_suffix is None else args.model_suffix
     if step < 0:
 
-        D_train_data = np.load(settings.get_dataset_path(dataset_name, case, "train_data"))
-        D_train_labels = np.load(settings.get_dataset_path(dataset_name, case, "train_label"))
-        D_test_data = np.load(settings.get_dataset_path(dataset_name, case, "test_data"))
-        D_test_labels = np.load(settings.get_dataset_path(dataset_name, case, "test_label"))
+        D_train_data = np.load(
+            settings.get_dataset_path(dataset_name, case, "train_data")
+        )
+        D_train_labels = np.load(
+            settings.get_dataset_path(dataset_name, case, "train_label")
+        )
+        D_test_data = np.load(
+            settings.get_dataset_path(dataset_name, case, "test_data")
+        )
+        D_test_labels = np.load(
+            settings.get_dataset_path(dataset_name, case, "test_label")
+        )
 
         # 打印用于训练的模型和数据
         print("用于训练的数据: train_data.npy 和 train_labels.npy")
@@ -291,17 +303,25 @@ def train_step(
             writer=writer,
         )
         model_raw_path = settings.get_ckpt_path(dataset_name, case, model_name,
-                                                model_suffix, unique_name=uni_name)
+                                                "worker_restore", unique_name=uni_name)
         subdir = os.path.dirname(model_raw_path)
         os.makedirs(subdir, exist_ok=True)
         torch.save(model_raw.state_dict(), model_raw_path)
         print(f"M_raw 训练完毕并保存至 {model_raw_path}")
         return
     elif step == 0:  # 基于$D_0$数据集和原始的resnet网络训练一个模型 M_p0
-        D_train_data = np.load(settings.get_dataset_path(dataset_name, case, "train_data", step=step))
-        D_train_labels = np.load(settings.get_dataset_path(dataset_name, case, "train_label", step=step))
-        D_test_data = np.load(settings.get_dataset_path(dataset_name, case, "test_data"))
-        D_test_labels = np.load(settings.get_dataset_path(dataset_name, case, "test_label"))
+        D_train_data = np.load(
+            settings.get_dataset_path(dataset_name, case, "train_data", step=step)
+        )
+        D_train_labels = np.load(
+            settings.get_dataset_path(dataset_name, case, "train_label", step=step)
+        )
+        D_test_data = np.load(
+            settings.get_dataset_path(dataset_name, case, "test_data")
+        )
+        D_test_labels = np.load(
+            settings.get_dataset_path(dataset_name, case, "test_label")
+        )
 
         # 打印用于训练的模型和数据
         print("用于训练的数据: D_0.npy 和 D_0_labels.npy")
@@ -323,19 +343,32 @@ def train_step(
             weight_decay=args.weight_decay,
             writer=writer,
         )
-        model_p0_path = settings.get_ckpt_path(dataset_name, case,
-                                               model_name, "worker_restore",
-                                               step=step, unique_name=uni_name)
+        model_p0_path = settings.get_ckpt_path(
+            dataset_name,
+            case,
+            model_name,
+            "worker_restore",
+            step=step,
+            unique_name=uni_name,
+        )
         subdir = os.path.dirname(model_p0_path)
         os.makedirs(subdir, exist_ok=True)
         torch.save(model_p0.state_dict(), model_p0_path)
         print(f"M_p0 训练完毕并保存至 {model_p0_path}")
     else:  # 从外部加载通过命令行指定的某个模型
         # 加载当前步骤的训练数据
-        D_train_data = np.load(settings.get_dataset_path(dataset_name, case, "train_data", step=step))
-        D_train_labels = np.load(settings.get_dataset_path(dataset_name, case, "train_label", step=step))
-        D_test_data = np.load(settings.get_dataset_path(dataset_name, case, "test_data"))
-        D_test_labels = np.load(settings.get_dataset_path(dataset_name, case, "test_label"))
+        D_train_data = np.load(
+            settings.get_dataset_path(dataset_name, case, "train_data", step=step)
+        )
+        D_train_labels = np.load(
+            settings.get_dataset_path(dataset_name, case, "train_label", step=step)
+        )
+        D_test_data = np.load(
+            settings.get_dataset_path(dataset_name, case, "test_data")
+        )
+        D_test_labels = np.load(
+            settings.get_dataset_path(dataset_name, case, "test_label")
+        )
 
         # 打印用于训练的模型和数据
         print(f"用于训练的模型: M_p{step-1}")
@@ -373,9 +406,14 @@ def train_step(
         )
 
         # save current model
-        current_model_path = settings.get_ckpt_path(dataset_name, case,
-                                               model_name, model_suffix,
-                                               step=step, unique_name=uni_name)
+        current_model_path = settings.get_ckpt_path(
+            dataset_name,
+            case,
+            model_name,
+            model_suffix,
+            step=step,
+            unique_name=uni_name,
+        )
         subdir = os.path.dirname(current_model_path)
         os.makedirs(subdir, exist_ok=True)
         torch.save(current_model.state_dict(), current_model_path)
