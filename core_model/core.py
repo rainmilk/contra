@@ -440,6 +440,7 @@ def execute(args):
             train_teacher_model(
                 args,
                 0,
+                num_classes,
                 lip_teacher_model,
                 teacher_opt,
                 teacher_lr_scheduler,
