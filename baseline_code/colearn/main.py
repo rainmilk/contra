@@ -14,17 +14,20 @@ import numpy as np
 import nni
 import torch
 
-from datasets.our_dataset import get_dataset_loader
+from core_model.dataset import get_dataset_loader
+from args_paser import parse_args
+from configs import settings
+from core_model.custom_model import load_custom_model, ClassifierWrapper
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "--config",
     "-c",
     type=str,
-    default="./configs/standardCE.py",
+    default="./co_configs/standardCE.py",
     help="The path of config file.",
 )
-args = parser.parse_args()
+# args = parser.parse_args()
 
 
 def main():
@@ -34,10 +37,19 @@ def main():
     # config.update(tuner_params)
     # print_config(config)
 
-    # todo choose model config (support 3 models)
-    # from configs.coteachingplus import config
-    # from configs.coteaching import config
-    from configs.jocor import config
+    custom_args = parse_args()
+    case = settings.get_case(custom_args.noise_ratio, custom_args.noise_type, custom_args.balanced)
+    step = getattr(custom_args, "step", 1)
+    uni_name = getattr(custom_args, "uni_name", None)
+    num_classes = settings.num_classes_dict[custom_args.dataset]
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    if uni_name == 'coteaching_plus':
+        from co_configs.coteachingplus import config
+    elif uni_name == 'coteaching':
+        from co_configs.coteaching import config
+    elif uni_name == 'jocor':
+        from co_configs.jocor import config
 
     set_seed(config["seed"])
 
@@ -45,14 +57,14 @@ def main():
         model = algorithms.Colearning(
             config,
             input_channel=config["input_channel"],
-            num_classes=config["num_classes"],
+            num_classes=num_classes,
         )
         train_mode = "train"
     else:
         model = algorithms.__dict__[config["algorithm"]](
             config,
             input_channel=config["input_channel"],
-            num_classes=config["num_classes"],
+            num_classes=num_classes,
         )
         train_mode = "train_single"
 
@@ -68,56 +80,45 @@ def main():
     # dora modify dataloader and load model
     # trainloader, testloader = dataloaders.run(mode=train_mode), dataloaders.run(mode='test')
 
-    # todo get corrected dataset and model path
-    dataset_paths = {
-        "cifar-10": "../../data/cifar-10",
-        "cifar-100": "../data/cifar-100",
-        "pet-37": "../../data/pet-37",
-        # "food-101": "../data/food-101",
-        # "flowers-102": "../data/flowers-102",
-        # "tiny-imagenet-200": "../data/tiny-imagenet-200",
-    }
-    model_paths = {
-        "cifar-10": "../../ckpt/cifar-10/p1_checkpoint.pth",
-        "cifar-100": "../../ckpt/cifar-100/p1_checkpoint.pth",
-        "pet-37": "../../ckpt/pet-37/p1_checkpoint.pth",
-    }
-
-    # mode_path = r"../../ckpt/cifar-10/p1_checkpoint.pth"
-
-    dataset_path = dataset_paths[config["dataset"]]
-    model_path = model_paths["cifar-10"]
-
-    _, trainloader = get_dataset_loader(
-        config["dataset"],
-        "inc",
-        dataset_path,
-        config["batch_size"],
-        drop_last=True,
-        shuffle=True,
+    # get corrected dataset and model path
+    _, _, trainloader = get_dataset_loader(
+        custom_args.dataset, "train", case, step, None, None, custom_args.batch_size, shuffle=False
     )
 
-    _, testloader = get_dataset_loader(
-        config["dataset"], "test", dataset_path, config["batch_size"], shuffle=False
+    _, _, testloader = get_dataset_loader(
+        custom_args.dataset, "test", case, None, None, None, custom_args.batch_size, shuffle=False
     )
+
     num_test_images = len(testloader.dataset)
 
-    checkpoint = torch.load(model_path)
-    model.model1.load_state_dict(checkpoint, strict=False)
-    model.model2.load_state_dict(checkpoint, strict=False)
+    load_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model, model_suffix="worker_raw",
+                                        step=step, unique_name=uni_name)
+    save_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model, model_suffix="worker_restore",
+                                        step=step, unique_name=uni_name)
+    # checkpoint = torch.load(load_model_path)
+
+    model.epochs = custom_args.num_epochs
+
+    loaded_model = load_custom_model(custom_args.model, num_classes, ckpt_path=load_model_path)
+    model.model1 = ClassifierWrapper(loaded_model, num_classes)
+    model.model2 = ClassifierWrapper(loaded_model, num_classes)
+    model.model1.to(device)
+    model.model2.to(device)
+    # model.model1.load_state_dict(checkpoint, strict=False)
+    # model.model2.load_state_dict(checkpoint, strict=False)
 
     epoch = 0
     # evaluate models with random weights
     test_acc = get_test_acc(model.evaluate(testloader))
     print(
         "Epoch [%d/%d] Test Accuracy on the %s test images: %.4f"
-        % (epoch + 1, config["epochs"], num_test_images, test_acc)
+        % (epoch + 1, custom_args.num_epochs, num_test_images, test_acc)
     )
 
     acc_list, acc_all_list = [], []
     best_acc, best_epoch = 0.0, 0
 
-    for epoch in range(1, config["epochs"]):
+    for epoch in range(1, custom_args.num_epochs):
         # train
         model.train(trainloader, epoch)
         # evaluate
@@ -128,12 +129,16 @@ def main():
 
         print(
             "Epoch [%d/%d] Test Accuracy on the %s test images: %.4f %%"
-            % (epoch + 1, config["epochs"], num_test_images, test_acc)
+            % (epoch + 1, custom_args.num_epochs, num_test_images, test_acc)
         )
 
-        if epoch >= config["epochs"] - 10:
+        if epoch >= custom_args.num_epochs - 10:
             acc_list.extend([test_acc])
         acc_all_list.extend([test_acc])
+
+        # todo save model model1? model2?
+        torch.save(model.model1.state_dict(), save_model_path)
+        print('model saved to:', save_model_path)
 
     if config["save_result"]:
         acc_np = np.array(acc_list)
