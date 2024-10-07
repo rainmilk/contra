@@ -13,6 +13,8 @@ import algorithms
 import numpy as np
 import nni
 import torch
+import os
+import shutil
 
 from core_model.dataset import get_dataset_loader
 from args_paser import parse_args
@@ -82,7 +84,7 @@ def main():
 
     # get corrected dataset and model path
     _, _, trainloader = get_dataset_loader(
-        custom_args.dataset, "train", case, step, None, None, custom_args.batch_size, shuffle=False
+        custom_args.dataset, "train", case, step, None, None, custom_args.batch_size, shuffle=True
     )
 
     _, _, testloader = get_dataset_loader(
@@ -91,8 +93,16 @@ def main():
 
     num_test_images = len(testloader.dataset)
 
-    load_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model, model_suffix="worker_raw",
-                                        step=step, unique_name=uni_name)
+    load_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model, model_suffix="worker_restore",
+                                        step=step-1, unique_name=uni_name)
+    # step=1, copy contra/step_0/ -> target/step_0
+    if step == 1 and not os.path.exists(load_model_path):
+        contra_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model, model_suffix="worker_restore",
+                                        step=step-1, unique_name="contra")
+        os.makedirs(os.path.dirname(load_model_path), exist_ok=True)
+        shutil.copy(contra_model_path, load_model_path)
+        print('copy contra model: %s to : %s' % (contra_model_path, load_model_path))
+
     save_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model, model_suffix="worker_restore",
                                         step=step, unique_name=uni_name)
     # checkpoint = torch.load(load_model_path)
@@ -101,6 +111,7 @@ def main():
 
     loaded_model = load_custom_model(custom_args.model, num_classes, ckpt_path=load_model_path)
     model.model1 = ClassifierWrapper(loaded_model, num_classes)
+
     model.model2 = ClassifierWrapper(loaded_model, num_classes)
     model.model1.to(device)
     model.model2.to(device)
@@ -136,7 +147,8 @@ def main():
             acc_list.extend([test_acc])
         acc_all_list.extend([test_acc])
 
-        # todo save model model1? model2?
+        # save model1
+        os.makedirs(os.path.dirname(save_model_path), exist_ok=True)
         torch.save(model.model1.state_dict(), save_model_path)
         print('model saved to:', save_model_path)
 

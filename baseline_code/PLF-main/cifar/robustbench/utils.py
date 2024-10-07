@@ -202,7 +202,8 @@ def clean_accuracy(model: nn.Module,
                    x: torch.Tensor,
                    y: torch.Tensor,
                    batch_size: int = 100,
-                   device: torch.device = None):
+                   device: torch.device = None,
+                   save_path=''):
     if device is None:
         device = x.device
     acc = 0.
@@ -218,6 +219,10 @@ def clean_accuracy(model: nn.Module,
             corrected_num = (output.max(1)[1] == y_curr).float().sum()
             acc += corrected_num
             print('batch %d, corrected_num: %d' % (counter, corrected_num.item()))
+        # save step model_tta
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        torch.save(model.state_dict(), save_path)
+        print('model saved to:', save_path)
 
     return acc.item() / x.shape[0]
 

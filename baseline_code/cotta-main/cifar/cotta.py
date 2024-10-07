@@ -12,11 +12,15 @@ from torchvision.transforms import InterpolationMode
 import my_transforms as my_transforms
 from time import time
 import logging
+from core_model.custom_model import load_custom_model, ClassifierWrapper
+from configs import settings
 
 
-def get_tta_transforms(gaussian_std: float = 0.005, soft=False, clip_inputs=False):
+def get_tta_transforms(gaussian_std: float = 0.005, soft=False, clip_inputs=False, dataset=''):
     # todo modify shape cifar10 cifar100 为 (32, 32,3) 新数据集待修改
     img_shape = (32, 32, 3)
+    if dataset == 'pet-37':
+        img_shape = (224, 224, 3)
     n_pixels = img_shape[0]
 
     clip_min, clip_max = 0.0, 1.0
@@ -72,6 +76,7 @@ class CoTTA(nn.Module):
         self,
         model,
         optimizer,
+        args,
         steps=1,
         episodic=False,
         mt_alpha=0.99,
@@ -84,11 +89,12 @@ class CoTTA(nn.Module):
         self.steps = steps
         assert steps > 0, "cotta requires >= 1 step(s) to forward and update"
         self.episodic = episodic
+        self.args = args
 
         self.model_state, self.optimizer_state, self.model_ema, self.model_anchor = (
-            copy_model_and_optimizer(self.model, self.optimizer)
+            copy_model_and_optimizer(self.model, self.optimizer, self.args)
         )
-        self.transform = get_tta_transforms()
+        self.transform = get_tta_transforms(dataset=self.args.dataset)
         self.mt = mt_alpha
         self.rst = rst_m
         self.ap = ap
@@ -110,7 +116,7 @@ class CoTTA(nn.Module):
         )
         # Use this line to also restore the teacher model
         self.model_state, self.optimizer_state, self.model_ema, self.model_anchor = (
-            copy_model_and_optimizer(self.model, self.optimizer)
+            copy_model_and_optimizer(self.model, self.optimizer, self.args)
         )
 
     @torch.enable_grad()  # ensure grads in possible no grad context for testing
@@ -175,23 +181,28 @@ def collect_params(model):
                 if np in ["weight", "bias"] and p.requires_grad:
                     params.append(p)
                     names.append(f"{nm}.{np}")
-                    print(nm, np)
+                    # print(nm, np)
     return params, names
 
 
-def copy_model_and_optimizer(model, optimizer):
+def copy_model_and_optimizer(model, optimizer, args):
     """Copy the model and optimizer states for resetting after adaptation."""
     model_state = deepcopy(model.state_dict())
 
-    # todo get corrected p0_model path and dataset number_classes
-    number_classes = 10
-    model_path = r"../../ckpt/cifar-10/p0_checkpoint.pth"
+    # get corrected p0_model path and dataset number_classes
+    case = settings.get_case(args.noise_ratio, args.noise_type, args.balanced)
+    uni_name = getattr(args, "uni_name", None)
+    num_classes = settings.num_classes_dict[args.dataset]
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    model_p0 = models.resnet18(pretrained=False, num_classes=number_classes)
+    load_model_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="worker_restore",
+                                             step=0, unique_name=uni_name)
+    loaded_model = load_custom_model(args.model, num_classes, ckpt_path=load_model_path)
+    model_p0 = ClassifierWrapper(loaded_model, num_classes)
 
-    checkpoint = torch.load(model_path)
-    model_p0.load_state_dict(checkpoint, strict=False)
-    model_p0 = model_p0.cuda()
+    # checkpoint = torch.load(model_path)
+    # model_p0.load_state_dict(checkpoint, strict=False)
+    model_p0 = model_p0.to(device)
     model_anchor = deepcopy(model_p0)
 
     optimizer_state = deepcopy(optimizer.state_dict())

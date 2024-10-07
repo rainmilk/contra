@@ -15,14 +15,8 @@ echo "CUDA_VISIBLE_DEVICES is set to: $CUDA_VISIBLE_DEVICES"
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "PYTHONPATH is set to: $PYTHONPATH"
 
-python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 1 --step 1 --learning_rate 0.01 --optimizer adam  --batch_size 256 --balanced --model_suffix worker_raw --uni_name jocor
-
 python baseline_code/colearn/main.py --model wideresnet50 --dataset pet-37 --num_epochs 2 --step 1 --batch_size 256 --balanced --uni_name jocor
 
-python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 1 --step 2 --learning_rate 0.01 --optimizer adam  --batch_size 256 --balanced --model_suffix worker_raw --uni_name jocor
-
 python baseline_code/colearn/main.py --model wideresnet50 --dataset pet-37 --num_epochs 2 --step 2 --batch_size 256 --balanced --uni_name jocor
-
-python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 1 --step 3 --learning_rate 0.01 --optimizer adam  --batch_size 256 --balanced --model_suffix worker_raw --uni_name jocor
 
 python baseline_code/colearn/main.py --model wideresnet50 --dataset pet-37 --num_epochs 2 --step 3 --batch_size 256 --balanced --uni_name jocor

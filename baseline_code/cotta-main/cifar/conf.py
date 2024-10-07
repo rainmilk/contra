@@ -32,7 +32,7 @@ _C.MODEL.ARCH = 'Standard'
 # - source: baseline without adaptation
 # - norm: test-time normalization
 # - tent: test-time entropy minimization (ours)
-_C.MODEL.ADAPTATION = 'source'
+_C.MODEL.ADAPTATION = 'cotta'
 
 # By default tent is online, with updates persisting across batches.
 # To make adaptation episodic, and reset the model for each batch, choose True.

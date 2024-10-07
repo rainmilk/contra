@@ -1,5 +1,6 @@
 import logging
 import os
+import shutil
 
 import torch
 import torch.optim as optim
@@ -15,59 +16,54 @@ import norm
 import plf
 
 from conf import cfg, load_cfg_fom_args
-from our_dataset import get_dataset_loader
-from cfgs.dataset import cifar10_config, cifar100_config
+from core_model.dataset import get_dataset_loader
+from args_paser import parse_args
+from configs import settings
+from core_model.custom_model import load_custom_model, ClassifierWrapper
 
 
 logger = logging.getLogger(__name__)
 
 
 def evaluate(description):
-    load_cfg_fom_args(description)
+    # load_cfg_fom_args(description)
 
     # dora modify model resnet18
     # configure model
     # base_model = load_model(cfg.MODEL.ARCH, cfg.CKPT_DIR,
     #                    cfg.CORRUPTION.DATASET, ThreatModel.corruptions).cuda()
 
-    # todo get corrected num_classes and dataset_path and p1_model path
-    num_classes_dict = {
-        "cifar10": 10,
-        "cifar100": 100,
-        "pet-37": 37,
-        # "food101": 101,
-        # "flowers102": 102,
-        # "tiny-imagenet-200": 200,
-    }
+    custom_args = parse_args()
+    case = settings.get_case(custom_args.noise_ratio, custom_args.noise_type, custom_args.balanced)
+    step = getattr(custom_args, "step", 1)
+    uni_name = getattr(custom_args, "uni_name", None)
+    num_classes = settings.num_classes_dict[custom_args.dataset]
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    dataset_paths = {
-        "cifar-10": "../../data/cifar-10",
-        "cifar-100": "../../data/cifar-100",
-        "pet-37": "../../data/pet-37",
-        # "food-101": "../../data/food-101",
-        # "flowers-102": "../../data/flowers-102",
-        # "tiny-imagenet-200": "../../data/tiny-imagenet-200",
-    }
-    dataset = "cifar-10"
-
-    model_dir = r"../../ckpt/cifar-10/"
-    p1_model_path = os.path.join(model_dir, "p1_checkpoint.pth")
-
-    data_dir = dataset_paths[dataset]
-    mean, std = None, None
-    if dataset == "cifar-10":
-        mean = cifar10_config["mean"]
-        std = cifar10_config["std"]
-    elif dataset == "cifar-100":
-        mean = cifar100_config["mean"]
-        std = cifar100_config["std"]
-
-    base_model = models.resnet18(
-        pretrained=False, num_classes=num_classes_dict[cfg.CORRUPTION.DATASET]
+    # get corrected dataset and model path
+    test_data, test_labels, testloader = get_dataset_loader(
+        custom_args.dataset, "test", case, None, None, None, custom_args.batch_size, shuffle=False
     )
-    checkpoint = torch.load(p1_model_path)
-    base_model.load_state_dict(checkpoint, strict=False)
-    base_model = base_model.cuda()
+
+    load_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model,
+                                             model_suffix="worker_restore",
+                                             step=0, unique_name=uni_name)
+
+    if not os.path.exists(load_model_path):
+        contra_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model,
+                                                   model_suffix="worker_restore",
+                                                   step=0, unique_name="contra")
+        os.makedirs(os.path.dirname(load_model_path), exist_ok=True)
+        shutil.copy(contra_model_path, load_model_path)
+        print('copy contra model: %s to : %s' % (contra_model_path, load_model_path))
+
+    save_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model,
+                                             model_suffix="worker_tta",
+                                             step=step, unique_name=uni_name)
+
+    loaded_model = load_custom_model(custom_args.model, num_classes, ckpt_path=load_model_path)
+    base_model = ClassifierWrapper(loaded_model, num_classes)
+    base_model.to(device)
 
     if cfg.MODEL.ADAPTATION == "source":
         logger.info("test-time adaptation: NONE")
@@ -80,7 +76,7 @@ def evaluate(description):
         model = setup_tent(base_model)
     if cfg.MODEL.ADAPTATION == "PLF":
         logger.info("test-time adaptation: PLF")
-        model = setup_plf(base_model)
+        model = setup_plf(base_model, custom_args, num_classes)
     # evaluate on each severity and type of corruption in turn
     prev_ct = "x0"
     # for severity in cfg.CORRUPTION.SEVERITY:
@@ -99,14 +95,14 @@ def evaluate(description):
         #                                [corruption_type])
 
     # dora modify load Dts
-    test_data, test_labels, test_dataloader = get_dataset_loader(
-        dataset, "test", data_dir, mean, std, cfg.TEST.BATCH_SIZE, shuffle=False
-    )
+    # test_data, test_labels, test_dataloader = get_dataset_loader(
+    #     dataset, "test", data_dir, mean, std, cfg.TEST.BATCH_SIZE, shuffle=False
+    # )
     x_test = torch.from_numpy(test_data)
     y_test = torch.from_numpy(test_labels)
 
-    x_test, y_test = x_test.cuda(), y_test.cuda()
-    acc = accuracy(model, x_test, y_test, cfg.TEST.BATCH_SIZE)
+    x_test, y_test = x_test.to(device), y_test.to(device)
+    acc = accuracy(model, x_test, y_test, custom_args.batch_size, save_path=save_model_path)
     err = 1.0 - acc
     logger.info(f"error % ]: {err:.2%}")
 
@@ -151,7 +147,7 @@ def setup_tent(model):
     return tent_model
 
 
-def setup_plf(model):
+def setup_plf(model, custom_args, num_classes):
     """Set up tent adaptation.
 
     Configure the model for training + feature modulation by batch statistics,
@@ -164,11 +160,13 @@ def setup_plf(model):
     plf_model = plf.PLF(
         model,
         optimizer,
+        custom_args,
         steps=cfg.OPTIM.STEPS,
         episodic=cfg.MODEL.EPISODIC,
         mt_alpha=cfg.OPTIM.MT,
         rst_m=cfg.OPTIM.RST,
         ap=cfg.OPTIM.AP,
+        num_classes=num_classes,
     )
     logger.info(f"model for adaptation: %s", model)
     logger.info(f"params for adaptation: %s", param_names)
