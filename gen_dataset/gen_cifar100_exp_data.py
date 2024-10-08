@@ -17,7 +17,7 @@ def split_by_class(data, labels, num_classes=100):
     return class_data
 
 
-def sample_class_balanced_data(class_data, split_ratio=0.5):
+def sample_class_balanced_data(class_data, split_ratio):
     """按比例从每个类别中均衡抽取样本"""
     D_0_data = []
     D_0_labels = []
@@ -118,6 +118,7 @@ def create_cifar100_npy_files(
     num_versions=3,
     retention_ratios=[0.5, 0.3, 0.1],
     balanced=False,
+    split_ratio=0.5,
 ):
     # transform = transforms.Compose([transforms.ToTensor()])
 
@@ -163,7 +164,7 @@ def create_cifar100_npy_files(
 
         # 构建类均衡的 D_0 和 D_inc_0
         D_0_data, D_0_labels, D_inc_data, D_inc_labels = sample_class_balanced_data(
-            class_data, split_ratio=0.5
+            class_data, split_ratio
         )
 
         # 构建重放数据集 D_a（从 D_0 中随机抽取 10% 的样本）
@@ -421,6 +422,13 @@ def main():
         help="是否使用类均衡的数据划分方式。如果不指定，则使用随机划分。",
     )
 
+    parser.add_argument(
+        "--split_ratio",
+        type=float,
+        default=0.5,
+        help="类均衡划分的比例，默认为 0.5",
+    )
+
     args = parser.parse_args()
 
     create_cifar100_npy_files(
@@ -431,6 +439,7 @@ def main():
         num_versions=args.num_versions,
         retention_ratios=args.retention_ratios,
         balanced=args.balanced,
+        split_ratio=args.split_ratio,
     )
 
 
