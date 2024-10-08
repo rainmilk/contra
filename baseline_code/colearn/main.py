@@ -93,26 +93,32 @@ def main():
 
     num_test_images = len(testloader.dataset)
 
-    load_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model, model_suffix="worker_restore",
-                                        step=step-1, unique_name=uni_name)
+    load_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model,
+                                             model_suffix="worker_restore", step=step-1, unique_name=uni_name)
     # step=1, copy contra/step_0/ -> target/step_0
     if step == 1 and not os.path.exists(load_model_path):
-        contra_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model, model_suffix="worker_restore",
-                                        step=step-1, unique_name="contra")
+        contra_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model,
+                                                   model_suffix="worker_restore", step=step-1, unique_name="contra")
         os.makedirs(os.path.dirname(load_model_path), exist_ok=True)
         shutil.copy(contra_model_path, load_model_path)
         print('copy contra model: %s to : %s' % (contra_model_path, load_model_path))
 
     save_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model, model_suffix="worker_restore",
-                                        step=step, unique_name=uni_name)
+                                            step=step, unique_name=uni_name)
     # checkpoint = torch.load(load_model_path)
 
     model.epochs = custom_args.num_epochs
 
-    loaded_model = load_custom_model(custom_args.model, num_classes, ckpt_path=load_model_path)
-    model.model1 = ClassifierWrapper(loaded_model, num_classes)
+    loaded_model1 = load_custom_model(custom_args.model, num_classes, load_pretrained=False)
+    model.model1 = ClassifierWrapper(loaded_model1, num_classes)
 
-    model.model2 = ClassifierWrapper(loaded_model, num_classes)
+    loaded_model2 = load_custom_model(custom_args.model, num_classes, load_pretrained=False)
+    model.model2 = ClassifierWrapper(loaded_model2, num_classes)
+
+    checkpoint = torch.load(load_model_path)
+    model.model1.load_state_dict(checkpoint, strict=False)
+    model.model2.load_state_dict(checkpoint, strict=False)
+
     model.model1.to(device)
     model.model2.to(device)
     # model.model1.load_state_dict(checkpoint, strict=False)

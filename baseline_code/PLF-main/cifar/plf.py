@@ -18,7 +18,7 @@ from configs import settings
 
 
 def get_tta_transforms(gaussian_std: float = 0.005, soft=False, clip_inputs=False, dataset=''):
-    # todo modify shape cifar10 cifar100 为 (32, 32,3) 新数据集待修改
+    # modify shape cifar10 cifar100 为 (32, 32,3) 新数据集待修改
     img_shape = (32, 32, 3)
     if dataset == 'pet-37':
         img_shape = (224, 224, 3)
@@ -335,8 +335,10 @@ def copy_model_and_optimizer(model, optimizer, args):
 
     load_model_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="worker_restore",
                                              step=0, unique_name=uni_name)
-    loaded_model = load_custom_model(args.model, num_classes, ckpt_path=load_model_path)
+    loaded_model = load_custom_model(args.model, num_classes, load_pretrained=False)
     model_p0 = ClassifierWrapper(loaded_model, num_classes)
+    checkpoint = torch.load(load_model_path)
+    model_p0.load_state_dict(checkpoint, strict=False)
 
     model_p0 = model_p0.to(device)
     model_anchor = deepcopy(model_p0)

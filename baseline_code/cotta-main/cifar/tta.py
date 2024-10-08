@@ -60,8 +60,10 @@ def evaluate(description):
                                              model_suffix="worker_tta",
                                              step=step, unique_name=uni_name)
 
-    loaded_model = load_custom_model(custom_args.model, num_classes, ckpt_path=load_model_path)
+    loaded_model = load_custom_model(custom_args.model, num_classes, load_pretrained=False)
     base_model = ClassifierWrapper(loaded_model, num_classes)
+    checkpoint = torch.load(load_model_path)
+    base_model.load_state_dict(checkpoint, strict=False)
     base_model.to(device)
 
     if cfg.MODEL.ADAPTATION == "source":
