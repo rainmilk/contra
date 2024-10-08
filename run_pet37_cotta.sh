@@ -15,8 +15,8 @@ echo "CUDA_VISIBLE_DEVICES is set to: $CUDA_VISIBLE_DEVICES"
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "PYTHONPATH is set to: $PYTHONPATH"
 
-python baseline_code/cotta-main/cifar/tta.py --model wideresnet50 --dataset pet-37 --num_epochs 1 --step 1 --batch_size 256 --balanced --uni_name cotta
+python baseline_code/cotta-main/cifar/tta.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 1 --batch_size 256 --balanced --uni_name cotta
 
-python baseline_code/cotta-main/cifar/tta.py --model wideresnet50 --dataset pet-37 --num_epochs 1 --step 2 --batch_size 256 --balanced --uni_name cotta
+python baseline_code/cotta-main/cifar/tta.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 2 --batch_size 256 --balanced --uni_name cotta
 
-python baseline_code/cotta-main/cifar/tta.py --model wideresnet50 --dataset pet-37 --num_epochs 1 --step 3 --batch_size 256 --balanced --uni_name cotta
+python baseline_code/cotta-main/cifar/tta.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 3 --batch_size 256 --balanced --uni_name cotta
