@@ -74,6 +74,7 @@ def load_dataset(file_path, is_data=True):
 
 def train_model(
     model,
+    num_classes,
     data,
     labels,
     test_data,
@@ -137,8 +138,6 @@ def train_model(
     # 用于存储训练和测试的损失和准确率
     train_losses = []
     test_accuracies = []
-
-    num_classes = len(set(labels.tolist()))
 
     use_data_aug = True
 
@@ -293,6 +292,7 @@ def train_step(
 
         model_raw = train_model(
             model_raw,
+            num_classes,
             D_train_data,
             D_train_labels,
             D_test_data,
@@ -335,6 +335,7 @@ def train_step(
 
         model_p0 = train_model(
             model_p0,
+            num_classes,
             D_train_data,
             D_train_labels,
             D_test_data,
