@@ -157,11 +157,12 @@ def train_model(
         # tqdm 进度条显示
         with tqdm(total=len(dataloader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for inputs, targets in dataloader:
-                inputs, targets = inputs.to(device), targets.to(device)
                 if use_data_aug:
                     transform = np.random.choice([mixup_transform, cutmix_transform])
                     targets = targets.to(torch.long)
                     inputs, targets = transform(inputs, targets)
+
+                inputs, targets = inputs.to(device), targets.to(device)
 
                 optimizer.zero_grad()
                 outputs = model(inputs)

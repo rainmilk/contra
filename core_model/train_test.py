@@ -42,12 +42,12 @@ def model_train(
         # 用 tqdm 显示训练进度条
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for i, (inputs, labels) in enumerate(train_loader):
-                inputs, labels = inputs.to(device), labels.to(device)
                 if mix_classes > 0:
                     transform = np.random.choice([cutmix_transform, mixup_transform])
                     labels = labels.to(torch.long)
                     inputs, labels = transform(inputs, labels)
 
+                inputs, labels = inputs.to(device), labels.to(device)
                 optimizer.zero_grad()  # 清除上一步的梯度
                 outputs = model(inputs)
 
