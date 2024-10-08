@@ -18,19 +18,19 @@ def load_custom_model(model_name, num_classes, load_pretrained=True, ckpt_path=N
             weights = models.ResNet50_Weights.DEFAULT
             model = models.resnet50(weights=weights)
         else:
-            model = models.resnet18(num_classes=num_classes)
+            model = models.resnet50(num_classes=num_classes)
     elif model_name == "resnet101":
         if load_pretrained:
             weights = models.ResNet101_Weights.DEFAULT
             model = models.resnet101(weights=weights)
         else:
-            model = models.resnet18(num_classes=num_classes)
+            model = models.resnet101(num_classes=num_classes)
     elif model_name == "wideresnet50":
         if load_pretrained:
             weights = models.Wide_ResNet50_2_Weights.DEFAULT
             model = models.wide_resnet50_2(weights=weights)
         else:
-            model = models.vgg19_bn(num_classes=num_classes)
+            model = models.wide_resnet50_2(num_classes=num_classes)
     elif model_name == "cifar-resnet18":
         model = resnet18(num_classes=num_classes)
     elif model_name == "cifar-wideresnet40":
