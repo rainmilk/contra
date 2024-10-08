@@ -57,7 +57,7 @@ class WideResNet(nn.Module):
         self.bn = nn.BatchNorm2d(64 * k)
         self.relu = nn.ReLU(inplace=True)
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
-        self.linear = nn.Linear(64 * k, num_classes)
+        self.fc = nn.Linear(64 * k, num_classes)
 
     def forward(self, x):
         x = self.init_conv(x)
@@ -68,7 +68,7 @@ class WideResNet(nn.Module):
         x = self.relu(x)
         x = self.avg_pool(x)
         x = x.view(x.size(0), -1)
-        x = self.linear(x)
+        x = self.fc(x)
 
         return x
 
