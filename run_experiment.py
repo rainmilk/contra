@@ -401,6 +401,7 @@ def train_step(
 
         current_model = train_model(
             current_model,
+            num_classes,
             D_train_data,
             D_train_labels,
             D_test_data,
