@@ -380,11 +380,11 @@ def execute(args):
 
     # 2. load model
     # (1) load working model
-    working_model = load_custom_model(
-        args.model, num_classes, ckpt_path=working_model_path
-    )
+    working_model = load_custom_model(args.model, num_classes, load_pretrained=False)
 
     working_model = ClassifierWrapper(working_model, num_classes)
+    checkpoint = torch.load(working_model_path)
+    working_model.load_state_dict(checkpoint, strict=False)
 
     working_opt, working_lr_scheduler = create_optimizer_scheduler(
         optimizer_type,
