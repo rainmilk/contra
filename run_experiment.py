@@ -360,11 +360,21 @@ def train_step(
         print(f"M_p0 训练完毕并保存至 {model_p0_path}")
     else:  # 从外部加载通过命令行指定的某个模型
         # 加载当前步骤的训练数据
+        if args.train_aux:
+            trainset = "aux"
+            load_model_suffix = "worker_raw"
+            data_step = None
+            model_step = step
+        else:
+            trainset = "train"
+            load_model_suffix = "worker_restore"
+            data_step = step
+            model_step = step - 1
         D_train_data = np.load(
-            settings.get_dataset_path(dataset_name, case, "train_data", step=step)
+            settings.get_dataset_path(dataset_name, case, f"{trainset}_data", step=data_step)
         )
         D_train_labels = np.load(
-            settings.get_dataset_path(dataset_name, case, "train_label", step=step)
+            settings.get_dataset_path(dataset_name, case, f"{trainset}_label", step=data_step)
         )
         D_test_data = np.load(
             settings.get_dataset_path(dataset_name, case, "test_data")
@@ -380,8 +390,8 @@ def train_step(
             dataset_name,
             case,
             model_name,
-            "worker_restore",
-            step=step - 1,
+            load_model_suffix,
+            step=model_step,
             unique_name=uni_name,
         )
         print(f"加载模型: {prev_model_path}")

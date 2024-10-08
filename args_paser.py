@@ -139,6 +139,13 @@ def parse_args():
     )
 
     parser.add_argument(
+        "--train_aux",
+        default=False,
+        action="store_true",
+        help="Training with auxiliary dataset",
+    )
+
+    parser.add_argument(
         "--tta_only",
         default=False,
         action="store_true",
