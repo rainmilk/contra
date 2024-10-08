@@ -51,7 +51,7 @@ def get_num_of_classes(dataset_name):
     return num_classes
 
 
-def load_dataset(subdir, dataset_name, file_name, is_data=True):
+def load_dataset(file_path, is_data=True):
     """
     加载数据集文件并返回 PyTorch 张量。
     :param subdir: 数据目录
@@ -60,7 +60,6 @@ def load_dataset(subdir, dataset_name, file_name, is_data=True):
     :param is_data: 是否为数据文件（True 表示数据文件，False 表示标签文件）
     :return: PyTorch 张量格式的数据
     """
-    file_path = os.path.join(subdir, file_name)
     data = np.load(file_path)
 
     if is_data:
@@ -161,6 +160,7 @@ def train_model(
                 inputs, targets = inputs.to(device), targets.to(device)
                 if use_data_aug:
                     transform = np.random.choice([mixup_transform, cutmix_transform])
+                    targets = targets.to(torch.long)
                     inputs, targets = transform(inputs, targets)
 
                 optimizer.zero_grad()
@@ -267,7 +267,7 @@ def train_step(
     model_suffix = "worker_raw" if args.model_suffix is None else args.model_suffix
     if step < 0:
 
-        D_train_data = np.load(
+        D_train_data = load_dataset(
             settings.get_dataset_path(dataset_name, case, "train_data")
         )
         D_train_labels = np.load(

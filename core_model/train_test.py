@@ -45,6 +45,7 @@ def model_train(
                 inputs, labels = inputs.to(device), labels.to(device)
                 if mix_classes > 0:
                     transform = np.random.choice([cutmix_transform, mixup_transform])
+                    inputs = inputs.to(torch.long)
                     inputs, labels = transform(inputs, labels)
 
                 optimizer.zero_grad()  # 清除上一步的梯度
