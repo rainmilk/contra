@@ -38,60 +38,47 @@ tasks=(
     "run_pet37_plf_asy.sh"
     "run_pet37_replay_asy.sh"
 )
-
-# 定义 GPU 使用范围，1-7
+# Define the GPUs to use
 gpus=(1 2 3 4 5 6 7)
 gpu_count=${#gpus[@]}
-gpu_usage=() # 用来追踪每个GPU上的任务状态
-for ((i = 0; i < gpu_count; i++)); do
-    gpu_usage[$i]=0 # 初始化每块GPU的任务数量为0
-done
 
-# 创建 logs 目录
+# Create logs directory
 mkdir -p logs
 
-# 函数：查找空闲的 GPU（当前没有高负荷任务）
-find_free_gpu() {
+# Initialize an associative array to keep track of GPU usage
+declare -A gpu_pids
+
+# Function to check if a PID is still running
+is_running() {
+    kill -0 "$1" 2>/dev/null
+}
+
+# Loop over the tasks
+for task in "${tasks[@]}"; do
+    # Find a free GPU
     while true; do
-        for ((i = 0; i < gpu_count; i++)); do
-            if [ ${gpu_usage[$i]} -eq 0 ]; then
-                echo $i
-                return
+        for gpu_id in "${gpus[@]}"; do
+            pid=${gpu_pids[$gpu_id]}
+            if [ -z "$pid" ] || ! is_running "$pid"; then
+                # GPU is free; assign the task
+                script_name=$(basename "$task" .sh)
+                log_file="logs/${script_name}.log"
+                echo "Running $task on GPU $gpu_id..."
+                ./$task "$gpu_id" >"$log_file" 2>&1 &
+                gpu_pids[$gpu_id]=$!
+                sleep 2 # Brief pause before assigning the next task
+                break 2 # Exit both loops
             fi
         done
-        # 等待 GPU 变空闲
-        sleep 5
+        sleep 2 # Wait before checking for free GPUs again
     done
-}
-
-# 函数：为指定的 GPU 运行任务
-run_task_on_gpu() {
-    local script=$1
-    local gpu_id=$2
-    script_name=$(basename "$script" .sh)
-
-    log_file="logs/${script_name}.log"
-
-    echo "Running $script on GPU $gpu_id..."
-    ./$script $gpu_id >"$log_file" 2>&1 &
-    local pid=$!
-
-    # 等待任务完成，并释放该GPU
-    wait $pid
-    gpu_usage[$gpu_id]=0
-}
-
-# 逐个分配任务
-for script in "${tasks[@]}"; do
-    free_gpu=$(find_free_gpu) # 查找空闲 GPU
-    gpu_id=${gpus[$free_gpu]}
-    gpu_usage[$free_gpu]=1 # 标记该 GPU 正在运行任务
-
-    # 在后台执行任务
-    run_task_on_gpu $script $gpu_id &
 done
 
-# 等待所有后台任务完成
-wait
+# Wait for all tasks to finish
+for pid in "${gpu_pids[@]}"; do
+    if [ -n "$pid" ] && is_running "$pid"; then
+        wait "$pid"
+    fi
+done
 
-echo "所有脚本已完成运行，日志已保存到 logs 目录中。"
+echo "All tasks have been completed. Logs are saved in the logs directory."
