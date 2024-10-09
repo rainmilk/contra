@@ -534,6 +534,8 @@ def execute(args):
     # 5. 迭代测试数据适应过程
     # (1) 构造适应过程数据：Dts, D_aug:  = Da + Dconf
     aux_labels_onehot = np.eye(num_classes)[aux_labels]
+    aug_data = aux_data
+    aug_labels = aux_labels_onehot
 
     if tta_only is not None:
         if tta_only == 0:
@@ -544,9 +546,6 @@ def execute(args):
             lip_teacher_model.load_state_dict(checkpoint, strict=False)
             checkpoint = torch.load(working_model_path)
             working_model.load_state_dict(checkpoint, strict=False)
-
-            aug_data = aux_data
-            aug_labels = aux_labels_onehot
         else:
             conf_data = np.load(conf_data_path)
             conf_labels = np.load(conf_label_path)

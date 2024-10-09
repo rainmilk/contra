@@ -22,8 +22,8 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 
 python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 0 --learning_rate 0.01 --optimizer adam --batch_size 256 --uni_name raw --balanced --model_suffix worker_restore
 
-python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 1 --learning_rate 0.01 --optimizer adam --batch_size 256 --uni_name raw --balanced --model_suffix worker_restore
+python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 20 --step 1 --learning_rate 0.001 --optimizer adam --batch_size 256 --uni_name raw --balanced --model_suffix worker_restore
 
-python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 2 --learning_rate 0.01 --optimizer adam --batch_size 256 --uni_name raw --balanced --model_suffix worker_restore
+python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 20 --step 2 --learning_rate 0.001 --optimizer adam --batch_size 256 --uni_name raw --balanced --model_suffix worker_restore
 
-python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 3 --learning_rate 0.01 --optimizer adam --batch_size 256 --uni_name raw --balanced --model_suffix worker_restore
+python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 20 --step 3 --learning_rate 0.001 --optimizer adam --batch_size 256 --uni_name raw --balanced --model_suffix worker_restore
