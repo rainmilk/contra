@@ -4,7 +4,7 @@ nohup bash -c "CUDA_VISIBLE_DEVICES=1 python run_experiment.py \
     --step 0 \
     --model cifar-resnet18 \
     --dataset cifar-10 \
-    --noise_ratio 0.2 \
+    --noise_ratio 0.1 \
     --noise_type symmetric \
     --balanced \
     --epoch 100 \
@@ -16,7 +16,7 @@ nohup bash -c "CUDA_VISIBLE_DEVICES=2 python run_experiment.py \
     --step 0 \
     --model wideresnet50 \
     --dataset pet-37 \
-    --noise_ratio 0.2 \
+    --noise_ratio 0.1 \
     --noise_type symmetric \
     --balanced \
     --epoch 30 \
@@ -28,7 +28,7 @@ nohup bash -c "CUDA_VISIBLE_DEVICES=3 python run_experiment.py \
     --step 0 \
     --model cifar-wideresnet40 \
     --dataset cifar-100 \
-    --noise_ratio 0.2 \
+    --noise_ratio 0.1 \
     --noise_type asymmetric \
     --balanced \
     --epoch 200 \
@@ -40,7 +40,7 @@ nohup bash -c "CUDA_VISIBLE_DEVICES=4 python run_experiment.py \
     --step 0 \
     --model wideresnet50 \
     --dataset pet-37 \
-    --noise_ratio 0.2 \
+    --noise_ratio 0.1 \
     --noise_type asymmetric \
     --balanced \
     --epoch 30 \
