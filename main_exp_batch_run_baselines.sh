@@ -12,7 +12,8 @@ tasks=(
     "run_cifar10_cotta.sh"
     "run_cifar10_jocor.sh"
     "run_cifar10_plf.sh"
-    "run_cifar10_replay.sh"
+    "run_cifar10_raw.sh"
+    "run_cifar10_rehearsal.sh"
     # 分类任务 - PET37 - 对称噪声 - Resnet50
     "run_pet37_contra.sh"
     "run_pet37_coteaching.sh"
@@ -20,7 +21,8 @@ tasks=(
     "run_pet37_cotta.sh"
     "run_pet37_jocor.sh"
     "run_pet37_plf.sh"
-    "run_pet37_replay.sh"
+    "run_pet37_raw.sh"
+    "run_pet37_rehearsal.sh"
     # 检索任务 - CIFAR-100 - 非对称噪声 - WideResnet40
     "run_cifar100_contra.sh"
     "run_cifar100_coteaching_plus.sh"
@@ -28,7 +30,8 @@ tasks=(
     "run_cifar100_cotta.sh"
     "run_cifar100_jocor.sh"
     "run_cifar100_plf.sh"
-    "run_cifar100_replay.sh"
+    "run_cifar100_raw.sh"
+    "run_cifar100_rehearsal.sh"
     # 检索任务 - PET37 - 非对称噪声 - WideResnet50
     "run_pet37_contra_asy.sh"
     "run_pet37_coteaching_asy.sh"
@@ -36,17 +39,18 @@ tasks=(
     "run_pet37_cotta_asy.sh"
     "run_pet37_jocor_asy.sh"
     "run_pet37_plf_asy.sh"
-    "run_pet37_replay_asy.sh"
-)
-
-tasks_rehs=(
-    "run_cifar10_rehearsal.sh"
-    "run_pet37_rehearsal.sh"
-    "run_cifar100_rehearsal.sh"
+    "run_pet37_raw_asy.sh"
     "run_pet37_rehearsal_asy.sh"
 )
 
-tasks_all=("${tasks[@]}" "${tasks_rehs[@]}")
+# tasks_rehs=(
+#     "run_cifar10_rehearsal.sh"
+#     "run_pet37_rehearsal.sh"
+#     "run_cifar100_rehearsal.sh"
+#     "run_pet37_rehearsal_asy.sh"
+# )
+
+# tasks_all=("${tasks[@]}" "${tasks_rehs[@]}")
 
 # Define the GPUs to use
 gpus=(1 2 3 4 5 6 7)
@@ -65,8 +69,8 @@ is_running() {
 
 # Loop over the tasks
 for task in "${tasks[@]}"; do
-# for task in "${tasks_rehs[@]}"; do  
-# for task in "${tasks_all[@]}"; do
+    # for task in "${tasks_rehs[@]}"; do
+    # for task in "${tasks_all[@]}"; do
     # Find a free GPU
     while true; do
         for gpu_id in "${gpus[@]}"; do
