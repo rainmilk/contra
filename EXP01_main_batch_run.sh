@@ -5,7 +5,7 @@ rm -f logs/*.log
 
 # 定义任务的脚本列表
 tasks=(
-    # 分类任务 - CIFAR-10 - 对称噪声 - Resnet18
+    # 分类任务 - CIFAR-10 - 对称噪声 20% - 遗忘 0.5/0.3/0.1 - Resnet18
     "run_cifar10_contra.sh"
     "run_cifar10_coteaching_plus.sh"
     "run_cifar10_coteaching.sh"
@@ -14,7 +14,7 @@ tasks=(
     "run_cifar10_plf.sh"
     "run_cifar10_raw.sh"
     "run_cifar10_rehearsal.sh"
-    # 分类任务 - PET37 - 对称噪声 - Resnet50
+    # 分类任务 - PET37 - 对称噪声 20% - 遗忘 0.5/0.3/0.1 - Resnet50
     "run_pet37_contra.sh"
     "run_pet37_coteaching.sh"
     "run_pet37_coteaching_plus.sh"
@@ -23,7 +23,7 @@ tasks=(
     "run_pet37_plf.sh"
     "run_pet37_raw.sh"
     "run_pet37_rehearsal.sh"
-    # 检索任务 - CIFAR-100 - 非对称噪声 - WideResnet40
+    # 检索任务 - CIFAR-100 - 非对称噪声 20% - 遗忘 0.5/0.3/0.1 - WideResnet40
     "run_cifar100_contra.sh"
     "run_cifar100_coteaching_plus.sh"
     "run_cifar100_coteaching.sh"
@@ -32,7 +32,7 @@ tasks=(
     "run_cifar100_plf.sh"
     "run_cifar100_raw.sh"
     "run_cifar100_rehearsal.sh"
-    # 检索任务 - PET37 - 非对称噪声 - WideResnet50
+    # 检索任务 - PET37 - 非对称噪声 20% - 遗忘 0.5/0.3/0.1 - WideResnet50
     "run_pet37_contra_asy.sh"
     "run_pet37_coteaching_asy.sh"
     "run_pet37_coteaching_plus_asy.sh"
