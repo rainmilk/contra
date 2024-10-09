@@ -63,7 +63,7 @@ is_running() {
 
 # Loop over the tasks
 # for task in "${tasks[@]}"; do
-for task in "${tasks_rehs[@]}"; do
+for task in "${tasks_rehs[@]}"; do  
     # Find a free GPU
     while true; do
         for gpu_id in "${gpus[@]}"; do
