@@ -38,6 +38,14 @@ tasks=(
     "run_pet37_plf_asy.sh"
     "run_pet37_replay_asy.sh"
 )
+
+tasks_rehs=(
+    "run_cifar10_rehearsal.sh"
+    "run_pet37_rehearsal.sh"
+    "run_cifar100_rehearsal.sh"
+    "run_pet37_rehearsal_asy.sh"
+)
+
 # Define the GPUs to use
 gpus=(1 2 3 4 5 6 7)
 gpu_count=${#gpus[@]}
@@ -54,7 +62,8 @@ is_running() {
 }
 
 # Loop over the tasks
-for task in "${tasks[@]}"; do
+# for task in "${tasks[@]}"; do
+for task in "${tasks_rehs[@]}"; do
     # Find a free GPU
     while true; do
         for gpu_id in "${gpus[@]}"; do
