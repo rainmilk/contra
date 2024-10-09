@@ -274,11 +274,11 @@ def create_cifar100_npy_files(
     ]
 
     # 读取 CIFAR-100 类别
-    cifar100_classes_file = "./configs/classes/cifar_100_classes.txt"
+    cifar100_classes_file = "../configs/classes/cifar_100_classes.txt"
     cifar100_classes = load_classes_from_file(cifar100_classes_file)
 
     # 读取 CIFAR-100 的 superclass 和 child class 映射
-    cifar100_mapping_file = "./configs/classes/cifar_100_mapping.json"
+    cifar100_mapping_file = "../configs/classes/cifar_100_mapping.json"
     cifar100_superclass_mapping = load_cifar100_superclass_mapping(
         cifar100_mapping_file
     )
