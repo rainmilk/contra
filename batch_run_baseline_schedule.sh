@@ -46,6 +46,8 @@ tasks_rehs=(
     "run_pet37_rehearsal_asy.sh"
 )
 
+tasks_all=("${tasks[@]}" "${tasks_rehs[@]}")
+
 # Define the GPUs to use
 gpus=(1 2 3 4 5 6 7)
 gpu_count=${#gpus[@]}
@@ -62,8 +64,9 @@ is_running() {
 }
 
 # Loop over the tasks
-# for task in "${tasks[@]}"; do
-for task in "${tasks_rehs[@]}"; do  
+for task in "${tasks[@]}"; do
+# for task in "${tasks_rehs[@]}"; do  
+# for task in "${tasks_all[@]}"; do
     # Find a free GPU
     while true; do
         for gpu_id in "${gpus[@]}"; do
