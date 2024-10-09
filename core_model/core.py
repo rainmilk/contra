@@ -355,7 +355,7 @@ def execute(args):
     optimizer_type = getattr(args, "optimizer", "adam")
     num_epochs = getattr(args, "num_epochs", 50)
     step = getattr(args, "step", 1)
-    tta_only = getattr(args, "tta_only", False)
+    tta_only = getattr(args, "tta_only", None)
     uni_name = getattr(args, "uni_name", None)
 
     working_model_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="worker_raw", step=step, unique_name=uni_name) # model_paths["working_model_path"]
@@ -425,7 +425,7 @@ def execute(args):
     subdir = os.path.dirname(conf_data_path)
     os.makedirs(subdir, exist_ok=True)
 
-    if not tta_only:
+    if tta_only is None:
         if os.path.exists(lip_teacher_model_path):
             checkpoint = torch.load(lip_teacher_model_path)
             lip_teacher_model.load_state_dict(checkpoint, strict=False)
@@ -535,17 +535,29 @@ def execute(args):
     # (1) 构造适应过程数据：Dts, D_aug:  = Da + Dconf
     aux_labels_onehot = np.eye(num_classes)[aux_labels]
 
-    if tta_only:
-        conf_data = np.load(conf_data_path)
-        conf_labels = np.load(conf_label_path)
+    if tta_only is not None:
+        if tta_only == 0:
+            lip_teacher_model_path = settings.get_ckpt_path(args.dataset, case, args.model,
+                                                            model_suffix="teacher_restore", step=0,
+                                                            unique_name=uni_name)
+            checkpoint = torch.load(lip_teacher_model_path)
+            lip_teacher_model.load_state_dict(checkpoint, strict=False)
+            checkpoint = torch.load(working_model_path)
+            working_model.load_state_dict(checkpoint, strict=False)
 
-        checkpoint = torch.load(teacher_model_repair_save_path)
-        lip_teacher_model.load_state_dict(checkpoint, strict=False)
-        checkpoint = torch.load(working_model_repair_save_path)
-        working_model.load_state_dict(checkpoint, strict=False)
+            aug_data = aux_data
+            aug_labels = aux_labels_onehot
+        else:
+            conf_data = np.load(conf_data_path)
+            conf_labels = np.load(conf_label_path)
 
-    aug_data = np.concatenate([aux_data, conf_data], axis=0)
-    aug_labels = np.concatenate([aux_labels_onehot, conf_labels], axis=0)
+            checkpoint = torch.load(teacher_model_repair_save_path)
+            lip_teacher_model.load_state_dict(checkpoint, strict=False)
+            checkpoint = torch.load(working_model_repair_save_path)
+            working_model.load_state_dict(checkpoint, strict=False)
+
+            aug_data = np.concatenate([aux_data, conf_data], axis=0)
+            aug_labels = np.concatenate([aux_labels_onehot, conf_labels], axis=0)
 
     # (2) 迭代测试数据适应过程：根据 混合的Dts 迭代 Mp 和 Mt
     for i in range(adapt_iter_num):

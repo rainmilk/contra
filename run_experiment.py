@@ -1,4 +1,5 @@
 import os
+import shutil
 import warnings
 import numpy as np
 from args_paser import parse_args
@@ -312,52 +313,70 @@ def train_step(
         print(f"M_raw 训练完毕并保存至 {model_raw_path}")
         return
     elif step == 0:  # 基于$D_0$数据集和原始的resnet网络训练一个模型 M_p0
-        D_train_data = np.load(
-            settings.get_dataset_path(dataset_name, case, "train_data", step=step)
-        )
-        D_train_labels = np.load(
-            settings.get_dataset_path(dataset_name, case, "train_label", step=step)
-        )
-        D_test_data = np.load(
-            settings.get_dataset_path(dataset_name, case, "test_data")
-        )
-        D_test_labels = np.load(
-            settings.get_dataset_path(dataset_name, case, "test_label")
-        )
-
-        # 打印用于训练的模型和数据
-        print("用于训练的数据: D_0.npy 和 D_0_labels.npy")
-        print("用于训练的模型: ResNet18 初始化")
-
-        model_p0 = load_custom_model(model_name, num_classes)
-        model_p0 = ClassifierWrapper(model_p0, num_classes)
-        print(f"开始训练 M_p0 on ({dataset_name})...")
-
-        model_p0 = train_model(
-            model_p0,
-            num_classes,
-            D_train_data,
-            D_train_labels,
-            D_test_data,
-            D_test_labels,
-            epochs=args.num_epochs,
-            batch_size=args.batch_size,
-            learning_rate=args.learning_rate,
-            weight_decay=args.weight_decay,
-            writer=writer,
-        )
         model_p0_path = settings.get_ckpt_path(
             dataset_name,
             case,
             model_name,
             "worker_restore",
-            step=step,
-            unique_name=uni_name,
+            step=step
         )
-        subdir = os.path.dirname(model_p0_path)
-        os.makedirs(subdir, exist_ok=True)
-        torch.save(model_p0.state_dict(), model_p0_path)
-        print(f"M_p0 训练完毕并保存至 {model_p0_path}")
+        if uni_name is None:
+            D_train_data = np.load(
+                settings.get_dataset_path(dataset_name, case, "train_data", step=step)
+            )
+            D_train_labels = np.load(
+                settings.get_dataset_path(dataset_name, case, "train_label", step=step)
+            )
+            D_test_data = np.load(
+                settings.get_dataset_path(dataset_name, case, "test_data")
+            )
+            D_test_labels = np.load(
+                settings.get_dataset_path(dataset_name, case, "test_label")
+            )
+
+            # 打印用于训练的模型和数据
+            print("用于训练的数据: D_0.npy 和 D_0_labels.npy")
+            print("用于训练的模型: ResNet18 初始化")
+
+            model_p0 = load_custom_model(model_name, num_classes)
+            model_p0 = ClassifierWrapper(model_p0, num_classes)
+
+            print(f"开始训练 M_p0 on ({dataset_name})...")
+
+            model_p0 = train_model(
+                model_p0,
+                num_classes,
+                D_train_data,
+                D_train_labels,
+                D_test_data,
+                D_test_labels,
+                epochs=args.num_epochs,
+                batch_size=args.batch_size,
+                learning_rate=args.learning_rate,
+                weight_decay=args.weight_decay,
+                writer=writer,
+            )
+            subdir = os.path.dirname(model_p0_path)
+            os.makedirs(subdir, exist_ok=True)
+            torch.save(model_p0.state_dict(), model_p0_path)
+            print(f"M_p0 训练完毕并保存至 {model_p0_path}")
+        else:
+            copy_model_p0_path = settings.get_ckpt_path(
+                dataset_name,
+                case,
+                model_name,
+                "worker_restore",
+                step=step,
+                unique_name=uni_name,
+            )
+            if os.path.exists(model_p0_path):
+                subdir = os.path.dirname(copy_model_p0_path)
+                os.makedirs(subdir, exist_ok=True)
+                shutil.copy(model_p0_path, copy_model_p0_path)
+                print(f"Copy {model_p0_path} to {copy_model_p0_path}")
+            else:
+                raise FileNotFoundError(model_p0_path)
+
     else:  # 从外部加载通过命令行指定的某个模型
         # 加载当前步骤的训练数据
         if args.train_aux:

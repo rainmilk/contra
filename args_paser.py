@@ -147,9 +147,10 @@ def parse_args():
 
     parser.add_argument(
         "--tta_only",
-        default=False,
-        action="store_true",
-        help="TTA Only after model restoration",
+        default=None,
+        type=int,
+        choices=[0,1],
+        help="",
     )
 
     parser.add_argument(
