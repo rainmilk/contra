@@ -13,15 +13,15 @@ tasks=(
     # noise type: sy
     # noise ratio: 0.5/0.3/0.1
     # method: raw/coteaching/contra
-    "run_pet37_raw_nr_50_pec.sh"
-    "run_pet37_raw_nr_30_pec.sh"
     "run_pet37_raw_nr_10_pec.sh"
-    "run_pet37_contra_nr_50_pec.sh"
-    "run_pet37_contra_nr_30_pec.sh"
+    "run_pet37_raw_nr_30_pec.sh"
+    "run_pet37_raw_nr_50_pec.sh"
     "run_pet37_contra_nr_10_pec.sh"
-    "run_pet37_coteaching_nr_50_pec.sh"
-    "run_pet37_coteaching_nr_30_pec.sh"
+    "run_pet37_contra_nr_30_pec.sh"
+    "run_pet37_contra_nr_50_pec.sh"
     "run_pet37_coteaching_nr_10_pec.sh"
+    "run_pet37_coteaching_nr_30_pec.sh"
+    "run_pet37_coteaching_nr_50_pec.sh"
     # "run_pet37_coteaching_plus.sh"
     # "run_pet37_cotta.sh"
     # "run_pet37_jocor.sh"
@@ -34,15 +34,15 @@ tasks=(
     # noise type: asy
     # noise ratio: 0.5/0.3/0.1
     # method: raw/coteaching/contra
-    "run_pet37_raw_asy_nr_50_pec.sh"
-    "run_pet37_raw_asy_nr_30_pec.sh"
     "run_pet37_raw_asy_nr_10_pec.sh"
-    "run_pet37_contra_asy_nr_50_pec.sh"
-    "run_pet37_contra_asy_nr_30_pec.sh"
+    "run_pet37_raw_asy_nr_30_pec.sh"
+    "run_pet37_raw_asy_nr_50_pec.sh"
     "run_pet37_contra_asy_nr_10_pec.sh"
-    "run_pet37_coteaching_asy_nr_50_pec.sh"
-    "run_pet37_coteaching_asy_nr_30_pec.sh"
+    "run_pet37_contra_asy_nr_30_pec.sh"
+    "run_pet37_contra_asy_nr_50_pec.sh"
     "run_pet37_coteaching_asy_nr_10_pec.sh"
+    "run_pet37_coteaching_asy_nr_30_pec.sh"
+    "run_pet37_coteaching_asy_nr_50_pec.sh"
     # "run_pet37_coteaching_plus_asy.sh"
     # "run_pet37_cotta_asy.sh"
     # "run_pet37_jocor_asy.sh"

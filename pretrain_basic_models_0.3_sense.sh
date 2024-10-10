@@ -1,10 +1,10 @@
 mkdir -p logs
 
-# nohup bash -c "CUDA_VISIBLE_DEVICES=1 python run_experiment.py \
+# nohup bash -c "CUDA_VISIBLE_DEVICES=5 python run_experiment.py \
 #     --step 0 \
 #     --model cifar-resnet18 \
 #     --dataset cifar-10 \
-#     --noise_ratio 0.5 \
+#     --noise_ratio 0.3 \
 #     --noise_type symmetric \
 #     --balanced \
 #     --num_epochs 100 \
@@ -12,11 +12,11 @@ mkdir -p logs
 #     --optimizer adam \
 #     --batch_size 256" >logs/run_experiment_step0_resnet18_cifar10_$(date +'%Y%m%d_%H%M%S').log 2>&1 &
 
-# nohup bash -c "CUDA_VISIBLE_DEVICES=2 python run_experiment.py \
+# nohup bash -c "CUDA_VISIBLE_DEVICES=6 python run_experiment.py \
 #     --step 0 \
 #     --model wideresnet50 \
 #     --dataset pet-37 \
-#     --noise_ratio 0.5 \
+#     --noise_ratio 0.3 \
 #     --noise_type symmetric \
 #     --balanced \
 #     --num_epochs 30 \
@@ -24,11 +24,11 @@ mkdir -p logs
 #     --optimizer adam \
 #     --batch_size 64" >logs/run_experiment_step0_wideresnet50_pet37_$(date +'%Y%m%d_%H%M%S').log 2>&1 &
 
-# nohup bash -c "CUDA_VISIBLE_DEVICES=3 python run_experiment.py \
+# nohup bash -c "CUDA_VISIBLE_DEVICES=7 python run_experiment.py \
 #     --step 0 \
 #     --model cifar-wideresnet40 \
 #     --dataset cifar-100 \
-#     --noise_ratio 0.5 \
+#     --noise_ratio 0.3 \
 #     --noise_type asymmetric \
 #     --balanced \
 #     --num_epochs 200 \
@@ -36,11 +36,11 @@ mkdir -p logs
 #     --optimizer adam \
 #     --batch_size 256" >logs/run_experiment_step0_wideresnet40_cifar100_$(date +'%Y%m%d_%H%M%S').log 2>&1 &
 
-nohup bash -c "CUDA_VISIBLE_DEVICES=5 python run_experiment.py \
+nohup bash -c "CUDA_VISIBLE_DEVICES=6 python run_experiment.py \
    --step 0 \
    --model wideresnet50 \
    --dataset pet-37 \
-   --noise_ratio 0.5 \
+   --noise_ratio 0.3 \
    --noise_type symmetric \
    --balanced \
    --num_epochs 30 \
@@ -48,11 +48,11 @@ nohup bash -c "CUDA_VISIBLE_DEVICES=5 python run_experiment.py \
    --optimizer adam \
    --batch_size 64" >logs/run_experiment_step0_wideresnet50_pet37_symmetric_$(date +'%Y%m%d_%H%M%S').log 2>&1 &
 
-nohup bash -c "CUDA_VISIBLE_DEVICES=5 python run_experiment.py \
+nohup bash -c "CUDA_VISIBLE_DEVICES=7 python run_experiment.py \
    --step 0 \
    --model wideresnet50 \
    --dataset pet-37 \
-   --noise_ratio 0.5 \
+   --noise_ratio 0.3 \
    --noise_type asymmetric \
    --balanced \
    --num_epochs 30 \

@@ -42,6 +42,22 @@ def get_ckpt_path(dataset, case, model, model_suffix, step=None, unique_name=Non
     return os.path.join(path, f"{model}_{model_suffix}.pth")
 
 
+# get ckpt files for sensitivity experiment models
+def get_pretrain_ckpt_path(
+    dataset, case, model, model_suffix, step=None, unique_name=None
+):
+    """Generate and return model paths dynamically."""
+    path = os.path.join(root_dir, "ckpt", dataset, case)
+    pretrain_case = "pretrain"
+    path = os.path.join(path, pretrain_case)
+    if step is not None and step >= 0:
+        path = os.path.join(path, f"step_{step}")
+    if unique_name is not None:
+        path = os.path.join(path, unique_name)
+
+    return os.path.join(path, f"{model}_{model_suffix}.pth")
+
+
 def get_dataset_path(dataset, case, type, step=None):
     """Generate and return model paths dynamically."""
     path = os.path.join(root_dir, "data", dataset, "gen", case)

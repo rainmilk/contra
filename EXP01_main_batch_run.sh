@@ -79,7 +79,8 @@ fi
 # tasks_all=("${tasks[@]}" "${tasks_rehs[@]}")
 
 # Define the GPUs to use
-gpus=(1 2 3 4 5 6 7)
+# gpus=(1 2 3 4 5 6 7)
+gpus=(3 4 5 6 7)
 gpu_count=${#gpus[@]}
 
 # Create logs directory
