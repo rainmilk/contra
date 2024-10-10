@@ -28,8 +28,11 @@ def sample_class_balanced_data(class_data, split_ratio):
         num_samples = len(samples)
         split_idx = int(num_samples * split_ratio)
 
-        # 打乱样本
-        shuffled_indices = np.random.permutation(num_samples)
+        # # 打乱样本
+        # shuffled_indices = np.random.permutation(num_samples)
+
+        # 固定随机数种子，保证每次生成相同的数据
+        shuffled_indices = np.random.default_rng(42).permutation(num_samples)
 
         # D_0 获取前半部分数据
         D_0_data.extend([samples[i] for i in shuffled_indices[:split_idx]])
@@ -56,7 +59,10 @@ def sample_replay_data(D_0_data, D_0_labels, replay_ratio=0.1):
     for class_label, samples in class_data.items():
         num_samples = len(samples)
         num_replay_samples = int(num_samples * replay_ratio)
-        replay_indices = np.random.choice(
+        # replay_indices = np.random.choice(
+        #     num_samples, num_replay_samples, replace=False
+        # )
+        replay_indices = np.random.default_rng(42).choice(
             num_samples, num_replay_samples, replace=False
         )
 
@@ -193,7 +199,9 @@ def create_cifar100_npy_files(
 
         # 构建重放数据集 D_a（从 D_0 中随机抽取 10% 的样本）
         num_replay_samples = int(len(D_0_data) * 0.1)
-        D_a_indices = np.random.choice(len(D_0_data), num_replay_samples, replace=False)
+        D_a_indices = np.random.default_rng(42).choice(
+            len(D_0_data), num_replay_samples, replace=False
+        )
         D_a_data = D_0_data[D_a_indices]
         D_a_labels = D_0_labels[D_a_indices]
 
@@ -300,8 +308,11 @@ def create_cifar100_npy_files(
         num_forget_samples = int(len(D_inc_forget_indices) * retention_ratio)
 
         if num_forget_samples > 0:
-            forget_sample_indices = np.random.choice(
-                D_inc_forget_indices, num_forget_samples, replace=False
+            # forget_sample_indices = np.random.choice(
+            #     D_inc_forget_indices, num_forget_samples, replace=False
+            # )
+            forget_sample_indices = np.random.default_rng(42).choice(
+                len(D_inc_data), num_forget_samples, replace=False
             )
             D_f_data = D_inc_data[forget_sample_indices]
             D_f_labels = D_inc_labels[forget_sample_indices]
@@ -314,14 +325,16 @@ def create_cifar100_npy_files(
         num_noisy_samples = int(len(noise_sample_indices) * noise_ratio)
 
         if num_noisy_samples > 0:
-            noisy_indices = np.random.choice(
+            # noisy_indices = np.random.choice(
+            #     noise_sample_indices, num_noisy_samples, replace=False
+            # )
+            noisy_indices = np.random.default_rng(42).choice(
                 noise_sample_indices, num_noisy_samples, replace=False
             )
         else:
             noisy_indices = []
 
         D_n_data = D_inc_data[noise_sample_indices]
-        # D_n_labels = D_inc_labels[noise_sample_indices].clone()
         D_n_labels = D_inc_labels[noise_sample_indices]
 
         # 在 D_n_labels 中注入噪声
@@ -333,24 +346,25 @@ def create_cifar100_npy_files(
                 if noise_type == "symmetric":
                     new_label = original_label
                     while new_label == original_label:
-                        new_label = np.random.randint(0, num_classes)
+                        # new_label = np.random.randint(0, num_classes)
+                        new_label = np.random.default_rng(42).integers(0, 100)
                     D_n_labels[idx_in_D_n] = new_label
+                    symmetric_noisy_classes.append(original_label)
                 elif noise_type == "asymmetric":
                     if original_class_name in asymmetric_mapping:
                         new_class_name = asymmetric_mapping[original_class_name]
                         new_label = cifar100_classes.index(new_class_name)
                         D_n_labels[idx_in_D_n] = new_label
+                        asymmetric_noisy_classes.append(original_label)
                 else:
                     raise ValueError("Invalid noise type.")
-            else:
-                # 未被选中注入噪声的样本标签保持不变
-                pass
 
         D_tr_data = np.concatenate([D_f_data, D_n_data], axis=0)
         D_tr_labels = np.concatenate([D_f_labels, D_n_labels], axis=0)
 
         # 打乱训练数据集
-        perm = np.random.permutation(len(D_tr_data))  # 使用 numpy 的随机打乱
+        # perm = np.random.permutation(len(D_tr_data))  # 使用 numpy 的随机打乱
+        perm = np.random.default_rng(42).permutation(len(D_tr_data))
         D_tr_data = D_tr_data[perm]
         D_tr_labels = D_tr_labels[perm]
 
@@ -368,11 +382,15 @@ def create_cifar100_npy_files(
         np.save(train_data_path, D_tr_data)
         np.save(train_label_path, D_tr_labels)
 
-        # # 保存训练数据集
-        # np.save(os.path.join(subdir, f"D_tr_data_version_{t+1}.npy"), D_tr_data)
-        # np.save(os.path.join(subdir, f"D_tr_labels_version_{t+1}.npy"), D_tr_labels)
-
         print(f"D_tr 版本 {t+1} 已保存到 {subdir}")
+
+    # 记录噪声注入信息
+    if noise_type == "symmetric":
+        with open(os.path.join(gen_dir, "symmetric_noisy_classes.json"), "w") as f:
+            json.dump(symmetric_noisy_classes, f)
+    elif noise_type == "asymmetric":
+        with open(os.path.join(gen_dir, "asymmetric_noisy_classes.json"), "w") as f:
+            json.dump(asymmetric_noisy_classes, f)
 
     print("所有数据集生成完毕。")
 
