@@ -7,7 +7,7 @@ nohup bash -c "CUDA_VISIBLE_DEVICES=1 python run_experiment.py \
     --noise_ratio 0.3 \
     --noise_type symmetric \
     --balanced \
-    --epoch 100 \
+    --num_epochs 100 \
     --learning_rate 0.01 \
     --optimizer adam \
     --batch_size 256" >logs/run_experiment_step0_resnet18_cifar10_$(date +'%Y%m%d_%H%M%S').log 2>&1 &
@@ -19,7 +19,7 @@ nohup bash -c "CUDA_VISIBLE_DEVICES=2 python run_experiment.py \
     --noise_ratio 0.3 \
     --noise_type symmetric \
     --balanced \
-    --epoch 30 \
+    --num_epochs 30 \
     --learning_rate 0.0001 \
     --optimizer adam \
     --batch_size 64" >logs/run_experiment_step0_wideresnet50_pet37_$(date +'%Y%m%d_%H%M%S').log 2>&1 &
@@ -31,7 +31,7 @@ nohup bash -c "CUDA_VISIBLE_DEVICES=3 python run_experiment.py \
     --noise_ratio 0.3 \
     --noise_type asymmetric \
     --balanced \
-    --epoch 200 \
+    --num_epochs 200 \
     --learning_rate 0.02 \
     --optimizer adam \
     --batch_size 256" >logs/run_experiment_step0_wideresnet40_cifar100_$(date +'%Y%m%d_%H%M%S').log 2>&1 &
@@ -43,7 +43,7 @@ nohup bash -c "CUDA_VISIBLE_DEVICES=4 python run_experiment.py \
     --noise_ratio 0.3 \
     --noise_type asymmetric \
     --balanced \
-    --epoch 30 \
+    --num_epochs 30 \
     --learning_rate 0.0001 \
     --optimizer adam \
     --batch_size 64" >logs/run_experiment_step0_wideresnet50_pet37_asymmetric_$(date +'%Y%m%d_%H%M%S').log 2>&1 &

@@ -313,9 +313,10 @@ def train_step(
         print(f"M_raw 训练完毕并保存至 {model_raw_path}")
         return
     elif step == 0:  # 基于$D_0$数据集和原始的resnet网络训练一个模型 M_p0
+        pretrain_case = "pretrain"
         model_p0_path = settings.get_ckpt_path(
             dataset_name,
-            case,
+            pretrain_case,
             model_name,
             "worker_restore",
             step=step
