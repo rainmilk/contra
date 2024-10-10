@@ -1,13 +1,18 @@
 #!/bin/bash
 
 # 定义要查找并杀掉的进程关键字列表
-keywords=("baseline_code" "core_model")
+keywords=("baseline_code" "core_model" "run_experiment.py")
 
-# 循环遍历每个关键字并尝试杀掉相关进程
-for keyword in "${keywords[@]}"; do
+# 定义监控时长（秒），可以通过第一个参数指定，默认是30秒
+monitor_duration=${1:-30}
+end_time=$((SECONDS + monitor_duration))
+
+# 函数用于杀掉进程并打印结果
+kill_processes() {
+    local keyword=$1
     echo -e "\e[34m[Info] Searching for processes containing keyword: $keyword\e[0m"
     pids=$(ps aux | grep "$keyword" | grep -v "grep" | awk '{print $2}')
-
+    
     if [ -z "$pids" ]; then
         echo -e "\e[33m[Warning] No processes found for keyword: $keyword\e[0m"
     else
@@ -21,6 +26,21 @@ for keyword in "${keywords[@]}"; do
             fi
         done
     fi
+}
+
+# 初次执行杀掉进程
+for keyword in "${keywords[@]}"; do
+    kill_processes "$keyword"
 done
 
-echo -e "\e[34m[Info] All matching processes have been processed.\e[0m"
+echo -e "\e[34m[Info] Initial process kill completed. Monitoring for $monitor_duration seconds...\e[0m"
+
+# 监控并杀掉重启的进程
+while [ $SECONDS -lt $end_time ]; do
+    for keyword in "${keywords[@]}"; do
+        kill_processes "$keyword"
+    done
+    sleep 2 # 每隔2秒检查一次
+done
+
+echo -e "\e[34m[Info] Monitoring completed. All matching processes have been processed.\e[0m"
