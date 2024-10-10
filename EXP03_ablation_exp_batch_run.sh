@@ -15,17 +15,17 @@ tasks=(
     # forget ratio: 0.5/0.3/0.1
     # method: raw/coteaching/contra
     # 消融01: 仅有 repair
-    "run_pet37_raw_repair_only.sh"
-    "run_pet37_conteaching_repair_only.sh"
-    "run_pet37_contra_repair_only.sh"
+    # Add 10-10 已经生成
+    # "run_pet37_raw_repair_only.sh"
+    # "run_pet37_conteaching_repair_only.sh"
+    # "run_pet37_contra_repair_only.sh"
     ######################################
     # 消融02: 仅有 tta
-    "run_pet37_raw_tta_only.sh"
-    "run_pet37_conteaching_tta_only.sh"
+    # "run_pet37_raw_tta_only.sh"
+    # "run_pet37_conteaching_tta_only.sh"
     "run_pet37_contra_tta_only.sh"
     ############################################
     # 消融03: 有 repair + 有 tta, done
-
 
     ############################################
     # 检索任务 - PET37 - 非对称噪声 - WideResnet50
@@ -36,17 +36,43 @@ tasks=(
     # forget ratio: 0.5/0.3/0.1
     # method: raw/coteaching/contra
     # 消融01: 仅有 repair
-    "run_pet37_raw_asy_repair_only.sh"
-    "run_pet37_conteaching_asy_repair_only.sh"
-    "run_pet37_contra_asy_repair_only.sh"
+    # "run_pet37_raw_asy_repair_only.sh"
+    # "run_pet37_conteaching_asy_repair_only.sh"
+    # "run_pet37_contra_asy_repair_only.sh"
     ######################################
     # 消融02: 仅有 tta
-    "run_pet37_raw_asy_tta_only.sh"
-    "run_pet37_conteaching_asy_tta_only.sh"
+    # "run_pet37_raw_asy_tta_only.sh"
+    # "run_pet37_conteaching_asy_tta_only.sh"
     "run_pet37_contra_asy_tta_only.sh"
     ############################################
     # 消融03: 有 repair + 有 tta, done
 )
+
+# 检查所有任务脚本是否存在
+check_only=false
+if [ "$1" == "--check-only" ]; then
+    check_only=true
+fi
+
+all_present=true
+for task in "${tasks[@]}"; do
+    if [ -f "$task" ]; then
+        echo -e "\e[32m[✔] Checked: $task - File exists\e[0m"
+    else
+        echo -e "\e[31m[✖] Error: $task - File not found\e[0m"
+        all_present=false
+    fi
+done
+
+if [ "$all_present" == false ]; then
+    echo -e "\e[31mOne or more scripts are missing. Exiting.\e[0m"
+    exit 1
+fi
+
+if [ "$check_only" == true ]; then
+    echo -e "\e[34mAll scripts are present. Exiting as per --check-only flag.\e[0m"
+    exit 0
+fi
 
 # Define the GPUs to use
 gpus=(1 2 3 4 5 6 7)
