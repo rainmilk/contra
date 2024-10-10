@@ -15,13 +15,14 @@ tasks=(
     # forget ratio: 0.5/0.3/0.1
     # method: raw/coteaching/contra
     # 消融01: 仅有 repair
-    "run_pet37_raw_repair_only.sh"
-    "run_pet37_conteaching_repair_only.sh"
-    "run_pet37_contra_repair_only.sh"
+    # Add 10-10 已经生成
+    # "run_pet37_raw_repair_only.sh"
+    # "run_pet37_conteaching_repair_only.sh"
+    # "run_pet37_contra_repair_only.sh"
     ######################################
     # 消融02: 仅有 tta
-    "run_pet37_raw_tta_only.sh"
-    "run_pet37_conteaching_tta_only.sh"
+    # "run_pet37_raw_tta_only.sh"
+    # "run_pet37_conteaching_tta_only.sh"
     "run_pet37_contra_tta_only.sh"
     ############################################
     # 消融03: 有 repair + 有 tta, done
@@ -35,13 +36,13 @@ tasks=(
     # forget ratio: 0.5/0.3/0.1
     # method: raw/coteaching/contra
     # 消融01: 仅有 repair
-    "run_pet37_raw_asy_repair_only.sh"
-    "run_pet37_conteaching_asy_repair_only.sh"
-    "run_pet37_contra_asy_repair_only.sh"
+    # "run_pet37_raw_asy_repair_only.sh"
+    # "run_pet37_conteaching_asy_repair_only.sh"
+    # "run_pet37_contra_asy_repair_only.sh"
     ######################################
     # 消融02: 仅有 tta
-    "run_pet37_raw_asy_tta_only.sh"
-    "run_pet37_conteaching_asy_tta_only.sh"
+    # "run_pet37_raw_asy_tta_only.sh"
+    # "run_pet37_conteaching_asy_tta_only.sh"
     "run_pet37_contra_asy_tta_only.sh"
     ############################################
     # 消融03: 有 repair + 有 tta, done
