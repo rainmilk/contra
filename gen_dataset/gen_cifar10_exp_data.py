@@ -1,3 +1,4 @@
+import json
 import torch
 import numpy as np
 import os
@@ -200,6 +201,10 @@ def create_cifar10_npy_files(
         6: 4,
         8: 0,
     }
+    symmetric_noisy_classes = []
+    asymmetric_noisy_classes = []
+    symmetric_noisy_classes_simple = set()
+    asymmetric_noisy_classes_simple = set()
 
     # 生成增量版本数据集
     for t in range(num_versions):
@@ -229,8 +234,8 @@ def create_cifar10_npy_files(
             noisy_indices = []
 
         D_n_data = D_inc_data[noise_sample_indices]
-        # D_n_labels = D_inc_labels[noise_sample_indices].clone()
         D_n_labels = D_inc_labels[noise_sample_indices]
+        # D_n_labels = D_inc_labels[noise_sample_indices].clone()
 
         # 在 D_n_labels 中注入噪声
         for idx_in_D_n, D_inc_idx in enumerate(noise_sample_indices):
@@ -243,14 +248,30 @@ def create_cifar10_npy_files(
                             [i for i in range(num_classes) if i != original_label]
                         )
                     D_n_labels[idx_in_D_n] = new_label
+                    symmetric_noisy_classes.append(
+                        {
+                            "original_label": int(original_label),
+                            "new_label": int(new_label),
+                        }
+                    )
+                    symmetric_noisy_classes_simple.add(
+                        (int(original_label), int(new_label))
+                    )
                 elif noise_type == "asymmetric":
                     if original_label in asymmetric_mapping:
-                        D_n_labels[idx_in_D_n] = asymmetric_mapping[original_label]
+                        new_label = asymmetric_mapping[original_label]
+                        D_n_labels[idx_in_D_n] = new_label
+                        asymmetric_noisy_classes.append(
+                            {
+                                "original_label": int(original_label),
+                                "new_label": int(new_label),
+                            }
+                        )
+                        asymmetric_noisy_classes_simple.add(
+                            (int(original_label), int(new_label))
+                        )
                 else:
                     raise ValueError("Invalid noise type.")
-            else:
-                # 未被选中注入噪声的样本标签保持不变
-                pass
 
         # 组合训练数据集 D_tr^{(t)}
         D_tr_data = np.concatenate([D_f_data, D_n_data], axis=0)
@@ -276,6 +297,30 @@ def create_cifar10_npy_files(
         np.save(train_label_path, D_tr_labels)
 
         print(f"D_tr 版本 {t+1} 已保存到 {subdir}")
+
+    # 保存噪声注入详细信息
+    if noise_type == "symmetric":
+        with open(
+            f"{dataset_name}-{noise_type}-{noise_ratio}-symmetric_noisy_classes_detailed.json",
+            "w",
+        ) as f:
+            json.dump(symmetric_noisy_classes, f, indent=4)
+        with open(
+            f"{dataset_name}-{noise_type}-{noise_ratio}-symmetric_noisy_classes_simple.json",
+            "w",
+        ) as f:
+            json.dump(list(symmetric_noisy_classes_simple), f, indent=4)
+    elif noise_type == "asymmetric":
+        with open(
+            f"{dataset_name}-{noise_type}-{noise_ratio}-asymmetric_noisy_classes_detailed.json",
+            "w",
+        ) as f:
+            json.dump(asymmetric_noisy_classes, f, indent=4)
+        with open(
+            f"{dataset_name}-{noise_type}-{noise_ratio}-asymmetric_noisy_classes_simple.json",
+            "w",
+        ) as f:
+            json.dump(list(asymmetric_noisy_classes_simple), f, indent=4)
 
     print("所有数据集生成完毕。")
 
