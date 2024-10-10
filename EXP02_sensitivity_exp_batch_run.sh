@@ -50,6 +50,32 @@ tasks=(
     # "run_pet37_rehearsal_asy.sh"
 )
 
+# 检查所有任务脚本是否存在
+check_only=false
+if [ "$1" == "--check-only" ]; then
+    check_only=true
+fi
+
+all_present=true
+for task in "${tasks[@]}"; do
+    if [ -f "$task" ]; then
+        echo -e "\e[32m[✔] Checked: $task - File exists\e[0m"
+    else
+        echo -e "\e[31m[✖] Error: $task - File not found\e[0m"
+        all_present=false
+    fi
+done
+
+if [ "$all_present" == false ]; then
+    echo -e "\e[31mOne or more scripts are missing. Exiting.\e[0m"
+    exit 1
+fi
+
+if [ "$check_only" == true ]; then
+    echo -e "\e[34mAll scripts are present. Exiting as per --check-only flag.\e[0m"
+    exit 0
+fi
+
 # Define the GPUs to use
 gpus=(1 2 3 4 5 6 7)
 gpu_count=${#gpus[@]}
