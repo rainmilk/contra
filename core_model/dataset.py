@@ -33,9 +33,15 @@ def normalize_dataset(dataset, mean=None, std=None):
     if channel_idx == 3:
         dataset = np.transpose(dataset, [0, 3, 1, 2])
 
+    # [2024-10-10 Add by sunzekun]
+    # 下面的代码会引发bug，因为目前数据集都是已经经过了归一化的
+    # 此时有部分值会超出1，为1.xxx。但它不是像素值
+    # 所以会错误地触发这个判断条件，导致整体所有的值再被除了一次255.
+    # 为了避免出问题，此处直接把这行注释掉即可。
+
     # normalize
-    if (dataset[0] > 1).any():
-        dataset = dataset / 255.
+    # if (dataset[0] > 1).any():
+    #     dataset = dataset / 255.
 
     # gaussian normalize
     if mean is not None:
