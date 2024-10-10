@@ -20,7 +20,7 @@ def split_by_class(data, labels, num_classes=37):
     return class_data
 
 
-def sample_class_balanced_data(class_data, split_ratio=0.5):
+def sample_class_balanced_data(class_data, split_ratio, rng):
     """按比例从每个类别中均衡抽取样本"""
     D_0_data = []
     D_0_labels = []
@@ -30,9 +30,7 @@ def sample_class_balanced_data(class_data, split_ratio=0.5):
     for class_label, samples in class_data.items():
         num_samples = len(samples)
         split_idx = int(num_samples * split_ratio)
-
-        # 打乱样本
-        shuffled_indices = np.random.permutation(num_samples)
+        shuffled_indices = rng.permutation(num_samples)
 
         # D_0 获取前半部分数据
         D_0_data.extend([samples[i] for i in shuffled_indices[:split_idx]])
@@ -50,7 +48,7 @@ def sample_class_balanced_data(class_data, split_ratio=0.5):
     return D_0_data, D_0_labels, D_inc_data, D_inc_labels
 
 
-def sample_replay_data(D_0_data, D_0_labels, replay_ratio=0.1):
+def sample_replay_data(D_0_data, D_0_labels, replay_ratio, rng):
     """从 D_0 中均衡抽取样本作为重放数据集 D_a"""
     class_data = split_by_class(D_0_data, D_0_labels)
     D_a_data = []
@@ -59,9 +57,7 @@ def sample_replay_data(D_0_data, D_0_labels, replay_ratio=0.1):
     for class_label, samples in class_data.items():
         num_samples = len(samples)
         num_replay_samples = int(num_samples * replay_ratio)
-        replay_indices = np.random.choice(
-            num_samples, num_replay_samples, replace=False
-        )
+        replay_indices = rng.choice(num_samples, num_replay_samples, replace=False)
 
         D_a_data.extend([samples[i] for i in replay_indices])
         D_a_labels.extend([class_label] * num_replay_samples)
@@ -86,7 +82,7 @@ def load_pet37_superclass_mapping(file_path):
     return pet37_superclass_to_child
 
 
-def build_asymmetric_mapping(superclass_mapping, classes):
+def build_asymmetric_mapping(superclass_mapping, classes, rng):
     """构建非对称标签映射，确保标签替换为同superclass内的其他类"""
     child_to_superclass_mapping = {}
 
@@ -104,7 +100,7 @@ def build_asymmetric_mapping(superclass_mapping, classes):
             # 在同一superclass中随机选择一个不同的类别作为替换
             available_classes = [c for c in child_classes if c != class_name]
             if available_classes:
-                new_class = np.random.choice(available_classes)
+                new_class = rng.choice(available_classes)
                 asymmetric_mapping[class_name] = new_class
             else:
                 asymmetric_mapping[class_name] = (
@@ -123,16 +119,11 @@ def create_pet37_npy_files(
     balanced=False,
 ):
 
+    rng = np.random.default_rng(42)
+
     weights = torchvision.models.ResNet18_Weights.DEFAULT
 
-    data_transform = transforms.Compose(
-        [
-            # transforms.Resize((224,224)),
-            weights.transforms(),
-            # transforms.ToTensor(),
-            # transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-        ]
-    )
+    data_transform = transforms.Compose([weights.transforms()])
 
     # 加载 PET-37 数据集
     train_dataset = datasets.OxfordIIITPet(
@@ -155,29 +146,23 @@ def create_pet37_npy_files(
     # 根据 balanced 参数调整存储路径
     if balanced:
         print("使用类均衡的数据划分方式...")
-        # subdir = os.path.join(gen_dir, f"nr_{noise_ratio}_nt_{noise_type}_balanced")
         subdir = os.path.join(gen_dir, case)
-
         # 按类别划分训练数据
         class_data = split_by_class(train_data, train_labels)
-
         # 构建类均衡的 D_0 和 D_inc_0
         D_0_data, D_0_labels, D_inc_data, D_inc_labels = sample_class_balanced_data(
-            class_data, split_ratio=0.5
+            class_data, split_ratio=0.5, rng=rng
         )
-
         # 构建重放数据集 D_a（从 D_0 中随机抽取 10% 的样本）
         D_a_data, D_a_labels = sample_replay_data(
-            D_0_data, D_0_labels, replay_ratio=0.1
+            D_0_data, D_0_labels, replay_ratio=0.1, rng=rng
         )
 
     else:
         print("使用随机的数据划分方式...")
         subdir = os.path.join(gen_dir, case)
-
-        # 随机划分初始数据集 D_0 和增量数据集 D_inc^(0)
         num_samples = len(train_data)
-        indices = np.random.permutation(num_samples)
+        indices = rng.permutation(num_samples)
         split_idx = num_samples // 2
 
         D_0_indices = indices[:split_idx]
@@ -191,7 +176,7 @@ def create_pet37_npy_files(
 
         # 构建重放数据集 D_a（从 D_0 中随机抽取 10% 的样本）
         num_replay_samples = int(len(D_0_data) * 0.1)
-        D_a_indices = np.random.choice(len(D_0_data), num_replay_samples, replace=False)
+        D_a_indices = rng.choice(len(D_0_data), num_replay_samples, replace=False)
         D_a_data = D_0_data[D_a_indices]
         D_a_labels = D_0_labels[D_a_indices]
 
@@ -209,12 +194,8 @@ def create_pet37_npy_files(
 
     np.save(aux_data_path, D_a_data)
     np.save(aux__label_path, D_a_labels)
-
-    # 保存训练数据集
     np.save(train_data_path, train_data)
     np.save(train_label_path, train_labels)
-
-    # 保存测试数据集
     np.save(test_data_path, test_data)
     np.save(test_label_path, test_labels)
 
@@ -229,38 +210,21 @@ def create_pet37_npy_files(
     # 保存初始数据集、初始增量数据集、重放数据集
     np.save(train_data_path, D_0_data)
     np.save(train_label_path, D_0_labels)
-
     np.save(inc_data_path, D_inc_data)
     np.save(inc_label_path, D_inc_labels)
 
-    # # 创建存储目录
-    # os.makedirs(subdir, exist_ok=True)
-
-    # # 检查 D_0 数据分布
-    # print("D_0 Labels distribution:", collections.Counter(D_0_labels))
-
-    # # 检查 D_inc 数据分布
-    # print("D_inc Labels distribution:", collections.Counter(D_inc_labels))
-
-    # # 保存初始数据集、初始增量数据集、重放数据集
-    # np.save(os.path.join(subdir, "D_0.npy"), D_0_data)
-    # np.save(os.path.join(subdir, "D_0_labels.npy"), D_0_labels)
-
-    # np.save(os.path.join(subdir, "D_inc_0_data.npy"), D_inc_data)
-    # np.save(os.path.join(subdir, "D_inc_0_labels.npy"), D_inc_labels)
-
-    # np.save(os.path.join(subdir, "D_a.npy"), D_a_data)
-    # np.save(os.path.join(subdir, "D_a_labels.npy"), D_a_labels)
-
-    # # 保存训练数据集
-    # np.save(os.path.join(subdir, "train_data.npy"), train_data)
-    # np.save(os.path.join(subdir, "train_labels.npy"), train_labels)
-
-    # # 保存测试数据集
-    # np.save(os.path.join(subdir, "test_data.npy"), test_data)
-    # np.save(os.path.join(subdir, "test_labels.npy"), test_labels)
-
     num_classes = 37
+
+    # 读取 Oxford-Pets 类别
+    pet37_classes_file = "../configs/classes/pet_37_classes.txt"
+    pet37_classes = load_classes_from_file(pet37_classes_file)
+
+    # 打印读取到的类别信息
+    print("PET-37 Classes:", pet37_classes)
+
+    # 读取 Oxford-Pets 的 superclass 和 child class 映射
+    pet37_mapping_file = "../configs/classes/pet_37_mapping.json"
+    pet37_superclass_mapping = load_pet37_superclass_mapping(pet37_mapping_file)
 
     # 定义遗忘类别和噪声类别
     forget_classes = list(range(18))  # 前18个类别作为遗忘类别
@@ -274,47 +238,35 @@ def create_pet37_npy_files(
         i for i in range(len(D_inc_labels)) if D_inc_labels[i] in noise_classes
     ]
 
-    # 读取 Oxford-Pets 类别
-    pet37_classes_file = "../configs/classes/pet_37_classes.txt"
-    pet37_classes = load_classes_from_file(pet37_classes_file)
-
-    # 打印读取到的类别信息
-    print("PET-37 Classes:", pet37_classes)
-
-    # 读取 Oxford-Pets 的 superclass 和 child class 映射
-    pet37_mapping_file = "../configs/classes/pet_37_mapping.json"
-    pet37_superclass_mapping = load_pet37_superclass_mapping(pet37_mapping_file)
-
     # 构建非对称映射，如果选择了非对称噪声
     if noise_type == "asymmetric":
         asymmetric_mapping = build_asymmetric_mapping(
-            pet37_superclass_mapping, pet37_classes
+            pet37_superclass_mapping, pet37_classes, rng
         )
 
-    # 生成增量版本数据集
+    symmetric_noisy_classes = []
+    asymmetric_noisy_classes = []
+    symmetric_noisy_classes_simple = set()
+    asymmetric_noisy_classes_simple = set()
+
+    rng = np.random.default_rng(42)
     for t in range(num_versions):
         retention_ratio = retention_ratios[t]
-
-        # 模拟遗忘：根据保留比例抽取遗忘类别的样本
         num_forget_samples = int(len(D_inc_forget_indices) * retention_ratio)
-
         if num_forget_samples > 0:
-            forget_sample_indices = np.random.choice(
+            forget_sample_indices = rng.choice(
                 D_inc_forget_indices, num_forget_samples, replace=False
             )
             D_f_data = D_inc_data[forget_sample_indices]
             D_f_labels = D_inc_labels[forget_sample_indices]
         else:
-            # D_f_data = torch.empty(0, 3, 32, 32)
             D_f_data = torch.empty(0, 3, 224, 224)
             D_f_labels = torch.empty(0, dtype=torch.long)
 
-        # 噪声注入：对噪声类别的样本注入噪声
         noise_sample_indices = D_inc_noise_indices
         num_noisy_samples = int(len(noise_sample_indices) * noise_ratio)
-
         if num_noisy_samples > 0:
-            noisy_indices = np.random.choice(
+            noisy_indices = rng.choice(
                 noise_sample_indices, num_noisy_samples, replace=False
             )
         else:
@@ -323,54 +275,86 @@ def create_pet37_npy_files(
         D_n_data = D_inc_data[noise_sample_indices]
         D_n_labels = D_inc_labels[noise_sample_indices]
 
-        # 在 D_n_labels 中注入噪声
         for idx_in_D_n, D_inc_idx in enumerate(noise_sample_indices):
             if D_inc_idx in noisy_indices:
-                original_label = D_n_labels[idx_in_D_n].item()
-                original_class_name = pet37_classes[original_label]
-
-                if noise_type == "symmetric":
-                    new_label = original_label
-                    while new_label == original_label:
-                        new_label = np.random.randint(0, num_classes)
-                    D_n_labels[idx_in_D_n] = new_label
-                elif noise_type == "asymmetric":
-                    if original_class_name in asymmetric_mapping:
-                        new_class_name = asymmetric_mapping[original_class_name]
-                        new_label = pet37_classes.index(new_class_name)
+                original_label = int(D_n_labels[idx_in_D_n].item())
+                if original_label in noise_classes:
+                    original_class_name = pet37_classes[original_label]
+                    if noise_type == "symmetric":
+                        new_label = rng.choice(
+                            [i for i in range(num_classes) if i != original_label]
+                        )
                         D_n_labels[idx_in_D_n] = new_label
-                else:
-                    raise ValueError("Invalid noise type.")
-            else:
-                pass
+                        symmetric_noisy_classes.append(
+                            {
+                                "original_label": int(original_label),
+                                "original_class_name": original_class_name,
+                                "new_label": int(new_label),
+                                "new_class_name": pet37_classes[new_label],
+                            }
+                        )
+                        symmetric_noisy_classes_simple.add(
+                            (int(original_label), int(new_label))
+                        )
+                    elif noise_type == "asymmetric":
+                        if original_class_name in asymmetric_mapping:
+                            new_class_name = asymmetric_mapping[original_class_name]
+                            new_label = pet37_classes.index(new_class_name)
+                            D_n_labels[idx_in_D_n] = new_label
+                            asymmetric_noisy_classes.append(
+                                {
+                                    "original_label": int(original_label),
+                                    "original_class_name": original_class_name,
+                                    "new_label": int(new_label),
+                                    "new_class_name": new_class_name,
+                                }
+                            )
+                            asymmetric_noisy_classes_simple.add(
+                                (int(original_label), int(new_label))
+                            )
+                    else:
+                        raise ValueError("Invalid noise type.")
 
         D_tr_data = np.concatenate([D_f_data, D_n_data], axis=0)
         D_tr_labels = np.concatenate([D_f_labels, D_n_labels], axis=0)
-
-        # 打乱训练数据集
-        perm = np.random.permutation(len(D_tr_data))  # 使用 numpy 的随机打乱
+        perm = rng.permutation(len(D_tr_data))
         D_tr_data = D_tr_data[perm]
         D_tr_labels = D_tr_labels[perm]
 
-        # 保存训练数据集
         train_data_path = settings.get_dataset_path(
             dataset_name, case, "train_data", t + 1
         )
         train_label_path = settings.get_dataset_path(
             dataset_name, case, "train_label", t + 1
         )
-
         subdir = os.path.dirname(train_data_path)
         os.makedirs(subdir, exist_ok=True)
-
         np.save(train_data_path, D_tr_data)
         np.save(train_label_path, D_tr_labels)
+        print(f"D_tr 版本 {t + 1} 已保存到 {subdir}")
 
-        # 保存训练数据集
-        # np.save(os.path.join(subdir, f"D_tr_data_version_{t+1}.npy"), D_tr_data)
-        # np.save(os.path.join(subdir, f"D_tr_labels_version_{t+1}.npy"), D_tr_labels)
-
-        # print(f"D_tr 版本 {t+1} 已保存到 {subdir}")
+    if noise_type == "symmetric":
+        with open(
+            f"{dataset_name}-{noise_type}-{noise_ratio}-symmetric_noisy_classes_detailed.json",
+            "w",
+        ) as f:
+            json.dump(symmetric_noisy_classes, f, indent=4)
+        with open(
+            f"{dataset_name}-{noise_type}-{noise_ratio}-symmetric_noisy_classes_simple.json",
+            "w",
+        ) as f:
+            json.dump(list(symmetric_noisy_classes_simple), f, indent=4)
+    elif noise_type == "asymmetric":
+        with open(
+            f"{dataset_name}-{noise_type}-{noise_ratio}-asymmetric_noisy_classes_detailed.json",
+            "w",
+        ) as f:
+            json.dump(asymmetric_noisy_classes, f, indent=4)
+        with open(
+            f"{dataset_name}-{noise_type}-{noise_ratio}-asymmetric_noisy_classes_simple.json",
+            "w",
+        ) as f:
+            json.dump(list(asymmetric_noisy_classes_simple), f, indent=4)
 
     print("所有数据集生成完毕。")
 
