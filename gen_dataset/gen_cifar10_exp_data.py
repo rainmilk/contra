@@ -14,7 +14,7 @@ def split_by_class(data, labels, num_classes=10):
     return class_data
 
 
-def sample_class_balanced_data(class_data, split_ratio=0.5):
+def sample_class_balanced_data(class_data, split_ratio, rng):
     """按比例从每个类别中均衡抽取样本"""
     D_0_data = []
     D_0_labels = []
@@ -24,9 +24,7 @@ def sample_class_balanced_data(class_data, split_ratio=0.5):
     for class_label, samples in class_data.items():
         num_samples = len(samples)
         split_idx = int(num_samples * split_ratio)
-
-        # 打乱样本
-        shuffled_indices = np.random.permutation(num_samples)
+        shuffled_indices = rng.permutation(num_samples)
 
         # D_0 获取前半部分数据
         D_0_data.extend([samples[i] for i in shuffled_indices[:split_idx]])
@@ -44,7 +42,7 @@ def sample_class_balanced_data(class_data, split_ratio=0.5):
     return D_0_data, D_0_labels, D_inc_data, D_inc_labels
 
 
-def sample_replay_data(D_0_data, D_0_labels, replay_ratio=0.1):
+def sample_replay_data(D_0_data, D_0_labels, replay_ratio, rng):
     """从 D_0 中均衡抽取样本作为重放数据集 D_a"""
     class_data = split_by_class(D_0_data, D_0_labels)
     D_a_data = []
@@ -53,9 +51,7 @@ def sample_replay_data(D_0_data, D_0_labels, replay_ratio=0.1):
     for class_label, samples in class_data.items():
         num_samples = len(samples)
         num_replay_samples = int(num_samples * replay_ratio)
-        replay_indices = np.random.choice(
-            num_samples, num_replay_samples, replace=False
-        )
+        replay_indices = rng.choice(num_samples, num_replay_samples, replace=False)
 
         D_a_data.extend([samples[i] for i in replay_indices])
         D_a_labels.extend([class_label] * num_replay_samples)
@@ -75,6 +71,9 @@ def create_cifar10_npy_files(
     retention_ratios=[0.5, 0.3, 0.1],
     balanced=False,  # 选择是否类均衡
 ):
+
+    rng = np.random.default_rng(42)
+
     transform = transforms.Compose(
         [
             transforms.ToTensor(),
@@ -98,7 +97,7 @@ def create_cifar10_npy_files(
     test_labels = torch.tensor(test_labels)
 
     num_samples = len(train_data)
-    indices = np.random.permutation(num_samples)
+    indices = rng.permutation(num_samples)
     split_idx = num_samples // 2
 
     case = settings.get_case(noise_ratio, noise_type, balanced)
@@ -112,12 +111,12 @@ def create_cifar10_npy_files(
 
         # 构建类均衡的 D_0 和 D_inc_0
         D_0_data, D_0_labels, D_inc_data, D_inc_labels = sample_class_balanced_data(
-            class_data, split_ratio=0.5
+            class_data, split_ratio=0.5, rng=rng
         )
 
         # 构建重放数据集 D_a（从 D_0 中随机抽取 10% 的样本）
         D_a_data, D_a_labels = sample_replay_data(
-            D_0_data, D_0_labels, replay_ratio=0.1
+            D_0_data, D_0_labels, replay_ratio=0.1, rng=rng
         )
 
     else:
@@ -137,7 +136,7 @@ def create_cifar10_npy_files(
 
         # 构建重放数据集 D_a（从 D_0 中随机抽取 10% 的样本）
         num_replay_samples = int(len(D_0_data) * 0.1)
-        D_a_indices = np.random.choice(len(D_0_data), num_replay_samples, replace=False)
+        D_a_indices = rng.choice(len(D_0_data), num_replay_samples, replace=False)
         D_a_data = D_0_data[D_a_indices]
         D_a_labels = D_0_labels[D_a_indices]
 
@@ -209,7 +208,7 @@ def create_cifar10_npy_files(
         # 模拟遗忘：根据保留比例抽取遗忘类别的样本
         num_forget_samples = int(len(D_inc_forget_indices) * retention_ratio)
         if num_forget_samples > 0:
-            forget_sample_indices = np.random.choice(
+            forget_sample_indices = rng.choice(
                 D_inc_forget_indices, num_forget_samples, replace=False
             )
             D_f_data = D_inc_data[forget_sample_indices]
@@ -223,7 +222,7 @@ def create_cifar10_npy_files(
         num_noisy_samples = int(len(noise_sample_indices) * noise_ratio)
 
         if num_noisy_samples > 0:
-            noisy_indices = np.random.choice(
+            noisy_indices = rng.choice(
                 noise_sample_indices, num_noisy_samples, replace=False
             )
         else:
@@ -240,7 +239,9 @@ def create_cifar10_npy_files(
                 if noise_type == "symmetric":
                     new_label = original_label
                     while new_label == original_label:
-                        new_label = np.random.randint(0, num_classes)
+                        new_label = rng.choice(
+                            [i for i in range(num_classes) if i != original_label]
+                        )
                     D_n_labels[idx_in_D_n] = new_label
                 elif noise_type == "asymmetric":
                     if original_label in asymmetric_mapping:
