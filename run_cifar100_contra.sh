@@ -17,16 +17,16 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 
 python ./run_experiment.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 10 --step 0 --learning_rate 0.01 --optimizer adam --batch_size 256 --balanced --noise_type asymmetric --uni_name contra
 
-python ./core_model/train_teacher.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 200 --step 0 --learning_rate 0.02 --optimizer adam --batch_size 256 --balanced --noise_type asymmetric --uni_name contra
+python ./core_model/train_teacher.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 50 --step 0 --learning_rate 0.02 --optimizer adam --batch_size 256 --balanced --noise_type asymmetric --uni_name contra
 
-python ./run_experiment.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 20 --step 1 --learning_rate 0.001 --optimizer adam --batch_size 256 --balanced --model_suffix worker_raw --noise_type asymmetric --uni_name contra
+python ./run_experiment.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 5 --step 1 --learning_rate 0.001 --optimizer adam --batch_size 256 --balanced --model_suffix worker_raw --noise_type asymmetric --uni_name contra
 
 python ./core_model/core.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 2 --step 1 --learning_rate 0.0005 --optimizer adam --batch_size 256 --balanced --noise_type asymmetric --uni_name contra
 
-python ./run_experiment.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 20 --step 2 --learning_rate 0.001 --optimizer adam --batch_size 256 --balanced --model_suffix worker_raw --noise_type asymmetric --uni_name contra
+python ./run_experiment.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 5 --step 2 --learning_rate 0.001 --optimizer adam --batch_size 256 --balanced --model_suffix worker_raw --noise_type asymmetric --uni_name contra
 
 python ./core_model/core.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 2 --step 2 --learning_rate 0.0005 --optimizer adam --batch_size 256 --balanced --noise_type asymmetric --uni_name contra
 
-python ./run_experiment.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 20 --step 3 --learning_rate 0.001 --optimizer adam --batch_size 256 --balanced --model_suffix worker_raw --noise_type asymmetric --uni_name contra
+python ./run_experiment.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 5 --step 3 --learning_rate 0.001 --optimizer adam --batch_size 256 --balanced --model_suffix worker_raw --noise_type asymmetric --uni_name contra
 
 python ./core_model/core.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 2 --step 3 --learning_rate 0.0005 --optimizer adam --batch_size 256 --balanced --noise_type asymmetric --uni_name contra
