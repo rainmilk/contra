@@ -19,12 +19,12 @@ python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epoch
 
 python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 20 --step 1 --learning_rate 0.001 --optimizer adam --batch_size 256 --uni_name replay --balanced --model_suffix worker_raw
 
-python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 20 --step 1 --learning_rate 0.001 --optimizer adam --batch_size 256 --uni_name replay --balanced --train_aux
+python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 20 --step 1 --learning_rate 0.001 --optimizer adam --batch_size 256 --uni_name replay --balanced --train_aux --model_suffix worker_restore
 
 python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 20 --step 2 --learning_rate 0.001 --optimizer adam --batch_size 256 --uni_name replay --balanced --model_suffix worker_raw
 
-python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 20 --step 2 --learning_rate 0.001 --optimizer adam --batch_size 256 --uni_name replay --balanced --train_aux
+python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 20 --step 2 --learning_rate 0.001 --optimizer adam --batch_size 256 --uni_name replay --balanced --train_aux --model_suffix worker_restore
 
 python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 20 --step 3 --learning_rate 0.001 --optimizer adam --batch_size 256 --uni_name replay --balanced --model_suffix worker_raw
 
-python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 20 --step 3 --learning_rate 0.001 --optimizer adam --batch_size 256 --uni_name replay --balanced --train_aux
+python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 20 --step 3 --learning_rate 0.001 --optimizer adam --batch_size 256 --uni_name replay --balanced --train_aux --model_suffix worker_restore

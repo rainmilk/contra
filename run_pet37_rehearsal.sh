@@ -19,12 +19,12 @@ python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20
 
 python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 1 --learning_rate 0.0001 --optimizer adam --batch_size 64 --uni_name replay --balanced --model_suffix worker_raw
 
-python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 1 --learning_rate 0.0001 --optimizer adam --batch_size 64 --uni_name replay --balanced --train_aux
+python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 1 --learning_rate 0.0001 --optimizer adam --batch_size 64 --uni_name replay --balanced --train_aux --model_suffix worker_restore
 
 python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 2 --learning_rate 0.0001 --optimizer adam --batch_size 64 --uni_name replay --balanced --model_suffix worker_raw
 
-python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 2 --learning_rate 0.0001 --optimizer adam --batch_size 64 --uni_name replay --balanced --train_aux
+python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 2 --learning_rate 0.0001 --optimizer adam --batch_size 64 --uni_name replay --balanced --train_aux --model_suffix worker_restore
 
 python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 3 --learning_rate 0.0001 --optimizer adam --batch_size 64 --uni_name replay --balanced --model_suffix worker_raw
 
-python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 3 --learning_rate 0.0001 --optimizer adam --batch_size 64 --uni_name replay --balanced --train_aux
+python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 3 --learning_rate 0.0001 --optimizer adam --batch_size 64 --uni_name replay --balanced --train_aux --model_suffix worker_restore

@@ -40,17 +40,19 @@ def main():
     # print_config(config)
 
     custom_args = parse_args()
-    case = settings.get_case(custom_args.noise_ratio, custom_args.noise_type, custom_args.balanced)
+    case = settings.get_case(
+        custom_args.noise_ratio, custom_args.noise_type, custom_args.balanced
+    )
     step = getattr(custom_args, "step", 1)
     uni_name = getattr(custom_args, "uni_name", None)
     num_classes = settings.num_classes_dict[custom_args.dataset]
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    if uni_name == 'coteaching_plus':
+    if uni_name == "coteaching_plus":
         from co_configs.coteachingplus import config
-    elif uni_name == 'coteaching':
+    elif uni_name == "coteaching":
         from co_configs.coteaching import config
-    elif uni_name == 'jocor':
+    elif uni_name == "jocor":
         from co_configs.jocor import config
 
     set_seed(config["seed"])
@@ -84,35 +86,71 @@ def main():
 
     # get corrected dataset and model path
     _, _, trainloader = get_dataset_loader(
-        custom_args.dataset, "train", case, step, None, None, custom_args.batch_size, shuffle=True
+        custom_args.dataset,
+        "train",
+        case,
+        step,
+        None,
+        None,
+        custom_args.batch_size,
+        shuffle=True,
     )
 
     _, _, testloader = get_dataset_loader(
-        custom_args.dataset, "test", case, None, None, None, custom_args.batch_size, shuffle=False
+        custom_args.dataset,
+        "test",
+        case,
+        None,
+        None,
+        None,
+        custom_args.batch_size,
+        shuffle=False,
     )
 
     num_test_images = len(testloader.dataset)
 
-    load_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model,
-                                             model_suffix="worker_restore", step=step-1, unique_name=uni_name)
+    load_model_path = settings.get_ckpt_path(
+        custom_args.dataset,
+        case,
+        custom_args.model,
+        model_suffix="worker_restore",
+        step=step - 1,
+        unique_name=uni_name,
+    )
     # step=1, copy contra/step_0/ -> target/step_0
     if step == 1 and not os.path.exists(load_model_path):
-        contra_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model,
-                                                   model_suffix="worker_restore", step=step-1, unique_name="contra")
+        contra_model_path = settings.get_ckpt_path(
+            custom_args.dataset,
+            case,
+            custom_args.model,
+            model_suffix="worker_restore",
+            step=step - 1,
+            unique_name="contra",
+        )
         os.makedirs(os.path.dirname(load_model_path), exist_ok=True)
         shutil.copy(contra_model_path, load_model_path)
-        print('copy contra model: %s to : %s' % (contra_model_path, load_model_path))
+        print("copy contra model: %s to : %s" % (contra_model_path, load_model_path))
 
-    save_model_path = settings.get_ckpt_path(custom_args.dataset, case, custom_args.model, model_suffix="worker_restore",
-                                            step=step, unique_name=uni_name)
+    save_model_path = settings.get_ckpt_path(
+        custom_args.dataset,
+        case,
+        custom_args.model,
+        model_suffix="worker_restore",
+        step=step,
+        unique_name=uni_name,
+    )
     # checkpoint = torch.load(load_model_path)
 
     model.epochs = custom_args.num_epochs
 
-    loaded_model1 = load_custom_model(custom_args.model, num_classes, load_pretrained=False)
+    loaded_model1 = load_custom_model(
+        custom_args.model, num_classes, load_pretrained=False
+    )
     model.model1 = ClassifierWrapper(loaded_model1, num_classes)
 
-    loaded_model2 = load_custom_model(custom_args.model, num_classes, load_pretrained=False)
+    loaded_model2 = load_custom_model(
+        custom_args.model, num_classes, load_pretrained=False
+    )
     model.model2 = ClassifierWrapper(loaded_model2, num_classes)
 
     checkpoint = torch.load(load_model_path)
@@ -156,7 +194,7 @@ def main():
         # save model1
         os.makedirs(os.path.dirname(save_model_path), exist_ok=True)
         torch.save(model.model1.state_dict(), save_model_path)
-        print('model saved to:', save_model_path)
+        print("model saved to:", save_model_path)
 
     if config["save_result"]:
         acc_np = np.array(acc_list)
