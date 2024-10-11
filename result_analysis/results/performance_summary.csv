@@ -1,6 +1,0 @@
-Model,Dataset,Condition,Accuracy,Loss
-vgg16,flowers-102,combined,0.00980392156862745,4.870179235935211
-vgg16,cifar-10,original_data,0.1,2.3026249773183447
-vgg16,cifar-10,combined,0.1,2.3610506452572575
-vgg16,cifar-100,original_data,0.01,4.60517547085027
-vgg16,cifar-100,combined,0.01,4.623157452625834
