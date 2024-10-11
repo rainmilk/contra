@@ -48,11 +48,11 @@ def main():
     num_classes = settings.num_classes_dict[custom_args.dataset]
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    if uni_name == "coteaching_plus":
+    if uni_name == "Coteachingplus":
         from co_configs.coteachingplus import config
-    elif uni_name == "coteaching":
+    elif uni_name == "Coteaching":
         from co_configs.coteaching import config
-    elif uni_name == "jocor":
+    elif uni_name == "JoCoR":
         from co_configs.jocor import config
 
     set_seed(config["seed"])
