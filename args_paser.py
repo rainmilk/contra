@@ -250,7 +250,7 @@ def parse_args():
     parser.add_argument(
         "--repair_iter_num",
         type=int,
-        default=20,
+        default=5,
         help="The number of iterations to train the model",
     )
 

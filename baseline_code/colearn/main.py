@@ -162,8 +162,8 @@ def main():
         custom_args.dataset,
         case,
         custom_args.model,
-        model_suffix="worker_restore",
-        step=step - 1,
+        model_suffix="worker_raw",
+        step=step,
         unique_name=uni_name,
     )
     # step=1, copy contra/step_0/ -> target/step_0
