@@ -21,7 +21,5 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 # python ./core_model/train_teacher.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 100 --step 0 --learning_rate 0.001 --optimizer adam --batch_size 64 --balanced --noise_type asymmetric
 
 # GPU 5
-# python ./core_model/train_teacher.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 100 --step 0 --learning_rate 0.0001 --optimizer adam --batch_size 64 --balanced --noise_type asymmetric
-
-# GPU 3
-python ./core_model/train_teacher.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 100 --step 0 --learning_rate 0.0001 --optimizer adam --batch_size 64 --balanced
+# 有希望
+python ./core_model/train_teacher.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 100 --step 0 --learning_rate 0.0001 --optimizer adam --batch_size 64 --balanced --noise_type asymmetric

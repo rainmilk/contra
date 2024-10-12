@@ -1,4 +1,5 @@
 import argparse
+import importlib
 from utils import (
     load_config,
     get_log_name,
@@ -48,22 +49,44 @@ def main():
     num_classes = settings.num_classes_dict[custom_args.dataset]
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    if uni_name == "Coteachingplus":
-        from co_configs.coteachingplus import config
-    elif uni_name == "Coteaching":
-        from co_configs.coteaching import config
-    elif uni_name == "JoCoR":
-        from co_configs.jocor import config
+    # 根据 uni_name 动态加载对应的配置文件
+    config_modules = {
+        "Coteachingplus": "co_configs.coteachingplus",
+        "Coteaching": "co_configs.coteaching",
+        "JoCoR": "co_configs.jocor",
+    }
+
+    if uni_name not in config_modules:
+        raise ValueError(f"Unknown uni_name: {uni_name}")
+
+    # 动态导入配置模块
+    config_module = importlib.import_module(config_modules[uni_name])
+    config = config_module.config
 
     set_seed(config["seed"])
 
-    if config["algorithm"] == "colearning":
-        model = algorithms.Colearning(
+    # 根据配置中的算法选择对应的模型
+    if config["algorithm"] == "Coteachingplus":
+        model = algorithms.Coteachingplus(
             config,
             input_channel=config["input_channel"],
             num_classes=num_classes,
         )
         train_mode = "train"
+    elif config["algorithm"] == "Coteaching":
+        model = algorithms.Coteaching(
+            config,
+            input_channel=config["input_channel"],
+            num_classes=num_classes,
+        )
+        train_mode = "train_single"
+    elif config["algorithm"] == "JoCoR":
+        model = algorithms.JoCoR(
+            config,
+            input_channel=config["input_channel"],
+            num_classes=num_classes,
+        )
+        train_mode = "train_single"
     else:
         model = algorithms.__dict__[config["algorithm"]](
             config,
@@ -71,6 +94,32 @@ def main():
             num_classes=num_classes,
         )
         train_mode = "train_single"
+
+    # config = None
+
+    # if uni_name == "Coteachingplus":
+    #     from co_configs.coteachingplus import config
+    # elif uni_name == "Coteaching":
+    #     from co_configs.coteaching import config
+    # elif uni_name == "JoCoR":
+    #     from co_configs.jocor import config
+
+    # set_seed(config["seed"])
+
+    # if config["algorithm"] == "colearning":
+    #     model = algorithms.Colearning(
+    #         config,
+    #         input_channel=config["input_channel"],
+    #         num_classes=num_classes,
+    #     )
+    #     train_mode = "train"
+    # else:
+    #     model = algorithms.__dict__[config["algorithm"]](
+    #         config,
+    #         input_channel=config["input_channel"],
+    #         num_classes=num_classes,
+    #     )
+    #     train_mode = "train_single"
 
     dataloaders = cifar_dataloader(
         cifar_type=config["dataset"],
