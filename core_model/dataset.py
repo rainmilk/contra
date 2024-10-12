@@ -120,6 +120,8 @@ def get_dataset_loader(
     data_path = settings.get_dataset_path(dataset_name, case, f"{loader_name}_data", step)
     label_path = settings.get_dataset_path(dataset_name, case,f"{loader_name}_label", step)
 
+    print(f"Loading {data_path}")
+
     data = np.load(data_path)
     labels = np.load(label_path)
 

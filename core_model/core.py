@@ -28,7 +28,7 @@ def train_teacher_model(
     save_path,
     mean=None,
     std=None,
-    alpha=1,
+    lamda=1,
     train_dataloader=None,
     test_dataloader=None,
     test_per_it=1,
@@ -68,7 +68,7 @@ def train_teacher_model(
         teacher_opt,
         teacher_lr_scheduler,
         teacher_criterion,
-        alpha,
+        lamda,
         args,
         save_path=save_path,
         mix_classes=num_classes,
@@ -88,7 +88,7 @@ def iterate_repair_model(
     teacher_lr_schedule,
     teacher_criterion,
     teacher_model_save_path,
-    alpha,
+    lamda,
     inc_data,
     inc_labels,
     inc_dataloader,
@@ -116,7 +116,7 @@ def iterate_repair_model(
     select_idx = agree_idx & (teacher_inc_predicts == inc_labels)
     selected_data = inc_data[select_idx]
     selected_labels = inc_labels[select_idx]
-    selected_probs = teacher_inc_probs[select_idx]
+    selected_probs = (teacher_inc_probs[select_idx] + working_inc_probs[select_idx])/2
     selected_embeddings = teacher_inc_embeddings[select_idx]
 
     # (2) 获取Dc: 通过 Mt(Xa+Xs) 计算class embedding centroids (i.e. Class mean): E_centroid
@@ -151,7 +151,7 @@ def iterate_repair_model(
         distances = np.linalg.norm(
             disagree_class_embeddings - agree_class_embedding_centroid, axis=-1
         )
-        selected_top_conf_num = len(disagree_class_probs) // 20
+        selected_top_conf_num = len(disagree_class_probs) // 10
         top_idx = np.argpartition(distances, selected_top_conf_num)[
             selected_top_conf_num:
         ]
@@ -169,9 +169,9 @@ def iterate_repair_model(
 
     # (3) train Mp: Train Pp=Mp(X_mix), Loss=CrossEntropy(Pp, Y_mix)
     mix_data = np.concatenate([aux_data, selected_data, centroid_data], axis=0)
-    selected_labels_onehot = np.eye(num_classes)[selected_labels]
+    # selected_labels_onehot = np.eye(num_classes)[selected_labels]
     mix_labels_onehot = np.concatenate(
-        [aux_labels_onehot, selected_labels_onehot, centroid_probs_sharpen], axis=0
+        [aux_labels_onehot, selected_probs, centroid_probs_sharpen], axis=0
     )
     mix_dataloader_shuffled = mix_up_dataloader(
         mix_data,
@@ -181,7 +181,7 @@ def iterate_repair_model(
         mean=mean,
         std=std,
         batch_size=args.batch_size,
-        alpha=1.0,
+        alpha=0.5,
         transforms=None,
     )
 
@@ -191,7 +191,7 @@ def iterate_repair_model(
         working_opt,
         working_lr_schedule,
         working_criterion,
-        alpha,
+        lamda,
         args,
         device=device,
         save_path=working_model_save_path,
@@ -208,7 +208,7 @@ def iterate_repair_model(
         teacher_opt,
         teacher_lr_schedule,
         teacher_criterion,
-        alpha,
+        lamda,
         args,
         device=device,
         save_path=teacher_model_save_path,
@@ -216,10 +216,10 @@ def iterate_repair_model(
 
     # 3. 获取Dconf{Xs, Ys} 用与adapt: Dconf从Ds中top10% 数据(根据Ys_prob排序)
     select_probs_max = np.max(selected_probs, axis=-1)  # [N]
-    sample_size = len(selected_probs) // 20
+    sample_size = len(selected_probs) // 10
     sample_idx = np.argpartition(select_probs_max, -sample_size)[-sample_size:]
     conf_data = selected_data[sample_idx]
-    conf_labels = selected_labels_onehot[sample_idx]
+    conf_labels = selected_probs[sample_idx]
 
     return conf_data, conf_labels
 
@@ -235,7 +235,7 @@ def iterate_adapt_model(
     teacher_lr_scheduler,
     teacher_criterion,
     teacher_model_save_path,
-    alpha,
+    lamda,
     aug_data,
     aug_probs,
     test_data,
@@ -252,14 +252,14 @@ def iterate_adapt_model(
     # (2) 构造 Dt_mix: Dt_mix = mix_up(Dts, D_aug), Xt_mix = {a*Xts+(1-a)*X_aug}, Yt_mix = {a*Pts+(1-a)*Y_aug}
     test_probs_sharpen = sharpen(test_probs)
     ts_mixed_dataloader_shuffled = mix_up_dataloader(
-        test_data,
-        test_probs_sharpen,
         aug_data,
         aug_probs,
+        test_data,
+        test_probs_sharpen,
         mean=mean,
         std=std,
         batch_size=args.batch_size,
-        alpha=0.15,
+        alpha=0.2,
         transforms=None,
     )
 
@@ -270,7 +270,7 @@ def iterate_adapt_model(
         teacher_opt,
         teacher_lr_scheduler,
         teacher_criterion,
-        alpha,
+        lamda,
         args,
         device=device,
         save_path=teacher_model_save_path,
@@ -283,14 +283,14 @@ def iterate_adapt_model(
     # (2) 构造 Dp_mix: Dp_mix = mix_up(Dts, D_aug), Xp_mix = {a*Xts+(1-a)*X_aug}, Yt_mix = {a*Pts+(1-a)*Y_aug}
     test_probs_new_sharpen = sharpen(test_probs_new)
     ts_mixed_dataloader_shuffled_new = mix_up_dataloader(
-        test_data,
-        test_probs_new_sharpen,
         aug_data,
         aug_probs,
+        test_data,
+        test_probs_new_sharpen,
         mean=mean,
         std=std,
         batch_size=args.batch_size,
-        alpha=0.15,
+        alpha=0.2,
         transforms=None,
     )
 
@@ -301,7 +301,7 @@ def iterate_adapt_model(
         working_opt,
         working_lr_scheduler,
         working_criterion,
-        alpha,
+        lamda,
         args,
         device=device,
         save_path=working_model_save_path,
@@ -316,7 +316,7 @@ def mix_up_dataloader(
     mean,
     std,
     batch_size,
-    alpha=0.2,
+    alpha=1,
     transforms=None,
 ):
     mixed_dataset = MixupDataset(
@@ -340,7 +340,6 @@ def execute(args):
     num_classes = settings.num_classes_dict[args.dataset]
     kwargs = parse_kwargs(args.kwargs)
     case = settings.get_case(args.noise_ratio, args.noise_type, args.balanced)
-    alpha, beta = kwargs.get("alpha", 1), kwargs.get("beta", 0.1)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     log_path = os.path.join(settings.root_dir, "logs")
@@ -357,6 +356,7 @@ def execute(args):
     step = getattr(args, "step", 1)
     tta_only = getattr(args, "tta_only", None)
     uni_name = getattr(args, "uni_name", None)
+    lamda = 1.0
 
     working_model_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="worker_raw", step=step, unique_name=uni_name) # model_paths["working_model_path"]
     working_model_repair_save_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="worker_restore", step=step, unique_name=uni_name)
@@ -402,6 +402,7 @@ def execute(args):
     backbone = nn.Sequential(*list(backbone.children())[:-1], nn.Flatten())
     lip_teacher_model = SimpleLipNet(backbone, features, num_classes)
 
+
     # 根据用户选择的优化器初始化
     teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(
         optimizer_type,
@@ -417,7 +418,7 @@ def execute(args):
     )
 
     test_data, test_labels, test_dataloader = get_dataset_loader(
-        args.dataset, "test", case, None, mean, std, args.batch_size, shuffle=False
+        args.dataset, "test", case, None, mean, std, args.batch_size, shuffle=True
     )
 
     conf_data_path = settings.get_dataset_path(args.dataset, case, "conf_data", step)
@@ -451,12 +452,7 @@ def execute(args):
             )
 
         # 3. 迭代修复过程
-        # (1) 构造修复过程数据集: Dtr、 Da、Dts
-        inc_data, inc_labels, inc_dataloader = get_dataset_loader(
-            args.dataset, "train", case, step, mean, std, args.batch_size, shuffle=False
-        )
-
-        # (2) 测试修复前 Dts 在 Mp 的表现
+        # (1) 测试修复前 Dts 在 Mp 的表现
         print(
             "---------------------working model test before------------------------------"
         )
@@ -468,6 +464,11 @@ def execute(args):
         )
         teacher_model_test_before = model_test(
             test_dataloader, lip_teacher_model, device=device
+        )
+
+        # (2) 构造修复过程数据集: Dtr、 Da、Dts
+        inc_data, inc_labels, inc_dataloader = get_dataset_loader(
+            args.dataset, "train", case, step, mean, std, args.batch_size, shuffle=False
         )
 
         # (3) 迭代修复过程：根据 Dtr 迭代 Mp 、 Mt
@@ -485,7 +486,7 @@ def execute(args):
                 teacher_lr_scheduler,
                 teacher_criterion,
                 teacher_model_repair_save_path,
-                alpha,
+                lamda,
                 inc_data,
                 inc_labels,
                 inc_dataloader,
@@ -558,6 +559,19 @@ def execute(args):
             aug_data = np.concatenate([aux_data, conf_data], axis=0)
             aug_labels = np.concatenate([aux_labels_onehot, conf_labels], axis=0)
 
+            print(
+                "---------------------working model test before------------------------------"
+            )
+            model_test(
+                test_dataloader, working_model, device=device
+            )
+            print(
+                "---------------------teacher model test before------------------------------"
+            )
+            model_test(
+                test_dataloader, lip_teacher_model, device=device
+            )
+
     # (2) 迭代测试数据适应过程：根据 混合的Dts 迭代 Mp 和 Mt
     for i in range(adapt_iter_num):
         print("-----------tta iterate %d ----------------------" % i)
@@ -572,7 +586,7 @@ def execute(args):
             teacher_lr_scheduler,
             teacher_criterion,
             teacher_model_adapt_save_path,
-            alpha,
+            lamda,
             aug_data,
             aug_labels,
             test_data,

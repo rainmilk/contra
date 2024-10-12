@@ -12,7 +12,7 @@ def model_train(
     optimizer,
     lr_scheduler,
     criterion,
-    alpha=1,
+    lamda=1,
     args=None,
     device="cuda",
     save_path=".",
@@ -51,7 +51,7 @@ def model_train(
                 optimizer.zero_grad()  # 清除上一步的梯度
                 outputs = model(inputs)
 
-                loss = criterion(outputs, labels) * alpha  # 使用 alpha 参数调整损失函数
+                loss = criterion(outputs, labels) * lamda  # 使用 lamda 参数调整损失函数
                 loss.backward()  # 反向传播
                 optimizer.step()  # 更新参数
                 running_loss += loss.item()
