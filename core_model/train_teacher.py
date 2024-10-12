@@ -66,6 +66,7 @@ if __name__ == "__main__":
             teacher_lr_scheduler,
             teacher_criterion,
             model_p0_path,
+            alpha=1.0,
             test_per_it=1,
         )
     else:

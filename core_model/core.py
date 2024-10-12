@@ -151,7 +151,7 @@ def iterate_repair_model(
         distances = np.linalg.norm(
             disagree_class_embeddings - agree_class_embedding_centroid, axis=-1
         )
-        selected_top_conf_num = len(disagree_class_probs) // 10
+        selected_top_conf_num = len(disagree_class_probs) // 20
         top_idx = np.argpartition(distances, selected_top_conf_num)[
             selected_top_conf_num:
         ]
@@ -181,7 +181,7 @@ def iterate_repair_model(
         mean=mean,
         std=std,
         batch_size=args.batch_size,
-        alpha=0.25,
+        alpha=1.0,
         transforms=None,
     )
 
@@ -216,7 +216,7 @@ def iterate_repair_model(
 
     # 3. 获取Dconf{Xs, Ys} 用与adapt: Dconf从Ds中top10% 数据(根据Ys_prob排序)
     select_probs_max = np.max(selected_probs, axis=-1)  # [N]
-    sample_size = len(selected_probs) // 10
+    sample_size = len(selected_probs) // 20
     sample_idx = np.argpartition(select_probs_max, -sample_size)[-sample_size:]
     conf_data = selected_data[sample_idx]
     conf_labels = selected_labels_onehot[sample_idx]
