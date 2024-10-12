@@ -250,7 +250,7 @@ def parse_args():
     parser.add_argument(
         "--repair_iter_num",
         type=int,
-        default=10,
+        default=5,
         help="The number of iterations to train the model",
     )
 
@@ -258,8 +258,15 @@ def parse_args():
     parser.add_argument(
         "--adapt_iter_num",
         type=int,
-        default=5,
+        default=2,
         help="The number of iterations to adapt the model",
+    )
+
+    parser.add_argument(
+        "--adapt_epochs",
+        type=int,
+        default=5,
+        help="The number of epochs to adapt the model",
     )
 
     # 捕获其他 kwargs

@@ -12,7 +12,7 @@ def model_train(
     optimizer,
     lr_scheduler,
     criterion,
-    lamda=1,
+    epochs=5,
     args=None,
     device="cuda",
     save_path=".",
@@ -31,7 +31,7 @@ def model_train(
         cutmix_transform = v2.CutMix(alpha=1.0, num_classes=mix_classes)
         mixup_transform = v2.MixUp(alpha=0.5, num_classes=mix_classes)
 
-    for epoch in tqdm(range(args.num_epochs), desc="Training Progress"):
+    for epoch in tqdm(range(epochs), desc="Training Progress"):
         running_loss = 0.0
         correct = 0
         total = 0
@@ -51,7 +51,7 @@ def model_train(
                 optimizer.zero_grad()  # 清除上一步的梯度
                 outputs = model(inputs)
 
-                loss = criterion(outputs, labels) * lamda  # 使用 lamda 参数调整损失函数
+                loss = criterion(outputs, labels)
                 loss.backward()  # 反向传播
                 optimizer.step()  # 更新参数
                 running_loss += loss.item()
@@ -69,7 +69,7 @@ def model_train(
         avg_loss = running_loss / len(train_loader)  # 计算平均损失
         accuracy = correct / total  # 计算训练集的准确率
         print(
-            f"Epoch [{epoch + 1}/{args.num_epochs}], Training Loss: {avg_loss:.4f}, Training Accuracy: {accuracy * 100:.2f}%"
+            f"Epoch [{epoch + 1}/{epochs}], Training Loss: {avg_loss:.4f}, Training Accuracy: {accuracy * 100:.2f}%"
         )
         torch.cuda.empty_cache()
 
@@ -77,7 +77,7 @@ def model_train(
             model_test(test_loader, model, device)
 
         # 仅在最后一次保存模型，避免每个 epoch 都保存
-        if epoch == args.num_epochs - 1:
+        if epoch == epochs - 1:
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
             torch.save(model.state_dict(), save_path)
             print(
