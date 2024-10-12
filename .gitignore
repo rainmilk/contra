@@ -209,5 +209,4 @@ cython_debug/
 
 # [24-10-12 sunzekun]
 # 不同步分析输出结果 防止冲突
-result_analysis/results_main/
-result_analysis/results_sensitivity/
+result_analysis/results_*/
