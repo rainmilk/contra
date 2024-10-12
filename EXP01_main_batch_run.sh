@@ -87,7 +87,7 @@ fi
 
 # Define the GPUs to use
 # gpus=(1 2 3 4 5 6 7)
-gpus=(2 3 4 5 6 7)
+gpus=(2 3 4 5 6)
 gpu_count=${#gpus[@]}
 
 # Create logs directory

@@ -22,7 +22,7 @@ nohup bash -c "CUDA_VISIBLE_DEVICES=3 python run_experiment.py \
     --num_epochs 30 \
     --learning_rate 0.0001 \
     --optimizer adam \
-    --batch_size 64" >logs/run_experiment_step0_wideresnet50_pet37_$(date +'%Y%m%d_%H%M%S').log 2>&1 &
+    --batch_size 16" >logs/run_experiment_step0_wideresnet50_pet37_$(date +'%Y%m%d_%H%M%S').log 2>&1 &
 
 nohup bash -c "CUDA_VISIBLE_DEVICES=4 python run_experiment.py \
     --step 0 \
