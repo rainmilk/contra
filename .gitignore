@@ -206,3 +206,8 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# [24-10-12 sunzekun]
+# 不同步分析输出结果 防止冲突
+result_analysis/results_main/
+result_analysis/results_sensitivity/
