@@ -95,6 +95,7 @@ def model_test(data_loader, model, device="cuda"):
     print("test_acc: %.2f" % (global_acc * 100))
     eval_results["global"] = global_acc.item()
 
+    model.eval()
     # class acc
     label_list = sorted(list(set(labels)))
     for label in label_list:

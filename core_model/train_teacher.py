@@ -42,10 +42,10 @@ if __name__ == "__main__":
     if uni_name is None:
         num_classes = settings.num_classes_dict[dataset]
         backbone = load_custom_model(model_name, num_classes, load_pretrained=True)
-        features = backbone.fc.in_features
-        backbone = nn.Sequential(*list(backbone.children())[:-1], nn.Flatten())
-        lip_teacher_model = SimpleLipNet(backbone, features, num_classes, spectral_norm=spec_norm)
-        # lip_teacher_model = ClassifierWrapper(backbone, num_classes)
+        # features = backbone.fc.in_features
+        # backbone = nn.Sequential(*list(backbone.children())[:-1], nn.Flatten())
+        # lip_teacher_model = SimpleLipNet(backbone, features, num_classes, spectral_norm=spec_norm)
+        lip_teacher_model = ClassifierWrapper(backbone, num_classes, spectral_norm=spec_norm)
 
         # 根据用户选择的优化器初始化
         teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(
