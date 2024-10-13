@@ -137,7 +137,7 @@ def split(dataset_name, case, train_dataset=None, test_dataset=None, num_classes
     # shutil.copy(train_data_path, train_data_path_case)
     # shutil.copy(train_label_path, train_label_path_case)
     shutil.copy(test_data_path, test_data_path_case)
-    shutil.copy(train_data_path, test_label_path_case)
+    shutil.copy(test_label_path, test_label_path_case)
     # shutil.copy(inc_data_path, inc_data_path_case)
     # shutil.copy(inc_label_path, inc_label_path_case)
     shutil.copy(aux_data_path, aux_data_path_case)
