@@ -46,8 +46,6 @@ if __name__ == "__main__":
         num_classes = settings.num_classes_dict[dataset]
         backbone = load_custom_model(model_name, num_classes, load_pretrained=True)
         lip_teacher_model = ClassifierWrapper(backbone, num_classes, spectral_norm=spec_norm)
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        lip_teacher_model.to(device)
 
         # 根据用户选择的优化器初始化
         teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(
