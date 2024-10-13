@@ -19,24 +19,6 @@ from torchvision.transforms import v2
 from train_test_utils import train_model
 
 
-class BaseTensorDataset(Dataset):
-
-    def __init__(self, data, labels, transforms=None, device=None):
-        self.data = torch.as_tensor(data, device=device)
-        self.labels = torch.as_tensor(labels, device=device)
-        self.transforms = transforms
-
-    def __len__(self) -> int:
-        return len(self.data)
-
-    def __getitem__(self, index):
-        data = self.data[index]
-        if self.transforms is not None:
-            self.transforms(data)
-
-        return data, self.labels[index]
-
-
 def get_num_of_classes(dataset_name):
     # 根据 dataset_name 设置分类类别数
     if dataset_name == "cifar-10":

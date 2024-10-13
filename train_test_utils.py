@@ -201,12 +201,12 @@ def train_model(
         ]
     )
 
-    dataset = BaseTensorDataset(data, labels, device=device)
+    dataset = BaseTensorDataset(data, labels)
     dataloader = DataLoader(
         dataset, batch_size=batch_size, drop_last=True, shuffle=True
     )
 
-    test_dataset = BaseTensorDataset(test_data, test_labels, device=device)
+    test_dataset = BaseTensorDataset(test_data, test_labels)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     # 用于存储训练和测试的损失和准确率
