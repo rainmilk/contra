@@ -85,7 +85,7 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
     select_idx = agree_idx & (teacher_inc_predicts == inc_labels)
     selected_data = inc_data[select_idx]
     selected_labels = inc_labels[select_idx]
-    selected_probs = (teacher_inc_probs[select_idx] + working_inc_probs[select_idx])/2
+    selected_probs = teacher_inc_probs[select_idx] # + working_inc_probs[select_idx])/2
     selected_embeddings = teacher_inc_embeddings[select_idx]
 
     # (2) 获取Dc: 通过 Mt(Xa+Xs) 计算class embedding centroids (i.e. Class mean): E_centroid
@@ -150,7 +150,7 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
         mean=mean,
         std=std,
         batch_size=args.batch_size,
-        alpha=0.5,
+        alpha=0.2,
         transforms=None,
     )
 
@@ -203,10 +203,10 @@ def iterate_adapt_model(working_model, working_opt, working_lr_scheduler, workin
     # (2) 构造 Dt_mix: Dt_mix = mix_up(Dts, D_aug), Xt_mix = {a*Xts+(1-a)*X_aug}, Yt_mix = {a*Pts+(1-a)*Y_aug}
     test_probs_sharpen = sharpen(test_probs)
     ts_mixed_dataloader_shuffled = mix_up_dataloader(
-        aug_data,
-        aug_probs,
         test_data,
         test_probs_sharpen,
+        aug_data,
+        aug_probs,
         mean=mean,
         std=std,
         batch_size=args.batch_size,
@@ -234,10 +234,10 @@ def iterate_adapt_model(working_model, working_opt, working_lr_scheduler, workin
     # (2) 构造 Dp_mix: Dp_mix = mix_up(Dts, D_aug), Xp_mix = {a*Xts+(1-a)*X_aug}, Yt_mix = {a*Pts+(1-a)*Y_aug}
     test_probs_new_sharpen = sharpen(test_probs_new)
     ts_mixed_dataloader_shuffled_new = mix_up_dataloader(
-        aug_data,
-        aug_probs,
         test_data,
         test_probs_new_sharpen,
+        aug_data,
+        aug_probs,
         mean=mean,
         std=std,
         batch_size=args.batch_size,

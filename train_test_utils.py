@@ -231,9 +231,9 @@ def train_model(
             for inputs, targets in dataloader:
                 if data_aug:
                     transform = np.random.choice([mixup_transform, cutmix_transform])
-                    targets = targets.to(torch.long)
                     inputs, targets = transform(inputs, targets)
 
+                targets = targets.to(torch.long)
                 inputs, targets = inputs.to(device), targets.to(device)
 
                 optimizer.zero_grad()
