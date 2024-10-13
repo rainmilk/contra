@@ -21,12 +21,12 @@ python ./core_model/train_teacher.py --model cifar-resnet18 --dataset cifar-10 -
 
 python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 5 --step 1 --learning_rate 0.001 --optimizer adam --batch_size 256 --balanced --model_suffix worker_raw --uni_name contra
 
-python ./core_model/core.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 2 --step 1 --learning_rate 0.0002 --optimizer adam --batch_size 256 --balanced --uni_name contra
+python ./core_model/core.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 1 --step 1 --learning_rate 0.0002 --optimizer adam --batch_size 256 --balanced --uni_name contra
 
 python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 5 --step 2 --learning_rate 0.001 --optimizer adam --batch_size 256 --balanced --model_suffix worker_raw --uni_name contra
 
-python ./core_model/core.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 2 --step 2 --learning_rate 0.0002 --optimizer adam --batch_size 256 --balanced --uni_name contra
+python ./core_model/core.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 1 --step 2 --learning_rate 0.0002 --optimizer adam --batch_size 256 --balanced --uni_name contra
 
 python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 5 --step 3 --learning_rate 0.001 --optimizer adam --batch_size 256 --balanced --model_suffix worker_raw --uni_name contra
 
-python ./core_model/core.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 2 --step 3 --learning_rate 0.0002 --optimizer adam --batch_size 256 --balanced --uni_name contra
+python ./core_model/core.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 1 --step 3 --learning_rate 0.0002 --optimizer adam --batch_size 256 --balanced --uni_name contra
