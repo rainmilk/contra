@@ -26,8 +26,15 @@ def model_train(
 
     # model = model.to(device)  # 确保模型移动到正确的设备
     model.train()
+    criterion = nn.CrossEntropyLoss()
 
-    if mix_classes > 0:
+    # 用于存储训练和测试的损失和准确率
+    train_losses = []
+    test_accuracies = []
+
+    use_data_aug = mix_classes > 0
+
+    if use_data_aug:
         cutmix_transform = v2.CutMix(alpha=1.0, num_classes=mix_classes)
         mixup_transform = v2.MixUp(alpha=0.5, num_classes=mix_classes)
 
@@ -39,11 +46,10 @@ def model_train(
         # 更新学习率调度器
         lr_scheduler.step(epoch)
 
-        # 用 tqdm 显示训练进度条
         # tqdm 进度条显示
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for inputs, targets in train_loader:
-                if mix_classes > 0:
+                if use_data_aug:
                     transform = np.random.choice([mixup_transform, cutmix_transform])
                     targets = targets.to(torch.long)
                     inputs, targets = transform(inputs, targets)
@@ -58,7 +64,7 @@ def model_train(
 
                 running_loss += loss.item()
                 _, predicted = torch.max(outputs.data, 1)
-                mixed_max = torch.argmax(targets.data, 1) if mix_classes > 0 else targets
+                mixed_max = torch.argmax(targets.data, 1) if use_data_aug else targets
                 total += targets.size(0)
                 correct += (predicted == mixed_max).sum().item()
 
@@ -66,23 +72,15 @@ def model_train(
                 pbar.set_postfix({"Loss": f"{loss.item():.4f}"})
                 pbar.update(1)
 
-        avg_loss = running_loss / len(train_loader)  # 计算平均损失
-        accuracy = correct / total  # 计算训练集的准确率
+        # 打印训练集的平均损失和准确率
+        avg_loss = running_loss / len(train_loader)
+        accuracy = correct / total
+        train_losses.append(avg_loss)
         print(
             f"Epoch [{epoch + 1}/{epochs}], Training Loss: {avg_loss:.4f}, Training Accuracy: {accuracy * 100:.2f}%"
         )
-        # torch.cuda.empty_cache()
-        #
-        # if test_loader is not None and epoch % test_per_it == 0:
-        #     model_test(test_loader, model, device)
-        #
-        # # 仅在最后一次保存模型，避免每个 epoch 都保存
-        # if epoch == epochs - 1:
-        #     os.makedirs(os.path.dirname(save_path), exist_ok=True)
-        #     torch.save(model.state_dict(), save_path)
-        #     print(
-        #         f"Model has saved to {save_path}."
-        #     )
+
+        # 测试集评估
         model.eval()
         test_loss = 0.0
         correct_test = 0
@@ -108,7 +106,12 @@ def model_train(
 
         test_loss /= len(test_loader)
         test_accuracy = 100 * correct_test / total_test
+        test_accuracies.append(test_accuracy)
         print(f"Test Accuracy after Epoch {epoch + 1}: {test_accuracy:.2f}%")
+
+        model.train()
+
+    return model
 
 
 def model_test(data_loader, model, device="cuda"):

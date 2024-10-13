@@ -63,44 +63,44 @@ if __name__ == "__main__":
 
         teacher_criterion = nn.CrossEntropyLoss()
 
-        # train_teacher_model(args, step, num_classes, lip_teacher_model, teacher_opt, teacher_lr_scheduler,
-        #                     teacher_criterion, model_p0_path, test_per_it=1)
+        train_teacher_model(args, step, num_classes, lip_teacher_model, teacher_opt, teacher_lr_scheduler,
+                            teacher_criterion, model_p0_path, test_per_it=1)
 
-        case = settings.get_case(args.noise_ratio, args.noise_type, args.balanced)
-        train_data, train_labels, train_dataloader = get_dataset_loader(
-            args.dataset,
-            "train",
-            case,
-            step,
-            None,
-            None,
-            args.batch_size,
-            num_classes=num_classes,
-            drop_last=False,
-            shuffle=True,
-            onehot_enc=False,
-        )
-
-        test_data, test_labels,  test_dataloader = get_dataset_loader(
-            args.dataset,
-            "test",
-            case,
-            None,
-            mean=None,
-            std=None,
-            batch_size=args.batch_size,
-            shuffle=False,
-        )
-
-        lip_teacher_model = train_model(
-            lip_teacher_model,
-            num_classes,
-            teacher_opt,
-            teacher_lr_scheduler,
-            train_dataloader,
-            test_dataloader,
-            epochs=args.num_epochs
-        )
+        # case = settings.get_case(args.noise_ratio, args.noise_type, args.balanced)
+        # train_data, train_labels, train_dataloader = get_dataset_loader(
+        #     args.dataset,
+        #     "train",
+        #     case,
+        #     step,
+        #     None,
+        #     None,
+        #     args.batch_size,
+        #     num_classes=num_classes,
+        #     drop_last=False,
+        #     shuffle=True,
+        #     onehot_enc=False,
+        # )
+        #
+        # test_data, test_labels,  test_dataloader = get_dataset_loader(
+        #     args.dataset,
+        #     "test",
+        #     case,
+        #     None,
+        #     mean=None,
+        #     std=None,
+        #     batch_size=args.batch_size,
+        #     shuffle=False,
+        # )
+        #
+        # lip_teacher_model = train_model(
+        #     lip_teacher_model,
+        #     num_classes,
+        #     teacher_opt,
+        #     teacher_lr_scheduler,
+        #     train_dataloader,
+        #     test_dataloader,
+        #     epochs=args.num_epochs
+        # )
     else:
         case = settings.get_case(noise_ratio, noise_type, balanced)
         copy_model_p0_path = settings.get_ckpt_path(
