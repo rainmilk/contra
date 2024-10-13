@@ -25,9 +25,6 @@ def model_train(
     print(f"Training model on {args.dataset}")
 
     # model = model.to(device)  # 确保模型移动到正确的设备
-    model.train()
-    criterion = nn.CrossEntropyLoss()
-
     # 用于存储训练和测试的损失和准确率
     train_losses = []
     test_accuracies = []
@@ -46,6 +43,7 @@ def model_train(
         # 更新学习率调度器
         lr_scheduler.step(epoch)
 
+        model.train()
         # tqdm 进度条显示
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for inputs, targets in train_loader:
@@ -80,9 +78,8 @@ def model_train(
             f"Epoch [{epoch + 1}/{epochs}], Training Loss: {avg_loss:.4f}, Training Accuracy: {accuracy * 100:.2f}%"
         )
 
-        model_test_global(model, test_loader, epoch, device)
-        # if test_loader is not None and epoch % test_per_it == 0:
-        #     model_test_global(model, test_loader, epoch, device)
+        if test_loader is not None and epoch % test_per_it == 0:
+            model_test(test_loader, model, device)
 
         # 仅在最后一次保存模型，避免每个 epoch 都保存
         if epoch == epochs - 1:
