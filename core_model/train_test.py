@@ -26,6 +26,7 @@ def model_train(
 
     # model = model.to(device)  # 确保模型移动到正确的设备
     model.train()
+    criterion = nn.CrossEntropyLoss()
 
     # 用于存储训练和测试的损失和准确率
     train_losses = []
@@ -79,8 +80,9 @@ def model_train(
             f"Epoch [{epoch + 1}/{epochs}], Training Loss: {avg_loss:.4f}, Training Accuracy: {accuracy * 100:.2f}%"
         )
 
-        if test_loader is not None and epoch % test_per_it == 0:
-            model_test_global(model, test_loader, epoch, device)
+        model_test_global(model, test_loader, epoch, device)
+        # if test_loader is not None and epoch % test_per_it == 0:
+        #     model_test_global(model, test_loader, epoch, device)
 
         # 仅在最后一次保存模型，避免每个 epoch 都保存
         if epoch == epochs - 1:
