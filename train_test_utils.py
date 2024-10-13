@@ -226,8 +226,8 @@ def train_model(
         scheduler.step(epoch)
 
         # tqdm 进度条显示
-        with tqdm(total=len(dataloader), desc=f"Epoch {epoch + 1} Training") as pbar:
-            for inputs, targets in dataloader:
+        with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
+            for inputs, targets in train_loader:
                 if use_data_aug:
                     transform = np.random.choice([mixup_transform, cutmix_transform])
                     targets = targets.to(torch.long)
@@ -252,7 +252,7 @@ def train_model(
                 pbar.update(1)
 
         # 打印训练集的平均损失和准确率
-        avg_loss = running_loss / len(dataloader)
+        avg_loss = running_loss / len(train_loader)
         accuracy = correct / total
         train_losses.append(avg_loss)
         print(
