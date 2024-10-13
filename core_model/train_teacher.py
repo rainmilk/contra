@@ -95,6 +95,8 @@ if __name__ == "__main__":
         lip_teacher_model = train_model(
             lip_teacher_model,
             num_classes,
+            teacher_opt,
+            teacher_lr_scheduler,
             train_dataloader,
             test_dataloader,
             epochs=args.num_epochs,

@@ -149,13 +149,11 @@ class TrainTestUtils:
 def train_model(
     model,
     num_classes,
+    optimizer,
+    scheduler,
     train_loader,
     test_loader,
     epochs=50,
-    batch_size=256,
-    optimizer_type="adam",
-    learning_rate=0.001,
-    weight_decay=5e-4,
     writer=None,
 ):
     """
@@ -177,13 +175,13 @@ def train_model(
     model.train()
     criterion = nn.CrossEntropyLoss()
 
-    optimizer, scheduler = create_optimizer_scheduler(
-        optimizer_type=optimizer_type,
-        parameters=model.parameters(),
-        learning_rate=learning_rate,
-        weight_decay=weight_decay,
-        epochs=epochs,
-    )
+    # optimizer, scheduler = create_optimizer_scheduler(
+    #     optimizer_type=optimizer_type,
+    #     parameters=model.parameters(),
+    #     learning_rate=learning_rate,
+    #     weight_decay=weight_decay,
+    #     epochs=epochs,
+    # )
 
     # weights = torchvision.models.ResNet18_Weights.DEFAULT
     transform_train = transforms.Compose(
