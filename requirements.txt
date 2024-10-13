@@ -5,7 +5,6 @@ Pillow
 tensorboardX
 torch>=2.0
 # torch
-torchnet
 # torchvision
 torchvision>=0.10
 tqdm

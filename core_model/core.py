@@ -63,30 +63,10 @@ def train_teacher_model(args, step, num_classes, teacher_model, teacher_opt, tea
     )
 
 
-def iterate_repair_model(
-    working_model,
-    working_opt,
-    working_lr_schedule,
-    working_criterion,
-    working_model_save_path,
-    teacher_model,
-    teacher_opt,
-    teacher_lr_schedule,
-    teacher_criterion,
-    teacher_model_save_path,
-    lamda,
-    inc_data,
-    inc_labels,
-    inc_dataloader,
-    aux_data,
-    aux_labels,
-    aux_dataloader,
-    num_classes,
-    mean,
-    std,
-    device,
-    args,
-):
+def iterate_repair_model(working_model, working_opt, working_lr_schedule, working_criterion, working_model_save_path,
+                         teacher_model, teacher_opt, teacher_lr_schedule, teacher_criterion, teacher_model_save_path,
+                         inc_data, inc_labels, inc_dataloader, aux_data, aux_labels, aux_dataloader, num_classes, mean,
+                         std, device, args):
     aux_labels_onehot = np.eye(num_classes)[aux_labels]
 
     # 1. 通过 Mt 获取 D_mix=Da+Ds+Dc,  Train Pp=Mp(Xp_mix), Loss=CrossEntropy(Pp, Yp_mix)
@@ -210,27 +190,9 @@ def iterate_repair_model(
     return conf_data, conf_labels
 
 
-def iterate_adapt_model(
-    working_model,
-    working_opt,
-    working_lr_scheduler,
-    working_criterion,
-    working_model_save_path,
-    teacher_model,
-    teacher_opt,
-    teacher_lr_scheduler,
-    teacher_criterion,
-    teacher_model_save_path,
-    lamda,
-    aug_data,
-    aug_probs,
-    test_data,
-    test_dataloader,
-    mean,
-    std,
-    device,
-    args,
-):
+def iterate_adapt_model(working_model, working_opt, working_lr_scheduler, working_criterion, working_model_save_path,
+                        teacher_model, teacher_opt, teacher_lr_scheduler, teacher_criterion, teacher_model_save_path,
+                        aug_data, aug_probs, test_data, test_dataloader, mean, std, device, args):
     # 1. 构造Dts融合数据集 Dt_mix: (Dts, D_aug), 进行mix up
     # (1) 构造 Dts: Dt={Xts, Pts}, Pt = Mt(Xts)
     test_predicts, test_probs = model_forward(test_dataloader, teacher_model)
@@ -304,6 +266,7 @@ def mix_up_dataloader(
     batch_size,
     alpha=1,
     transforms=None,
+    shuffle=True
 ):
     mixed_dataset = MixupDataset(
         data_pair=(inc_data, aug_data),
@@ -313,7 +276,7 @@ def mix_up_dataloader(
         mean=mean,
         std=std,
     )
-    return DataLoader(mixed_dataset, batch_size, drop_last=True, shuffle=True)
+    return DataLoader(mixed_dataset, batch_size, drop_last=True, shuffle=shuffle)
 
 
 def sharpen(prob_max, T=1, axis=-1):
@@ -344,7 +307,6 @@ def execute(args):
     step = getattr(args, "step", 1)
     tta_only = getattr(args, "tta_only", None)
     uni_name = getattr(args, "uni_name", None)
-    lamda = 1.0
 
     working_model_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="worker_raw", step=step, unique_name=uni_name) # model_paths["working_model_path"]
     working_model_repair_save_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="worker_restore", step=step, unique_name=uni_name)
@@ -406,7 +368,7 @@ def execute(args):
     )
 
     test_data, test_labels, test_dataloader = get_dataset_loader(
-        args.dataset, "test", case, None, mean, std, args.batch_size, shuffle=True
+        args.dataset, "test", case, None, mean, std, args.batch_size, shuffle=False
     )
 
     conf_data_path = settings.get_dataset_path(args.dataset, case, "conf_data", step)
@@ -453,30 +415,12 @@ def execute(args):
         conf_data, conf_labels = None, None
         for i in range(repair_iter_num):
             print("-----------restore iterate %d ----------------------" % i)
-            conf_data, conf_labels = iterate_repair_model(
-                working_model,
-                working_opt,
-                working_lr_scheduler,
-                working_criterion,
-                working_model_repair_save_path,
-                lip_teacher_model,
-                teacher_opt,
-                teacher_lr_scheduler,
-                teacher_criterion,
-                teacher_model_repair_save_path,
-                lamda,
-                inc_data,
-                inc_labels,
-                inc_dataloader,
-                aux_data,
-                aux_labels,
-                aux_dataloader,
-                num_classes,
-                mean,
-                std,
-                device,
-                args,
-            )
+            conf_data, conf_labels = iterate_repair_model(working_model, working_opt, working_lr_scheduler,
+                                                          working_criterion, working_model_repair_save_path,
+                                                          lip_teacher_model, teacher_opt, teacher_lr_scheduler,
+                                                          teacher_criterion, teacher_model_repair_save_path, inc_data,
+                                                          inc_labels, inc_dataloader, aux_data, aux_labels,
+                                                          aux_dataloader, num_classes, mean, std, device, args)
 
         np.save(conf_data_path, conf_data)
         np.save(conf_label_path, conf_labels)
@@ -553,27 +497,10 @@ def execute(args):
     # (2) 迭代测试数据适应过程：根据 混合的Dts 迭代 Mp 和 Mt
     for i in range(adapt_iter_num):
         print("-----------tta iterate %d ----------------------" % i)
-        iterate_adapt_model(
-            working_model,
-            working_opt,
-            working_lr_scheduler,
-            working_criterion,
-            working_model_adapt_save_path,
-            lip_teacher_model,
-            teacher_opt,
-            teacher_lr_scheduler,
-            teacher_criterion,
-            teacher_model_adapt_save_path,
-            lamda,
-            aug_data,
-            aug_labels,
-            test_data,
-            test_dataloader,
-            mean,
-            std,
-            device,
-            args,
-        )
+        iterate_adapt_model(working_model, working_opt, working_lr_scheduler, working_criterion,
+                            working_model_adapt_save_path, lip_teacher_model, teacher_opt, teacher_lr_scheduler,
+                            teacher_criterion, teacher_model_adapt_save_path, aug_data, aug_labels, test_data,
+                            test_dataloader, mean, std, device, args)
 
     # 6. 测试适应后 Dts 在 Mp 的表现
     working_model_after_adapt = model_test(
