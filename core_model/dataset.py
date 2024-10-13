@@ -133,7 +133,8 @@ def get_dataset_loader(
         labels = np.eye(num_classes)[labels]
 
     # 构建自定义数据集
-    dataset = NormalizeDataset(data, labels, transforms=transforms, mean=mean, std=std)
+    # dataset = NormalizeDataset(data, labels, transforms=transforms, mean=mean, std=std)
+    dataset = BaseTensorDataset(data, labels, transforms=transforms)
 
     data_loader = DataLoader(
         dataset, batch_size=batch_size, drop_last=drop_last, shuffle=shuffle

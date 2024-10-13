@@ -31,7 +31,7 @@ def train_teacher_model(args, step, num_classes, teacher_model, teacher_opt, tea
             std,
             args.batch_size,
             num_classes=num_classes,
-            drop_last=False,
+            drop_last=True,
             shuffle=True,
             onehot_enc=False,
         )
@@ -45,7 +45,10 @@ def train_teacher_model(args, step, num_classes, teacher_model, teacher_opt, tea
             mean=None,
             std=None,
             batch_size=args.batch_size,
+            num_classes=num_classes,
+            drop_last=False,
             shuffle=False,
+            onehot_enc=False,
         )
 
     model_train(
