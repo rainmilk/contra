@@ -14,13 +14,13 @@ config = {
     # train param
     'batch_size' : 128,
     'lr' : 0.001,
-    'epochs' : 50,
+    'epochs' : 15,
     'num_workers' : 4,
     'exponent' : 1,
     'adjust_lr' : 1,
     'co_lambda' : 0.1,
     'num_gradual' : 1,
     'forget_rate' : None,
-    'epoch_decay_start' : 80,
+    'epoch_decay_start' : 5,
     # result param
     'save_result' : True}
