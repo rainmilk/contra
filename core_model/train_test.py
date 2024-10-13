@@ -80,7 +80,7 @@ def model_train(
         )
 
         if test_loader is not None and epoch % test_per_it == 0:
-            model_test(test_loader, model, device)
+            model_test_global(model, test_loader, epoch, device)
 
         # 仅在最后一次保存模型，避免每个 epoch 都保存
         if epoch == epochs - 1:
@@ -155,4 +155,30 @@ def model_forward(test_loader, model, device="cuda",
         ret.append(np.concatenate(targets, axis=0))
 
     return tuple(ret)
+
+
+def model_test_global(model, test_loader, epoch, device="cuda"):
+    model.eval()
+    test_loss = 0.0
+    correct_test = 0
+    total_test = 0
+    with torch.no_grad():
+        with tqdm(
+                total=len(test_loader), desc=f"Epoch {epoch + 1} Testing"
+        ) as pbar:
+            for test_inputs, test_targets in test_loader:
+                test_inputs, test_targets = test_inputs.to(device), test_targets.to(
+                    device
+                )
+                test_outputs = model(test_inputs)
+                _, predicted_test = torch.max(test_outputs, 1)
+                total_test += test_targets.size(0)
+                correct_test += (predicted_test == test_targets).sum().item()
+
+                # 更新进度条
+                pbar.update(1)
+
+    test_loss /= len(test_loader)
+    test_accuracy = 100 * correct_test / total_test
+    print(f"Test Accuracy after Epoch {epoch + 1}: {test_accuracy:.2f}%")
 
