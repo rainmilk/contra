@@ -149,10 +149,8 @@ class TrainTestUtils:
 def train_model(
     model,
     num_classes,
-    data,
-    labels,
-    test_data,
-    test_labels,
+    train_loader,
+    test_loader,
     epochs=50,
     batch_size=256,
     optimizer_type="adam",
@@ -201,13 +199,13 @@ def train_model(
         ]
     )
 
-    dataset = BaseTensorDataset(data, labels)
-    dataloader = DataLoader(
-        dataset, batch_size=batch_size, drop_last=True, shuffle=True
-    )
-
-    test_dataset = BaseTensorDataset(test_data, test_labels)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    # dataset = BaseTensorDataset(data, labels)
+    # dataloader = DataLoader(
+    #     dataset, batch_size=batch_size, drop_last=True, shuffle=True
+    # )
+    #
+    # test_dataset = BaseTensorDataset(test_data, test_labels)
+    # test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     # 用于存储训练和测试的损失和准确率
     train_losses = []
