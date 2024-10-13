@@ -57,18 +57,8 @@ if __name__ == "__main__":
         )
         teacher_criterion = nn.CrossEntropyLoss()
 
-        train_teacher_model(
-            args,
-            step,
-            num_classes,
-            lip_teacher_model,
-            teacher_opt,
-            teacher_lr_scheduler,
-            teacher_criterion,
-            model_p0_path,
-            lamda=1.0,
-            test_per_it=1,
-        )
+        train_teacher_model(args, step, num_classes, lip_teacher_model, teacher_opt, teacher_lr_scheduler,
+                            teacher_criterion, model_p0_path, test_per_it=1)
     else:
         case = settings.get_case(noise_ratio, noise_type, balanced)
         copy_model_p0_path = settings.get_ckpt_path(

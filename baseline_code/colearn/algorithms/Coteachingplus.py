@@ -100,7 +100,7 @@ class Coteachingplus:
         return acc1, acc2
 
     def train(self, train_loader, epoch):
-        print("Training ...")
+        print("Training Coteaching_plus")
         self.model1.train()
         self.model2.train()
 

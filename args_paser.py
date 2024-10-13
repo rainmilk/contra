@@ -269,6 +269,13 @@ def parse_args():
         help="The number of epochs to adapt the model",
     )
 
+    parser.add_argument(
+        "--lr_scale",
+        type=float,
+        default=2.0,
+        help="Scale the working model lr",
+    )
+
     # 捕获其他 kwargs
     parser.add_argument(
         "--kwargs", nargs="*", help="Additional key=value arguments for hyperparameters"

@@ -100,7 +100,7 @@ class JoCoR:
         return acc1, acc2
 
     def train(self, train_loader, epoch):
-        print("Training ...")
+        print("Training JoCoR")
         self.model1.train()
         self.model2.train()
 

@@ -17,22 +17,8 @@ from train_test import model_train, model_test, model_forward
 from configs import settings
 
 
-def train_teacher_model(
-    args,
-    step,
-    num_classes,
-    teacher_model,
-    teacher_opt,
-    teacher_lr_scheduler,
-    teacher_criterion,
-    save_path,
-    mean=None,
-    std=None,
-    lamda=1,
-    train_dataloader=None,
-    test_dataloader=None,
-    test_per_it=1,
-):
+def train_teacher_model(args, step, num_classes, teacher_model, teacher_opt, teacher_lr_scheduler, teacher_criterion,
+                        save_path, mean=None, std=None, train_dataloader=None, test_dataloader=None, test_per_it=1):
 
     case = settings.get_case(args.noise_ratio, args.noise_type, args.balanced)
     if train_dataloader is None:
@@ -348,6 +334,8 @@ def execute(args):
     logging.basicConfig(filename=log_path, level=logging.INFO)
 
     learning_rate = getattr(args, "learning_rate", 0.001)
+    lr_scale = getattr(args, "lr_scale", 2.0)
+    working_lr = learning_rate * lr_scale
     weight_decay = getattr(args, "weight_decay", 5e-4)
     repair_iter_num = getattr(args, "repair_iter_num", 2)
     adapt_iter_num = getattr(args, "adapt_iter_num", 2)
@@ -390,7 +378,7 @@ def execute(args):
         optimizer_type,
         working_model.parameters(),
         num_epochs,
-        learning_rate,
+        working_lr,
         weight_decay,
     )
 
@@ -438,18 +426,8 @@ def execute(args):
                 % lip_teacher_model_path
             )
 
-            train_teacher_model(
-                args,
-                0,
-                num_classes,
-                lip_teacher_model,
-                teacher_opt,
-                teacher_lr_scheduler,
-                teacher_criterion,
-                lip_teacher_model_path,
-                test_dataloader=None,
-                test_per_it=1,
-            )
+            train_teacher_model(args, 0, num_classes, lip_teacher_model, teacher_opt, teacher_lr_scheduler,
+                                teacher_criterion, lip_teacher_model_path, test_dataloader=None, test_per_it=1)
 
         # 3. 迭代修复过程
         # (1) 测试修复前 Dts 在 Mp 的表现
