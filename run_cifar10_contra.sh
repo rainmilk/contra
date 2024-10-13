@@ -17,16 +17,16 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 
 python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 0 --learning_rate 0.01 --optimizer adam --batch_size 256 --uni_name contra --balanced
 
-python ./core_model/train_teacher.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 50 --step 0 --learning_rate 0.015 --optimizer adam --batch_size 256 --balanced --uni_name contra
+python ./core_model/train_teacher.py --no_spnorm --model cifar-resnet18 --dataset cifar-10 --num_epochs 50 --step 0 --learning_rate 0.015 --optimizer adam --batch_size 256 --balanced --uni_name contra
 
 python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 5 --step 1 --learning_rate 0.001 --optimizer adam --batch_size 256 --balanced --model_suffix worker_raw --uni_name contra
 
-python ./core_model/core.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 2 --step 1 --learning_rate 0.0005 --optimizer adam --batch_size 256 --balanced --uni_name contra
+python ./core_model/core.py --no_spnorm --model cifar-resnet18 --dataset cifar-10 --num_epochs 2 --step 1 --learning_rate 0.0002 --optimizer adam --batch_size 256 --balanced --uni_name contra
 
 python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 5 --step 2 --learning_rate 0.001 --optimizer adam --batch_size 256 --balanced --model_suffix worker_raw --uni_name contra
 
-python ./core_model/core.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 2 --step 2 --learning_rate 0.0005 --optimizer adam --batch_size 256 --balanced --uni_name contra
+python ./core_model/core.py --no_spnorm --model cifar-resnet18 --dataset cifar-10 --num_epochs 2 --step 2 --learning_rate 0.0002 --optimizer adam --batch_size 256 --balanced --uni_name contra
 
 python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 5 --step 3 --learning_rate 0.001 --optimizer adam --batch_size 256 --balanced --model_suffix worker_raw --uni_name contra
 
-python ./core_model/core.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 2 --step 3 --learning_rate 0.0005 --optimizer adam --batch_size 256 --balanced --uni_name contra
+python ./core_model/core.py --no_spnorm --model cifar-resnet18 --dataset cifar-10 --num_epochs 2 --step 3 --learning_rate 0.0002 --optimizer adam --batch_size 256 --balanced --uni_name contra
