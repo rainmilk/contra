@@ -473,7 +473,8 @@ def execute(args):
                                                             unique_name=uni_name)
             checkpoint = torch.load(lip_teacher_model_path)
             lip_teacher_model.load_state_dict(checkpoint, strict=False)
-            checkpoint = torch.load(working_model_path)
+
+            checkpoint = torch.load(working_model_repair_save_path)
             working_model.load_state_dict(checkpoint, strict=False)
         else:
             conf_data = np.load(conf_data_path)
