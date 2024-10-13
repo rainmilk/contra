@@ -53,56 +53,57 @@ if __name__ == "__main__":
         lip_teacher_model.to(device)
 
         # 根据用户选择的优化器初始化
-        # teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(
-        #     optimizer_type,
-        #     lip_teacher_model.parameters(),
-        #     num_epochs,
-        #     learning_rate,
-        #     weight_decay,
+        teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(
+            optimizer_type=optimizer_type,
+            parameters=lip_teacher_model.parameters(),
+            learning_rate=learning_rate,
+            weight_decay=weight_decay,
+            epochs=num_epochs,
+        )
+
+        teacher_criterion = nn.CrossEntropyLoss()
+
+        train_teacher_model(args, step, num_classes, lip_teacher_model, teacher_opt, teacher_lr_scheduler,
+                            teacher_criterion, model_p0_path, test_per_it=1)
+
+        # case = settings.get_case(args.noise_ratio, args.noise_type, args.balanced)
+        # train_data, train_labels, train_dataloader = get_dataset_loader(
+        #     args.dataset,
+        #     "train",
+        #     case,
+        #     step,
+        #     None,
+        #     None,
+        #     args.batch_size,
+        #     num_classes=num_classes,
+        #     drop_last=False,
+        #     shuffle=True,
+        #     onehot_enc=False,
         # )
-        # teacher_criterion = nn.CrossEntropyLoss()
         #
-        # train_teacher_model(args, step, num_classes, lip_teacher_model, teacher_opt, teacher_lr_scheduler,
-        #                     teacher_criterion, model_p0_path, test_per_it=1)
-
-        case = settings.get_case(args.noise_ratio, args.noise_type, args.balanced)
-        train_data, train_labels, train_dataloader = get_dataset_loader(
-            args.dataset,
-            "train",
-            case,
-            step,
-            None,
-            None,
-            args.batch_size,
-            num_classes=num_classes,
-            drop_last=False,
-            shuffle=True,
-            onehot_enc=False,
-        )
-
-        test_data, test_labels,  test_dataloader = get_dataset_loader(
-            args.dataset,
-            "test",
-            case,
-            None,
-            mean=None,
-            std=None,
-            batch_size=args.batch_size,
-            shuffle=False,
-        )
-
-        lip_teacher_model = train_model(
-            lip_teacher_model,
-            num_classes,
-            train_data,
-            train_labels,
-            test_data,
-            test_labels,
-            epochs=args.num_epochs,
-            batch_size=args.batch_size,
-            learning_rate=args.learning_rate,
-            weight_decay=args.weight_decay,
-        )
+        # test_data, test_labels,  test_dataloader = get_dataset_loader(
+        #     args.dataset,
+        #     "test",
+        #     case,
+        #     None,
+        #     mean=None,
+        #     std=None,
+        #     batch_size=args.batch_size,
+        #     shuffle=False,
+        # )
+        #
+        # lip_teacher_model = train_model(
+        #     lip_teacher_model,
+        #     num_classes,
+        #     train_data,
+        #     train_labels,
+        #     test_data,
+        #     test_labels,
+        #     epochs=args.num_epochs,
+        #     batch_size=args.batch_size,
+        #     learning_rate=args.learning_rate,
+        #     weight_decay=args.weight_decay,
+        # )
     else:
         case = settings.get_case(noise_ratio, noise_type, balanced)
         copy_model_p0_path = settings.get_ckpt_path(
