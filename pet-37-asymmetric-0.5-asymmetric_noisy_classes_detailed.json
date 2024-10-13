@@ -1,0 +1,4484 @@
+[
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 16,
+        "new_class_name": "Havanese"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 11,
+        "new_class_name": "Egyptian Mau"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 14,
+        "new_class_name": "German Shorthaired"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 8,
+        "new_class_name": "Boxer"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 29,
+        "new_class_name": "Samoyed"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 22,
+        "new_class_name": "Newfoundland"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 32,
+        "new_class_name": "Siamese"
+    }
+]
