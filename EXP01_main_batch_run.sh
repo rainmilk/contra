@@ -8,7 +8,7 @@ mv logs/*.log "$backup_dir" 2>/dev/null
 # 定义任务的脚本列表
 tasks=(
     # 分类任务 - CIFAR-10 - 对称噪声 20% - 遗忘 0.5/0.3/0.1 - Resnet18
-    # "run_cifar10_contra.sh"
+    "run_cifar10_contra.sh"
     "run_cifar10_coteaching_plus.sh"
     "run_cifar10_coteaching.sh"
     "run_cifar10_jocor.sh"
@@ -17,7 +17,7 @@ tasks=(
     "run_cifar10_raw.sh"
     "run_cifar10_rehearsal.sh"
     # 分类任务 - PET37 - 对称噪声 20% - 遗忘 0.5/0.3/0.1 - Resnet50
-    # "run_pet37_contra.sh"
+    "run_pet37_contra.sh"
     "run_pet37_coteaching_plus.sh"
     "run_pet37_coteaching.sh"
     "run_pet37_jocor.sh"
@@ -26,7 +26,7 @@ tasks=(
     "run_pet37_raw.sh"
     "run_pet37_rehearsal.sh"
     # 检索任务 - CIFAR-100 - 非对称噪声 20% - 遗忘 0.5/0.3/0.1 - WideResnet40
-    # "run_cifar100_contra.sh"
+    "run_cifar100_contra.sh"
     "run_cifar100_coteaching_plus.sh"
     "run_cifar100_coteaching.sh"
     "run_cifar100_jocor.sh"
@@ -35,7 +35,7 @@ tasks=(
     "run_cifar100_raw.sh"
     "run_cifar100_rehearsal.sh"
     # 检索任务 - PET37 - 非对称噪声 20% - 遗忘 0.5/0.3/0.1 - WideResnet50
-    # "run_pet37_contra_asy.sh"
+    "run_pet37_contra_asy.sh"
     "run_pet37_coteaching_plus_asy.sh"
     "run_pet37_coteaching_asy.sh"
     "run_pet37_jocor_asy.sh"
@@ -45,12 +45,12 @@ tasks=(
     "run_pet37_rehearsal_asy.sh"
 )
 
-tasks_contra=(
-    "run_cifar10_contra.sh"
-    "run_pet37_contra.sh"
-    "run_cifar100_contra.sh"
-    "run_pet37_contra_asy.sh"
-)
+# tasks_contra=(
+    # "run_cifar10_contra.sh"
+    # "run_pet37_contra.sh"
+    # "run_cifar100_contra.sh"
+    # "run_pet37_contra_asy.sh"
+# )
 
 # tasks_contra=(
 #     "run_cifar10_contra.sh"
@@ -65,29 +65,29 @@ if [ "$1" == "--check-only" ]; then
     check_only=true
 fi
 
-all_present=true
-for task in "${tasks_contra[@]}" "${tasks[@]}"; do
-    if [ -f "$task" ]; then
-        echo -e "\e[32m[✔] Checked: $task - File exists\e[0m"
-    else
-        echo -e "\e[31m[✖] Error: $task - File not found\e[0m"
-        all_present=false
-    fi
-done
+# all_present=true
+# for task in "${tasks_contra[@]}" "${tasks[@]}"; do
+#     if [ -f "$task" ]; then
+#         echo -e "\e[32m[✔] Checked: $task - File exists\e[0m"
+#     else
+#         echo -e "\e[31m[✖] Error: $task - File not found\e[0m"
+#         all_present=false
+#     fi
+# done
 
-if [ "$all_present" == false ]; then
-    echo -e "\e[31mOne or more scripts are missing. Exiting.\e[0m"
-    exit 1
-fi
+# if [ "$all_present" == false ]; then
+#     echo -e "\e[31mOne or more scripts are missing. Exiting.\e[0m"
+#     exit 1
+# fi
 
-if [ "$check_only" == true ]; then
-    echo -e "\e[34mAll scripts are present. Exiting as per --check-only flag.\e[0m"
-    exit 0
-fi
+# if [ "$check_only" == true ]; then
+#     echo -e "\e[34mAll scripts are present. Exiting as per --check-only flag.\e[0m"
+#     exit 0
+# fi
 
 # Define the GPUs to use
 # gpus=(1 2 3 4 5 6 7)
-gpus=(1 2 3 4 5 6)
+gpus=(0 1 2 3 4 5 6 7)
 gpu_count=${#gpus[@]}
 
 # Create logs directory

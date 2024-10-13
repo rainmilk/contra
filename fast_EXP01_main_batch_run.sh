@@ -45,7 +45,7 @@ tasks=(
     "run_pet37_rehearsal_asy.sh"
 )
 
-tasks_contra=(
+# tasks_contra=(
     # "run_cifar10_contra.sh"
     # "run_pet37_contra.sh"
     # "run_cifar100_contra.sh"
@@ -65,29 +65,29 @@ if [ "$1" == "--check-only" ]; then
     check_only=true
 fi
 
-all_present=true
-for task in "${tasks_contra[@]}" "${tasks[@]}"; do
-    if [ -f "$task" ]; then
-        echo -e "\e[32m[✔] Checked: $task - File exists\e[0m"
-    else
-        echo -e "\e[31m[✖] Error: $task - File not found\e[0m"
-        all_present=false
-    fi
-done
+# all_present=true
+# for task in "${tasks_contra[@]}" "${tasks[@]}"; do
+#     if [ -f "$task" ]; then
+#         echo -e "\e[32m[✔] Checked: $task - File exists\e[0m"
+#     else
+#         echo -e "\e[31m[✖] Error: $task - File not found\e[0m"
+#         all_present=false
+#     fi
+# done
 
-if [ "$all_present" == false ]; then
-    echo -e "\e[31mOne or more scripts are missing. Exiting.\e[0m"
-    exit 1
-fi
+# if [ "$all_present" == false ]; then
+#     echo -e "\e[31mOne or more scripts are missing. Exiting.\e[0m"
+#     exit 1
+# fi
 
-if [ "$check_only" == true ]; then
-    echo -e "\e[34mAll scripts are present. Exiting as per --check-only flag.\e[0m"
-    exit 0
-fi
+# if [ "$check_only" == true ]; then
+#     echo -e "\e[34mAll scripts are present. Exiting as per --check-only flag.\e[0m"
+#     exit 0
+# fi
 
 # Define the GPUs to use
 # gpus=(1 2 3 4 5 6 7)
-gpus=(0 1 3 4 5 6 7)
+gpus=(0 1 2 3 4 5 6 7)
 gpu_count=${#gpus[@]}
 
 # Create logs directory
