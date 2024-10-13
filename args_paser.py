@@ -90,6 +90,13 @@ def parse_args():
     )
 
     parser.add_argument(
+        "--no_spnorm",
+        action="store_true",
+        default=False,
+        help="If specified, no spectral norm",
+    )
+
+    parser.add_argument(
         "--condition",
         type=str,
         required=False,

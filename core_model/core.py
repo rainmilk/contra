@@ -307,6 +307,7 @@ def execute(args):
     step = getattr(args, "step", 1)
     tta_only = getattr(args, "tta_only", None)
     uni_name = getattr(args, "uni_name", None)
+    spec_norm = not args.no_spnorm
 
     working_model_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="worker_raw", step=step, unique_name=uni_name) # model_paths["working_model_path"]
     working_model_repair_save_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="worker_restore", step=step, unique_name=uni_name)
@@ -350,7 +351,7 @@ def execute(args):
     backbone = load_custom_model(args.model, num_classes)
     features = backbone.fc.in_features
     backbone = nn.Sequential(*list(backbone.children())[:-1], nn.Flatten())
-    lip_teacher_model = SimpleLipNet(backbone, features, num_classes)
+    lip_teacher_model = SimpleLipNet(backbone, features, num_classes, spectral_norm=spec_norm)
 
 
     # 根据用户选择的优化器初始化

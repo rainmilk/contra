@@ -26,7 +26,7 @@ if __name__ == "__main__":
     noise_type = args.noise_type
     balanced = args.balanced
     dataset = args.dataset
-
+    spec_norm = not args.no_spnorm
     uni_name = args.uni_name
 
     pretrain_case = "pretrain"
@@ -44,7 +44,7 @@ if __name__ == "__main__":
         backbone = load_custom_model(model_name, num_classes, load_pretrained=True)
         features = backbone.fc.in_features
         backbone = nn.Sequential(*list(backbone.children())[:-1], nn.Flatten())
-        lip_teacher_model = SimpleLipNet(backbone, features, num_classes)
+        lip_teacher_model = SimpleLipNet(backbone, features, num_classes, spectral_norm=spec_norm)
         # lip_teacher_model = ClassifierWrapper(backbone, num_classes)
 
         # 根据用户选择的优化器初始化
