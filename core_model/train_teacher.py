@@ -65,10 +65,11 @@ if __name__ == "__main__":
         # train_teacher_model(args, step, num_classes, lip_teacher_model, teacher_opt, teacher_lr_scheduler,
         #                     teacher_criterion, model_p0_path, test_per_it=1)
 
+        case = settings.get_case(args.noise_ratio, args.noise_type, args.balanced)
         train_data, train_labels, train_dataloader = get_dataset_loader(
             args.dataset,
             "train",
-            pretrain_case,
+            case,
             step,
             None,
             None,
@@ -82,7 +83,7 @@ if __name__ == "__main__":
         test_data, test_labels,  test_dataloader = get_dataset_loader(
             args.dataset,
             "test",
-            pretrain_case,
+            case,
             None,
             mean=None,
             std=None,
