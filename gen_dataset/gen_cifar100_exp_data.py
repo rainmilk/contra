@@ -79,26 +79,19 @@ def create_cifar100_npy_files(
         root=data_dir, train=False, download=True, transform=data_transform
     )
 
-    train_data, train_labels = zip(*train_dataset)
-    train_data = torch.stack(train_data)
-    train_labels = torch.tensor(train_labels)
-
-    test_data, test_labels = zip(*test_dataset)
-    test_data = torch.stack(test_data)
-    test_labels = torch.tensor(test_labels)
-
     case = settings.get_case(noise_ratio, noise_type, balanced)
 
     print("使用类均衡的数据划分方式...")
     dataset_name = "cifar-100"
-    D_inc_data, D_inc_labels = split(dataset_name, case, train_dataset, test_dataset)
+    num_classes = 100
+    D_inc_data, D_inc_labels = split(dataset_name, case, train_dataset, test_dataset, num_classes)
 
     # 读取 CIFAR-100 类别
-    cifar100_classes_file = "./configs/classes/cifar_100_classes.txt"
+    cifar100_classes_file = os.path.join(settings.root_dir, "configs/classes/cifar_100_classes.txt")
     cifar100_classes = load_classes_from_file(cifar100_classes_file)
 
     # 读取 CIFAR-100 的 superclass 和 child class 映射
-    cifar100_mapping_file = "./configs/classes/cifar_100_mapping.json"
+    cifar100_mapping_file = os.path.join(settings.root_dir, "configs/classes/cifar_100_mapping.json")
     cifar100_superclass_mapping = load_cifar100_superclass_mapping(
         cifar100_mapping_file
     )

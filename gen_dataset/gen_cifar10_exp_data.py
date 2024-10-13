@@ -34,24 +34,12 @@ def create_cifar10_npy_files(
         root=data_dir, train=False, download=True, transform=transform
     )
 
-    train_data, train_labels = zip(*train_dataset)
-    train_data = torch.stack(train_data)
-    train_labels = torch.tensor(train_labels)
-
-    test_data, test_labels = zip(*test_dataset)
-    test_data = torch.stack(test_data)
-    test_labels = torch.tensor(test_labels)
-
-    num_samples = len(train_data)
-    indices = rng.permutation(num_samples)
-    split_idx = num_samples // 2
-
     case = settings.get_case(noise_ratio, noise_type, balanced)
     print("使用类均衡的数据划分方式...")
     dataset_name = "cifar-10"
-    D_inc_data, D_inc_labels = split(dataset_name, case, train_dataset, test_dataset)
-
     num_classes = 10
+    D_inc_data, D_inc_labels = split(dataset_name, case, train_dataset, test_dataset, num_classes)
+
     # 定义遗忘类别和噪声类别
     forget_classes = [1, 3, 5, 7, 9]
     noise_classes = [0, 2, 4, 6, 8]

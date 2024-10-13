@@ -89,19 +89,18 @@ def create_pet37_npy_files(
     case = settings.get_case(noise_ratio, noise_type, balanced)
     print("使用类均衡的数据划分方式...")
     dataset_name = "pet-37"
-    D_inc_data, D_inc_labels = split(dataset_name, case, train_dataset, test_dataset)
-
     num_classes = 37
+    D_inc_data, D_inc_labels = split(dataset_name, case, train_dataset, test_dataset, num_classes)
 
     # 读取 Oxford-Pets 类别
-    pet37_classes_file = "./configs/classes/pet_37_classes.txt"
+    pet37_classes_file = os.path.join(settings.root_dir, "configs/classes/pet_37_classes.txt")
     pet37_classes = load_classes_from_file(pet37_classes_file)
 
     # 打印读取到的类别信息
     print("PET-37 Classes:", pet37_classes)
 
     # 读取 Oxford-Pets 的 superclass 和 child class 映射
-    pet37_mapping_file = "./configs/classes/pet_37_mapping.json"
+    pet37_mapping_file = os.path.join(settings.root_dir, "configs/classes/pet_37_mapping.json")
     pet37_superclass_mapping = load_pet37_superclass_mapping(pet37_mapping_file)
 
     # 定义遗忘类别和噪声类别

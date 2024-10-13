@@ -6,7 +6,7 @@ import numpy as np
 import torch
 
 
-def split_by_class(data, labels, num_classes=10):
+def split_by_class(data, labels, num_classes=100):
     """按类别划分数据集"""
     class_data = {i: [] for i in range(num_classes)}
     for i, label in enumerate(labels):
@@ -42,9 +42,9 @@ def sample_class_balanced_data(class_data, split_ratio):
     return D_0_data, D_0_labels, D_inc_data, D_inc_labels
 
 
-def sample_replay_data(D_0_data, D_0_labels, replay_ratio):
+def sample_replay_data(D_0_data, D_0_labels, replay_ratio, num_classes=100):
     """从 D_0 中均衡抽取样本作为重放数据集 D_a"""
-    class_data = split_by_class(D_0_data, D_0_labels)
+    class_data = split_by_class(D_0_data, D_0_labels, num_classes)
     D_a_data = []
     D_a_labels = []
 
@@ -61,7 +61,7 @@ def sample_replay_data(D_0_data, D_0_labels, replay_ratio):
 
     return D_a_data, D_a_labels
 
-def split(dataset_name, case, train_dataset=None, test_dataset=None):
+def split(dataset_name, case, train_dataset=None, test_dataset=None, num_classes=100):
     rawcase = None
     train_data_path = settings.get_dataset_path(dataset_name, rawcase, "train_data")
     train_label_path = settings.get_dataset_path(dataset_name, rawcase, "train_label")
@@ -86,7 +86,7 @@ def split(dataset_name, case, train_dataset=None, test_dataset=None):
         test_labels = torch.tensor(test_labels)
 
         # 按类别划分训练数据
-        class_data = split_by_class(train_data, train_labels)
+        class_data = split_by_class(train_data, train_labels, num_classes)
 
         # 构建类均衡的 D_0 和 D_inc_0
         D_0_data, D_0_labels, D_inc_data, D_inc_labels = sample_class_balanced_data(
