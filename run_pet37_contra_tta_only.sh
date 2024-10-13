@@ -15,18 +15,18 @@ echo "CUDA_VISIBLE_DEVICES is set to: $CUDA_VISIBLE_DEVICES"
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "PYTHONPATH is set to: $PYTHONPATH"
 
-python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 0 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced
+python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 0 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --uni_name contra_tta_only
 
-python ./core_model/train_teacher.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 0 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced
+python ./core_model/train_teacher.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 0 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --uni_name contra_tta_only
 
-python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 1 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --model_suffix worker_raw
+python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 1 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --model_suffix worker_raw --uni_name contra_tta_only
 
-python ./core_model/core.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 1 --learning_rate 0.001 --optimizer adam --batch_size 16 --balanced
+python ./core_model/core.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 1 --learning_rate 0.001 --optimizer adam --batch_size 16 --balanced --uni_name contra_tta_only
 
-python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 2 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --model_suffix worker_raw
+python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 2 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --model_suffix worker_raw --uni_name contra_tta_only
 
-python ./core_model/core.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 2 --learning_rate 0.001 --optimizer adam --batch_size 16 --balanced
+python ./core_model/core.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 2 --learning_rate 0.001 --optimizer adam --batch_size 16 --balanced --uni_name contra_tta_only
 
-python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 3 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --model_suffix worker_raw
+python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 3 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --model_suffix worker_raw --uni_name contra_tta_only
 
-python ./core_model/core.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 3 --learning_rate 0.001 --optimizer adam --batch_size 16 --balanced
+python ./core_model/core.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 3 --learning_rate 0.001 --optimizer adam --batch_size 16 --balanced --uni_name contra_tta_only
