@@ -15,8 +15,16 @@ echo "CUDA_VISIBLE_DEVICES is set to: $CUDA_VISIBLE_DEVICES"
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "PYTHONPATH is set to: $PYTHONPATH"
 
-python baseline_code/colearn/main.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 1 --batch_size 16 --balanced --uni_name coteaching --noise_type asymmetric --noise_ratio 0.3
+python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 0 --batch_size 16 --balanced --uni_name Coteaching --noise_type asymmetric --noise_ratio 0.3
 
-python baseline_code/colearn/main.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 2 --batch_size 16 --balanced --uni_name coteaching --noise_type asymmetric --noise_ratio 0.3
+python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 1 --batch_size 16 --balanced --model_suffix worker_raw --uni_name Coteaching --noise_type asymmetric --noise_ratio 0.3
 
-python baseline_code/colearn/main.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 3 --batch_size 16 --balanced --uni_name coteaching --noise_type asymmetric --noise_ratio 0.3
+python baseline_code/colearn/main.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 1 --batch_size 16 --balanced --uni_name Coteaching --noise_type asymmetric --noise_ratio 0.3
+
+python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 2 --batch_size 16 --balanced --model_suffix worker_raw --uni_name Coteaching --noise_type asymmetric --noise_ratio 0.3
+
+python baseline_code/colearn/main.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 2 --batch_size 16 --balanced --uni_name Coteaching --noise_type asymmetric --noise_ratio 0.3
+
+python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 3 --batch_size 16 --balanced --model_suffix worker_raw --uni_name Coteaching --noise_type asymmetric --noise_ratio 0.3
+
+python baseline_code/colearn/main.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 3 --batch_size 16 --balanced --uni_name Coteaching --noise_type asymmetric --noise_ratio 0.3
