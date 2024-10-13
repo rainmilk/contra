@@ -149,11 +149,15 @@ class TrainTestUtils:
 def train_model(
     model,
     num_classes,
-    optimizer,
-    scheduler,
-    train_loader,
-    test_loader,
+    data,
+    labels,
+    test_data,
+    test_labels,
     epochs=50,
+    batch_size=256,
+    optimizer_type="adam",
+    learning_rate=0.001,
+    weight_decay=5e-4,
     writer=None,
 ):
     """
@@ -175,13 +179,13 @@ def train_model(
     model.train()
     criterion = nn.CrossEntropyLoss()
 
-    # optimizer, scheduler = create_optimizer_scheduler(
-    #     optimizer_type=optimizer_type,
-    #     parameters=model.parameters(),
-    #     learning_rate=learning_rate,
-    #     weight_decay=weight_decay,
-    #     epochs=epochs,
-    # )
+    optimizer, scheduler = create_optimizer_scheduler(
+        optimizer_type=optimizer_type,
+        parameters=model.parameters(),
+        learning_rate=learning_rate,
+        weight_decay=weight_decay,
+        epochs=epochs,
+    )
 
     # weights = torchvision.models.ResNet18_Weights.DEFAULT
     transform_train = transforms.Compose(
@@ -197,13 +201,13 @@ def train_model(
         ]
     )
 
-    # dataset = BaseTensorDataset(data, labels)
-    # dataloader = DataLoader(
-    #     dataset, batch_size=batch_size, drop_last=True, shuffle=True
-    # )
-    #
-    # test_dataset = BaseTensorDataset(test_data, test_labels)
-    # test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    dataset = BaseTensorDataset(data, labels)
+    dataloader = DataLoader(
+        dataset, batch_size=batch_size, drop_last=True, shuffle=True
+    )
+
+    test_dataset = BaseTensorDataset(test_data, test_labels)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     # 用于存储训练和测试的损失和准确率
     train_losses = []
@@ -224,8 +228,8 @@ def train_model(
         scheduler.step(epoch)
 
         # tqdm 进度条显示
-        with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
-            for inputs, targets in train_loader:
+        with tqdm(total=len(dataloader), desc=f"Epoch {epoch + 1} Training") as pbar:
+            for inputs, targets in dataloader:
                 if use_data_aug:
                     transform = np.random.choice([mixup_transform, cutmix_transform])
                     targets = targets.to(torch.long)
@@ -250,7 +254,7 @@ def train_model(
                 pbar.update(1)
 
         # 打印训练集的平均损失和准确率
-        avg_loss = running_loss / len(train_loader)
+        avg_loss = running_loss / len(dataloader)
         accuracy = correct / total
         train_losses.append(avg_loss)
         print(
