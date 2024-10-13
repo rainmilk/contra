@@ -9,7 +9,9 @@ from args_paser import parse_args, parse_kwargs
 from lip_teacher import SimpleLipNet
 from optimizer import create_optimizer_scheduler
 from custom_model import load_custom_model, ClassifierWrapper
+from core_model.dataset import get_dataset_loader
 import torch
+from train_test_utils import train_model
 
 if __name__ == "__main__":
     args = parse_args()
@@ -51,17 +53,55 @@ if __name__ == "__main__":
         lip_teacher_model.to(device)
 
         # 根据用户选择的优化器初始化
-        teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(
-            optimizer_type,
-            lip_teacher_model.parameters(),
-            num_epochs,
-            learning_rate,
-            weight_decay,
-        )
-        teacher_criterion = nn.CrossEntropyLoss()
+        # teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(
+        #     optimizer_type,
+        #     lip_teacher_model.parameters(),
+        #     num_epochs,
+        #     learning_rate,
+        #     weight_decay,
+        # )
+        # teacher_criterion = nn.CrossEntropyLoss()
+        #
+        # train_teacher_model(args, step, num_classes, lip_teacher_model, teacher_opt, teacher_lr_scheduler,
+        #                     teacher_criterion, model_p0_path, test_per_it=1)
 
-        train_teacher_model(args, step, num_classes, lip_teacher_model, teacher_opt, teacher_lr_scheduler,
-                            teacher_criterion, model_p0_path, test_per_it=1)
+        train_data, train_labels, train_dataloader = get_dataset_loader(
+            args.dataset,
+            "train",
+            pretrain_case,
+            step,
+            None,
+            None,
+            args.batch_size,
+            num_classes=num_classes,
+            drop_last=False,
+            shuffle=True,
+            onehot_enc=False,
+        )
+
+        test_data, test_labels,  test_dataloader = get_dataset_loader(
+            args.dataset,
+            "test",
+            pretrain_case,
+            None,
+            mean=None,
+            std=None,
+            batch_size=args.batch_size,
+            shuffle=False,
+        )
+
+        lip_teacher_model = train_model(
+            lip_teacher_model,
+            num_classes,
+            train_data,
+            train_labels,
+            test_data,
+            test_labels,
+            epochs=args.num_epochs,
+            batch_size=args.batch_size,
+            learning_rate=args.learning_rate,
+            weight_decay=args.weight_decay,
+        )
     else:
         case = settings.get_case(noise_ratio, noise_type, balanced)
         copy_model_p0_path = settings.get_ckpt_path(
