@@ -95,7 +95,6 @@ def model_test(data_loader, model, device="cuda"):
     print("test_acc: %.2f" % (global_acc * 100))
     eval_results["global"] = global_acc.item()
 
-    model.eval()
     # class acc
     label_list = sorted(list(set(labels)))
     for label in label_list:
@@ -119,24 +118,25 @@ def model_forward(test_loader, model, device="cuda",
     if output_targets:
         targets = []
 
-    for i, (image, target) in enumerate(test_loader):
-        image = image.to(device)  # 数据移动到设备
+    with torch.no_grad():
+        for i, (image, target) in enumerate(test_loader):
+            image = image.to(device)  # 数据移动到设备
 
-        if output_embedding:
-            logics, embed_out = model(image, output_embedding)
-            embed_outs.append(embed_out.data.cpu().numpy())
-        else:
-            logics = model(image)
+            if output_embedding:
+                logics, embed_out = model(image, output_embedding)
+                embed_outs.append(embed_out.data.cpu().numpy())
+            else:
+                logics = model(image)
 
-        probs = nn.functional.softmax(logics, dim=-1)
-        probs = probs.data.cpu().numpy()
-        output_probs.append(probs)
+            probs = nn.functional.softmax(logics, dim=-1)
+            probs = probs.data.cpu().numpy()
+            output_probs.append(probs)
 
-        predicts = np.argmax(probs, axis=1)
-        output_predicts.append(predicts)
+            predicts = np.argmax(probs, axis=1)
+            output_predicts.append(predicts)
 
-        if output_targets:
-            targets.append(target.data.cpu().numpy())
+            if output_targets:
+                targets.append(target.data.cpu().numpy())
 
     output_predicts = np.concatenate(output_predicts, axis=0)
     output_probs = np.concatenate(output_probs, axis=0)
