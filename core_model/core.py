@@ -336,6 +336,7 @@ def execute(args):
     working_model = ClassifierWrapper(working_model, num_classes)
     checkpoint = torch.load(working_model_path)
     working_model.load_state_dict(checkpoint, strict=False)
+    working_model.to(device)
 
     working_opt, working_lr_scheduler = create_optimizer_scheduler(
         optimizer_type,
@@ -353,7 +354,7 @@ def execute(args):
     # backbone = nn.Sequential(*list(backbone.children())[:-1], nn.Flatten())
     # lip_teacher_model = SimpleLipNet(backbone, features, num_classes, spectral_norm=spec_norm)
     lip_teacher_model = ClassifierWrapper(backbone, num_classes, spectral_norm=spec_norm)
-
+    lip_teacher_model.to(device)
 
     # 根据用户选择的优化器初始化
     teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(

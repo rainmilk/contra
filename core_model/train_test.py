@@ -24,7 +24,7 @@ def model_train(
     # 训练模型并显示进度
     print(f"Training model on {args.dataset}")
 
-    model = model.to(device)  # 确保模型移动到正确的设备
+    # model = model.to(device)  # 确保模型移动到正确的设备
     model.train()
 
     if mix_classes > 0:
@@ -108,7 +108,6 @@ def model_test(data_loader, model, device="cuda"):
 
 def model_forward(test_loader, model, device="cuda",
                           output_embedding=False, output_targets=False):
-    model = model.to(device)
     model.eval()
 
     output_probs, output_predicts = [], []

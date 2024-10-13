@@ -9,6 +9,7 @@ from args_paser import parse_args, parse_kwargs
 from lip_teacher import SimpleLipNet
 from optimizer import create_optimizer_scheduler
 from custom_model import load_custom_model, ClassifierWrapper
+import torch
 
 if __name__ == "__main__":
     args = parse_args()
@@ -46,6 +47,8 @@ if __name__ == "__main__":
         # backbone = nn.Sequential(*list(backbone.children())[:-1], nn.Flatten())
         # lip_teacher_model = SimpleLipNet(backbone, features, num_classes, spectral_norm=spec_norm)
         lip_teacher_model = ClassifierWrapper(backbone, num_classes, spectral_norm=spec_norm)
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        lip_teacher_model.to(device)
 
         # 根据用户选择的优化器初始化
         teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(
