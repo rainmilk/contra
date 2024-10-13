@@ -24,14 +24,9 @@ def model_train(
     # 训练模型并显示进度
     print(f"Training model on {args.dataset}")
 
-    # model = model.to(device)  # 确保模型移动到正确的设备
-    # 用于存储训练和测试的损失和准确率
-    train_losses = []
-    test_accuracies = []
+    model = model.to(device)  # 确保模型移动到正确的设备
 
-    use_data_aug = mix_classes > 0
-
-    if use_data_aug:
+    if mix_classes > 0:
         cutmix_transform = v2.CutMix(alpha=1.0, num_classes=mix_classes)
         mixup_transform = v2.MixUp(alpha=0.5, num_classes=mix_classes)
 
@@ -42,38 +37,37 @@ def model_train(
 
         # 更新学习率调度器
         lr_scheduler.step(epoch)
-
         model.train()
-        # tqdm 进度条显示
+
+        # 用 tqdm 显示训练进度条
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
-            for inputs, targets in train_loader:
-                if use_data_aug:
-                    transform = np.random.choice([mixup_transform, cutmix_transform])
-                    targets = targets.to(torch.long)
-                    inputs, targets = transform(inputs, targets)
+            for i, (inputs, labels) in enumerate(train_loader):
+                if mix_classes > 0:
+                    transform = np.random.choice([cutmix_transform, mixup_transform])
+                    labels = labels.to(torch.long)
+                    inputs, labels = transform(inputs, labels)
 
-                inputs, targets = inputs.to(device), targets.to(device)
-
-                optimizer.zero_grad()
+                inputs, labels = inputs.to(device), labels.to(device)
+                optimizer.zero_grad()  # 清除上一步的梯度
                 outputs = model(inputs)
-                loss = criterion(outputs, targets)
-                loss.backward()
-                optimizer.step()
 
+                loss = criterion(outputs, labels)
+                loss.backward()  # 反向传播
+                optimizer.step()  # 更新参数
                 running_loss += loss.item()
-                _, predicted = torch.max(outputs.data, 1)
-                mixed_max = torch.argmax(targets.data, 1) if use_data_aug else targets
-                total += targets.size(0)
-                correct += (predicted == mixed_max).sum().item()
 
-                # 更新进度条
+                # 计算准确率
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                labels_ = torch.argmax(labels, dim=-1)
+                correct += (predicted == labels_).sum().item()
+
+                # 更新进度条显示每个 mini-batch 的损失
                 pbar.set_postfix({"Loss": f"{loss.item():.4f}"})
                 pbar.update(1)
 
-        # 打印训练集的平均损失和准确率
-        avg_loss = running_loss / len(train_loader)
-        accuracy = correct / total
-        train_losses.append(avg_loss)
+        avg_loss = running_loss / len(train_loader)  # 计算平均损失
+        accuracy = correct / total  # 计算训练集的准确率
         print(
             f"Epoch [{epoch + 1}/{epochs}], Training Loss: {avg_loss:.4f}, Training Accuracy: {accuracy * 100:.2f}%"
         )
@@ -113,6 +107,7 @@ def model_test(data_loader, model, device="cuda"):
 
 def model_forward(test_loader, model, device="cuda",
                           output_embedding=False, output_targets=False):
+    model.to(device)
     model.eval()
 
     output_probs, output_predicts = [], []
