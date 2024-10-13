@@ -40,29 +40,29 @@ def model_train(
         lr_scheduler.step(epoch)
 
         # 用 tqdm 显示训练进度条
+        # tqdm 进度条显示
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
-            for i, (inputs, labels) in enumerate(train_loader):
+            for inputs, targets in train_loader:
                 if mix_classes > 0:
-                    transform = np.random.choice([cutmix_transform, mixup_transform])
-                    labels = labels.to(torch.long)
-                    inputs, labels = transform(inputs, labels)
+                    transform = np.random.choice([mixup_transform, cutmix_transform])
+                    targets = targets.to(torch.long)
+                    inputs, targets = transform(inputs, targets)
 
-                inputs, labels = inputs.to(device), labels.to(device)
-                optimizer.zero_grad()  # 清除上一步的梯度
+                inputs, targets = inputs.to(device), targets.to(device)
+
+                optimizer.zero_grad()
                 outputs = model(inputs)
+                loss = criterion(outputs, targets)
+                loss.backward()
+                optimizer.step()
 
-                loss = criterion(outputs, labels)
-                loss.backward()  # 反向传播
-                optimizer.step()  # 更新参数
                 running_loss += loss.item()
-
-                # 计算准确率
                 _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                labels_ = torch.argmax(labels, dim=-1)
-                correct += (predicted == labels_).sum().item()
+                mixed_max = torch.argmax(targets.data, 1) if mix_classes > 0 else targets
+                total += targets.size(0)
+                correct += (predicted == mixed_max).sum().item()
 
-                # 更新进度条显示每个 mini-batch 的损失
+                # 更新进度条
                 pbar.set_postfix({"Loss": f"{loss.item():.4f}"})
                 pbar.update(1)
 
