@@ -337,9 +337,6 @@ def execute(args):
     working_model = load_custom_model(args.model, num_classes, load_pretrained=False)
 
     working_model = ClassifierWrapper(working_model, num_classes)
-    checkpoint = torch.load(working_model_path)
-    working_model.load_state_dict(checkpoint, strict=False)
-    # working_model.to(device)
 
     working_opt, working_lr_scheduler = create_optimizer_scheduler(
         optimizer_type,
@@ -383,6 +380,10 @@ def execute(args):
     os.makedirs(subdir, exist_ok=True)
 
     if tta_only is None:
+        checkpoint = torch.load(working_model_path)
+        working_model.load_state_dict(checkpoint, strict=False)
+        # working_model.to(device)
+
         if os.path.exists(lip_teacher_model_path):
             checkpoint = torch.load(lip_teacher_model_path)
             lip_teacher_model.load_state_dict(checkpoint, strict=False)
