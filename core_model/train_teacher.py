@@ -45,9 +45,6 @@ if __name__ == "__main__":
     if uni_name is None:
         num_classes = settings.num_classes_dict[dataset]
         backbone = load_custom_model(model_name, num_classes, load_pretrained=True)
-        # features = backbone.fc.in_features
-        # backbone = nn.Sequential(*list(backbone.children())[:-1], nn.Flatten())
-        # lip_teacher_model = SimpleLipNet(backbone, features, num_classes, spectral_norm=spec_norm)
         lip_teacher_model = ClassifierWrapper(backbone, num_classes, spectral_norm=spec_norm)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         lip_teacher_model.to(device)

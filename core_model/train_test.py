@@ -26,7 +26,6 @@ def model_train(
 
     # model = model.to(device)  # 确保模型移动到正确的设备
     model.train()
-    criterion = nn.CrossEntropyLoss()
 
     # 用于存储训练和测试的损失和准确率
     train_losses = []
@@ -80,38 +79,16 @@ def model_train(
             f"Epoch [{epoch + 1}/{epochs}], Training Loss: {avg_loss:.4f}, Training Accuracy: {accuracy * 100:.2f}%"
         )
 
-        # 测试集评估
-        model.eval()
-        test_loss = 0.0
-        correct_test = 0
-        total_test = 0
-        with torch.no_grad():
-            with tqdm(
-                    total=len(test_loader), desc=f"Epoch {epoch + 1} Testing"
-            ) as pbar:
-                for test_inputs, test_targets in test_loader:
-                    test_inputs, test_targets = test_inputs.to(device), test_targets.to(
-                        device
-                    )
-                    test_outputs = model(test_inputs)
-                    loss = criterion(test_outputs, test_targets)
-                    test_loss += loss.item()
-                    _, predicted_test = torch.max(test_outputs, 1)
-                    total_test += test_targets.size(0)
-                    correct_test += (predicted_test == test_targets).sum().item()
+        if test_loader is not None and epoch % test_per_it == 0:
+            model_test(test_loader, model, device)
 
-                    # 更新进度条
-                    pbar.set_postfix({"Loss": f"{loss.item():.4f}"})
-                    pbar.update(1)
-
-        test_loss /= len(test_loader)
-        test_accuracy = 100 * correct_test / total_test
-        test_accuracies.append(test_accuracy)
-        print(f"Test Accuracy after Epoch {epoch + 1}: {test_accuracy:.2f}%")
-
-        model.train()
-
-    return model
+        # 仅在最后一次保存模型，避免每个 epoch 都保存
+        if epoch == epochs - 1:
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            torch.save(model.state_dict(), save_path)
+            print(
+                f"Model has saved to {save_path}."
+            )
 
 
 def model_test(data_loader, model, device="cuda"):
