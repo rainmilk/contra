@@ -97,6 +97,13 @@ def parse_args():
     )
 
     parser.add_argument(
+        "--data_aug",
+        action="store_true",
+        default=False,
+        help="If specified, do data augmentation",
+    )
+
+    parser.add_argument(
         "--condition",
         type=str,
         required=False,

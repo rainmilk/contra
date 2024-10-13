@@ -158,6 +158,7 @@ def train_model(
     optimizer_type="adam",
     learning_rate=0.001,
     weight_decay=5e-4,
+    data_aug=False,
     writer=None,
 ):
     """
@@ -213,9 +214,7 @@ def train_model(
     train_losses = []
     test_accuracies = []
 
-    use_data_aug = True
-
-    if use_data_aug:
+    if data_aug:
         cutmix_transform = v2.CutMix(alpha=1.0, num_classes=num_classes)
         mixup_transform = v2.MixUp(alpha=0.5, num_classes=num_classes)
 
@@ -230,7 +229,7 @@ def train_model(
         # tqdm 进度条显示
         with tqdm(total=len(dataloader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for inputs, targets in dataloader:
-                if use_data_aug:
+                if data_aug:
                     transform = np.random.choice([mixup_transform, cutmix_transform])
                     targets = targets.to(torch.long)
                     inputs, targets = transform(inputs, targets)
@@ -245,7 +244,7 @@ def train_model(
 
                 running_loss += loss.item()
                 _, predicted = torch.max(outputs.data, 1)
-                mixed_max = torch.argmax(targets.data, 1) if use_data_aug else targets
+                mixed_max = torch.argmax(targets.data, 1) if data_aug else targets
                 total += targets.size(0)
                 correct += (predicted == mixed_max).sum().item()
 

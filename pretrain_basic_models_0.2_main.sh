@@ -10,6 +10,7 @@ nohup bash -c "CUDA_VISIBLE_DEVICES=7 python run_experiment.py \
     --num_epochs 200 \
     --learning_rate 0.015 \
     --optimizer adam \
+    --data_aug \
     --batch_size 256" >logs/run_experiment_step0_resnet18_cifar10_$(date +'%Y%m%d_%H%M%S').log 2>&1 &
 
 nohup bash -c "CUDA_VISIBLE_DEVICES=6 python run_experiment.py \
@@ -22,6 +23,7 @@ nohup bash -c "CUDA_VISIBLE_DEVICES=6 python run_experiment.py \
     --num_epochs 30 \
     --learning_rate 0.0001 \
     --optimizer adam \
+    --data_aug \
     --batch_size 16" >logs/run_experiment_step0_wideresnet50_pet37_$(date +'%Y%m%d_%H%M%S').log 2>&1 &
 
 nohup bash -c "CUDA_VISIBLE_DEVICES=5 python run_experiment.py \
@@ -34,6 +36,7 @@ nohup bash -c "CUDA_VISIBLE_DEVICES=5 python run_experiment.py \
     --num_epochs 200 \
     --learning_rate 0.015 \
     --optimizer adam \
+    --data_aug \
     --batch_size 256" >logs/run_experiment_step0_wideresnet40_cifar100_$(date +'%Y%m%d_%H%M%S').log 2>&1 &
 
 # nohup bash -c "CUDA_VISIBLE_DEVICES=4 python run_experiment.py \

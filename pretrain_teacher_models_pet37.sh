@@ -7,7 +7,7 @@ echo "CUDA_VISIBLE_DEVICES is set to: $CUDA_VISIBLE_DEVICES"
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "PYTHONPATH is set to: $PYTHONPATH"
 
-python ./core_model/train_teacher.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 0 --learning_rate 0.00005 --optimizer adam --batch_size 16 --balanced
+python ./core_model/train_teacher.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 0 --learning_rate 0.00005 --optimizer adam --batch_size 16 --balanced --data_aug
 
 # python ./core_model/train_teacher.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 200 --step 0 --learning_rate 0.015 --optimizer adam --batch_size 256 --balanced
 
