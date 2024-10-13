@@ -99,10 +99,7 @@ if __name__ == "__main__":
             teacher_lr_scheduler,
             train_dataloader,
             test_dataloader,
-            epochs=args.num_epochs,
-            batch_size=args.batch_size,
-            learning_rate=args.learning_rate,
-            weight_decay=args.weight_decay,
+            epochs=args.num_epochs
         )
     else:
         case = settings.get_case(noise_ratio, noise_type, balanced)
