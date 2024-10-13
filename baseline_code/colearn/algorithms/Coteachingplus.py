@@ -70,7 +70,7 @@ class Coteachingplus:
         self.loss_fn = loss_coteaching
 
     def evaluate(self, test_loader):
-        print("Evaluating ...")
+        print("Evaluating CoteachingPlus...")
         self.model1.eval()  # Change model to 'eval' mode.
         self.model2.eval()  # Change model to 'eval' mode
 

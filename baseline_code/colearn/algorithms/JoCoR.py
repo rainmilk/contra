@@ -71,7 +71,7 @@ class JoCoR:
         self.adjust_lr = config["adjust_lr"]
 
     def evaluate(self, test_loader):
-        print("Evaluating ...")
+        print("Evaluating JoCoR...")
         self.model1.eval()  # Change model to 'eval' mode.
         self.model2.eval()  # Change model to 'eval' mode
 
