@@ -42,7 +42,25 @@ if __name__ == "__main__":
         step=0
     )
 
-    if uni_name is None:
+    case = settings.get_case(noise_ratio, noise_type, balanced)
+    save_model_path = settings.get_ckpt_path(
+        dataset,
+        case,
+        model_name,
+        model_suffix,
+        step=step,
+        unique_name=uni_name,
+    )
+
+    if uni_name is not None and step == 0:
+        if os.path.exists(model_p0_path):
+            subdir = os.path.dirname(save_model_path)
+            os.makedirs(subdir, exist_ok=True)
+            shutil.copy(model_p0_path, save_model_path)
+            print(f"Copy {model_p0_path} to {save_model_path}")
+        else:
+            raise FileNotFoundError(model_p0_path)
+    else:
         num_classes = settings.num_classes_dict[dataset]
         backbone = load_custom_model(model_name, num_classes, load_pretrained=True)
         lip_teacher_model = ClassifierWrapper(backbone, num_classes, spectral_norm=spec_norm)
@@ -55,25 +73,9 @@ if __name__ == "__main__":
             weight_decay=weight_decay,
             epochs=num_epochs,
         )
-
         teacher_criterion = nn.CrossEntropyLoss()
 
+        if step == 0:
+            save_model_path = model_p0_path
         train_teacher_model(args, step, num_classes, lip_teacher_model, teacher_opt, teacher_lr_scheduler,
-                            teacher_criterion, model_p0_path, test_per_it=1)
-    else:
-        case = settings.get_case(noise_ratio, noise_type, balanced)
-        copy_model_p0_path = settings.get_ckpt_path(
-            dataset,
-            case,
-            model_name,
-            model_suffix,
-            step=step,
-            unique_name=uni_name,
-        )
-        if os.path.exists(model_p0_path):
-            subdir = os.path.dirname(copy_model_p0_path)
-            os.makedirs(subdir, exist_ok=True)
-            shutil.copy(model_p0_path, copy_model_p0_path)
-            print(f"Copy {model_p0_path} to {copy_model_p0_path}")
-        else:
-            raise FileNotFoundError(model_p0_path)
+                            teacher_criterion, save_model_path, test_per_it=1)
