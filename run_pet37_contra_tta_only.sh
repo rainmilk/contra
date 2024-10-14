@@ -19,14 +19,20 @@ python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 10
 
 python ./core_model/train_teacher.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 0 --learning_rate 1e-4 --optimizer adam --batch_size 16 --balanced --uni_name contra_tta_only --tta_only 0
 
-python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 1 --learning_rate 1e-4 --optimizer adam --batch_size 16 --balanced --model_suffix worker_restore --uni_name contra_tta_only --tta_only 0
+python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 1 --learning_rate 1e-4--optimizer adam --batch_size 16 --balanced --model_suffix worker_raw --uni_name contra_tta_only --tta_only 0
 
-python ./core_model/core.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 1 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --uni_name contra_tta_only --tta_only 0
+python ./core_model/train_teacher.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 1 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --uni_name contra_tta_only --tta_only 0
 
-python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 2 --learning_rate 1e-4 --optimizer adam --batch_size 16 --balanced --model_suffix worker_restore --uni_name contra_tta_only --tta_only 0
+python ./core_model/core.py --model wideresnet50 --dataset pet-37 --num_epochs 1 --step 1 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --uni_name contra_tta_only --tta_only 0
 
-python ./core_model/core.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 2 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --uni_name contra_tta_only --tta_only 0
+python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 2 --learning_rate 1e-4 --optimizer adam --batch_size 16 --balanced --model_suffix worker_raw --uni_name contra_tta_only --tta_only 0
 
-python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 3 --learning_rate 1e-4 --optimizer adam --batch_size 16 --balanced --model_suffix worker_restore --uni_name contra_tta_only --tta_only 0
+python ./core_model/train_teacher.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 2 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --uni_name contra_tta_only --tta_only 0
 
-python ./core_model/core.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 3 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --uni_name contra_tta_only --tta_only 0
+python ./core_model/core.py --model wideresnet50 --dataset pet-37 --num_epochs 1 --step 2 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --uni_name contra_tta_only --tta_only 0
+
+python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 3 --learning_rate 1e-4 --optimizer adam --batch_size 16 --balanced --model_suffix worker_raw --uni_name contra_tta_only --tta_only 0
+
+python ./core_model/train_teacher.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --step 3 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --uni_name contra_tta_only --tta_only 0
+
+python ./core_model/core.py --model wideresnet50 --dataset pet-37 --num_epochs 1 --step 3 --learning_rate 1e-5 --optimizer adam --batch_size 16 --balanced --uni_name contra_tta_only --tta_only 0
