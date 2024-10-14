@@ -1,7 +1,11 @@
 #!/bin/bash
 
 # 清空 logs 目录中的所有 .log 文件
-rm -f logs/*.log
+
+# 备份 logs 目录中的所有 .log 文件
+backup_dir="logs_backup/$(date +%Y%m%d_%H%M%S)"
+mkdir -p "$backup_dir"
+mv logs/*.log "$backup_dir" 2>/dev/null
 
 # 定义任务的脚本列表
 
@@ -79,7 +83,8 @@ fi
 # Define the GPUs to use
 # gpus=(1 2 3 4 5 6 7)
 
-gpus=(0 1 2 3 4 5 6 7)
+# gpus=(0 1 2 3 4 5 6 7)
+gpus=(0 1 3 4 5 6 7)
 
 gpu_count=${#gpus[@]}
 
