@@ -32,11 +32,10 @@ if __name__ == "__main__":
     spec_norm = not args.no_spnorm
     uni_name = args.uni_name
 
-    pretrain_case = "pretrain"
-    model_suffix = "teacher_restore"
+    case = "pretrain"
     model_p0_path = settings.get_ckpt_path(
         dataset,
-        pretrain_case,
+        case,
         model_name,
         model_suffix,
         step=0
