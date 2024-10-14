@@ -470,7 +470,7 @@ def execute(args):
     if tta_only is not None:
         if tta_only == 0:
             lip_teacher_model_path = settings.get_ckpt_path(args.dataset, case, args.model,
-                                                            model_suffix="teacher_restore", step=0,
+                                                            model_suffix="teacher_restore", step=step,
                                                             unique_name=uni_name)
             checkpoint = torch.load(lip_teacher_model_path)
             lip_teacher_model.load_state_dict(checkpoint, strict=False)
