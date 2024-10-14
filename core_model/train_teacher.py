@@ -63,6 +63,13 @@ if __name__ == "__main__":
         num_classes = settings.num_classes_dict[dataset]
         backbone = load_custom_model(model_name, num_classes, load_pretrained=True)
         lip_teacher_model = ClassifierWrapper(backbone, num_classes, spectral_norm=spec_norm)
+        if step == 0:
+            save_model_path = model_p0_path
+        # else:
+        #     if os.path.exists(save_model_path):
+        #         checkpoint = torch.load(model_p0_path)
+        #         lip_teacher_model.load_state_dict(checkpoint, strict=False)
+
 
         # 根据用户选择的优化器初始化
         teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(
@@ -74,7 +81,5 @@ if __name__ == "__main__":
         )
         teacher_criterion = nn.CrossEntropyLoss()
 
-        if step == 0:
-            save_model_path = model_p0_path
         train_teacher_model(args, step, num_classes, lip_teacher_model, teacher_opt, teacher_lr_scheduler,
                             teacher_criterion, save_model_path, test_per_it=1)
