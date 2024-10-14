@@ -127,6 +127,7 @@ def train_step(
             batch_size=args.batch_size,
             learning_rate=args.learning_rate,
             weight_decay=args.weight_decay,
+            data_aug=args.data_aug,
             writer=writer,
         )
         model_raw_path = settings.get_ckpt_path(
@@ -180,6 +181,7 @@ def train_step(
                 batch_size=args.batch_size,
                 learning_rate=args.learning_rate,
                 weight_decay=args.weight_decay,
+                data_aug=args.data_aug,
                 writer=writer,
             )
             subdir = os.path.dirname(model_p0_path)
@@ -270,6 +272,7 @@ def train_step(
             optimizer_type=args.optimizer,
             learning_rate=args.learning_rate,
             weight_decay=args.weight_decay,
+            data_aug=args.data_aug,
             writer=writer,
         )
 

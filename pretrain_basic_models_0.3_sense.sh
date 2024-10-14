@@ -46,6 +46,7 @@ nohup bash -c "CUDA_VISIBLE_DEVICES=6 python run_experiment.py \
    --num_epochs 30 \
    --learning_rate 0.0001 \
    --optimizer adam \
+   --data_aug \
    --batch_size 64" >logs/run_experiment_step0_wideresnet50_pet37_symmetric_$(date +'%Y%m%d_%H%M%S').log 2>&1 &
 
 nohup bash -c "CUDA_VISIBLE_DEVICES=7 python run_experiment.py \
@@ -58,4 +59,5 @@ nohup bash -c "CUDA_VISIBLE_DEVICES=7 python run_experiment.py \
    --num_epochs 30 \
    --learning_rate 0.0001 \
    --optimizer adam \
+   --data_aug \
    --batch_size 64" >logs/run_experiment_step0_wideresnet50_pet37_asymmetric_$(date +'%Y%m%d_%H%M%S').log 2>&1 &

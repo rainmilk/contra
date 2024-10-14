@@ -97,6 +97,13 @@ def parse_args():
     )
 
     parser.add_argument(
+        "--data_aug",
+        action="store_true",
+        default=False,
+        help="If specified, do data augmentation",
+    )
+
+    parser.add_argument(
         "--condition",
         type=str,
         required=False,
@@ -272,7 +279,7 @@ def parse_args():
     parser.add_argument(
         "--adapt_epochs",
         type=int,
-        default=5,
+        default=1,
         help="The number of epochs to adapt the model",
     )
 
