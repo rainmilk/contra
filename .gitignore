@@ -23,10 +23,11 @@ models/
 models-bak/
 model/
 
-# log
+# logs
 logs/
 log/
 runs/
+.out
 
 # models
 *.pt

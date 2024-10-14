@@ -60,8 +60,15 @@ def transform_data(data):
 
 
 class MixupDataset(Dataset):
-    def __init__(self, data_pair, label_pair, mixup_alpha=0.2, transforms=None,
-                 mean=None, std=None):
+    def __init__(
+        self,
+        data_pair,
+        label_pair,
+        mixup_alpha=0.2,
+        transforms=None,
+        mean=None,
+        std=None,
+    ):
         # modify shape to [N, H, W, C]
         self.data_first = data_pair[0]
         self.data_second = data_pair[1]
@@ -117,15 +124,19 @@ def get_dataset_loader(
     """
     根据 loader_name 加载相应的数据集：支持增量训练 (inc)、辅助数据 (aux) 、测试数据 (test)和 D0数据集(train)
     """
-    data_path = settings.get_dataset_path(dataset_name, case, f"{loader_name}_data", step)
-    label_path = settings.get_dataset_path(dataset_name, case,f"{loader_name}_label", step)
+    data_path = settings.get_dataset_path(
+        dataset_name, case, f"{loader_name}_data", step
+    )
+    label_path = settings.get_dataset_path(
+        dataset_name, case, f"{loader_name}_label", step
+    )
 
     print(f"Loading {data_path}")
 
     data = np.load(data_path)
     labels = np.load(label_path)
 
-    transforms = None # torchvision.transforms.Compose([])
+    transforms = None  # torchvision.transforms.Compose([])
     # if loader_name == "train":
     #     transform = True
 
@@ -139,6 +150,16 @@ def get_dataset_loader(
     data_loader = DataLoader(
         dataset, batch_size=batch_size, drop_last=drop_last, shuffle=shuffle
     )
+
+    if dataset_name == "pet-37":
+        data_loader = DataLoader(
+            dataset,
+            batch_size=batch_size,
+            drop_last=drop_last,
+            shuffle=shuffle,
+            num_workers=64,
+            pin_memory=True
+        )
 
     return data, labels, data_loader
 
