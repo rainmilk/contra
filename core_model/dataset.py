@@ -120,6 +120,7 @@ def get_dataset_loader(
     drop_last=False,
     shuffle=False,
     onehot_enc=False,
+    num_workers=0,
 ):
     """
     根据 loader_name 加载相应的数据集：支持增量训练 (inc)、辅助数据 (aux) 、测试数据 (test)和 D0数据集(train)
@@ -148,7 +149,7 @@ def get_dataset_loader(
     # dataset = BaseTensorDataset(data, labels, transforms=transforms)
 
     data_loader = DataLoader(
-        dataset, batch_size=batch_size, drop_last=drop_last, shuffle=shuffle
+        dataset, batch_size=batch_size, drop_last=drop_last, shuffle=shuffle, num_workers=num_workers
     )
 
     if dataset_name == "pet-37":
