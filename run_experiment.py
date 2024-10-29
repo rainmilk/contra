@@ -29,6 +29,8 @@ def get_num_of_classes(dataset_name):
         num_classes = 100
     elif dataset_name == "food-101":
         num_classes = 101
+    elif dataset_name == "flower-102":
+        num_classes = 102
     else:
         raise ValueError(f"Unsupported dataset type: {dataset_name}")
 
@@ -39,7 +41,7 @@ def load_dataset(file_path, is_data=True):
     """
     加载数据集文件并返回 PyTorch 张量。
     :param subdir: 数据目录
-    :param dataset_name: 数据集名称 (cifar-10, cifar-100, food-101)
+    :param dataset_name: 数据集名称 (cifar-10, cifar-100, food-101, pet-37, flower-102)
     :param file_name: 数据文件名
     :param is_data: 是否为数据文件（True 表示数据文件，False 表示标签文件）
     :return: PyTorch 张量格式的数据
