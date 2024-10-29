@@ -174,6 +174,13 @@ def parse_args():
     )
 
     parser.add_argument(
+        "--train_mode",
+        type=str,
+        choices=["pretrain", "inc_train", "finetune", "retrain"],
+        help="Train mode",
+    )
+
+    parser.add_argument(
         "--noise_ratio",
         type=float,
         default=0.2,

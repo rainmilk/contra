@@ -4,18 +4,9 @@ import warnings
 import numpy as np
 from args_paser import parse_args
 
-from tqdm import tqdm
 import torch
-import torch.nn as nn
-from torchvision import transforms
-from core_model.optimizer import create_optimizer_scheduler
 from core_model.custom_model import ClassifierWrapper, load_custom_model
 from configs import settings
-
-from torch.utils.data import DataLoader, Dataset
-from torch.utils.tensorboard import SummaryWriter
-
-from torchvision.transforms import v2
 from train_test_utils import train_model
 
 conference_name = "cvpr"
@@ -89,159 +80,157 @@ def train_step(
     )
 
     model_name = args.model
-    step = args.step
+    train_mode = args.train_mode
     
     if conference_name is not None:
         case = f"nr_{args.noise_ratio}_nt_{args.noise_type}_{conference_name}"
     
     uni_name = args.uni_name
-    model_suffix = "worker_raw" if args.model_suffix is None else args.model_suffix
 
-    if step == 0:  # Step 0: Train M_0 on D_0 (clean dataset)
-        D_0_data = load_dataset(
-            settings.get_dataset_path(dataset_name, case, "D_0_data")
-        )
-        D_0_labels = load_dataset(
-            settings.get_dataset_path(dataset_name, case, "D_0_labels"), is_data=False
-        )
-        D_test_data = load_dataset(
-            settings.get_dataset_path(dataset_name, case, "test_data")
-        )
-        D_test_labels = load_dataset(
-            settings.get_dataset_path(dataset_name, case, "test_label"), is_data=False
-        )
+    model_suffix = "worker_restore"
 
-        # 打印用于训练的模型和数据
-        print("用于训练的数据: D_0_data 和 D_0_labels")
-        print("用于训练的模型: ResNet18 初始化")
+    test_data = load_dataset(
+        settings.get_dataset_path(dataset_name, None, "test_data")
+    )
+    test_labels = load_dataset(
+        settings.get_dataset_path(dataset_name, None, "test_label"), is_data=False
+    )
 
-        model_0 = load_custom_model(model_name, num_classes)
-        model_0 = ClassifierWrapper(
-            model_0, num_classes=num_classes, freeze_weights=False
-        )
-        print(f"开始训练 M_0 on ({dataset_name})...")
+    if train_mode == "pretrain":  # 基于$D_0$数据集和原始的resnet网络训练一个模型 M_p0
+        # model_p0_path = settings.get_pretrain_ckpt_path(
+        #     dataset_name, case, model_name, "worker_restore", step=step
+        # )
+        model_p0_path = settings.get_ckpt_path(
+            dataset_name, "pretrain", model_name, "pretrain")
 
-        model_0 = train_model(
-            model_0,
-            num_classes,
-            D_0_data,
-            D_0_labels,
-            D_test_data,
-            D_test_labels,
-            epochs=args.num_epochs,
-            batch_size=args.batch_size,
-            learning_rate=args.learning_rate,
-            weight_decay=args.weight_decay,
-            data_aug=args.data_aug,
-            writer=writer,
-        )
-        model_0_path = settings.get_ckpt_path(
-            dataset_name, case, model_name, "M_0", unique_name=uni_name
-        )
-        subdir = os.path.dirname(model_0_path)
-        os.makedirs(subdir, exist_ok=True)
-        torch.save(model_0.state_dict(), model_0_path)
-        print(f"M_0 训练完毕并保存至 {model_0_path}")
-        return
-
-    elif step == 1:  # Step 1: Train M_1 on D_1+ (noisy dataset)
-        D_1_plus_data = load_dataset(
-            settings.get_dataset_path(dataset_name, case, "D_1_plus_data")
-        )
-        D_1_plus_labels = load_dataset(
-            settings.get_dataset_path(dataset_name, case, "D_1_plus_labels"),
-            is_data=False,
-        )
-        D_test_data = load_dataset(
-            settings.get_dataset_path(dataset_name, case, "test_data")
-        )
-        D_test_labels = load_dataset(
-            settings.get_dataset_path(dataset_name, case, "test_label"), is_data=False
-        )
-
-        # 打印用于训练的模型和数据
-        print("用于训练的数据: D_1_plus_data 和 D_1_plus_labels")
-        print("用于训练的模型: 从 M_0 开始")
-
-        prev_model_path = settings.get_ckpt_path(
-            dataset_name, case, model_name, "M_0", unique_name=uni_name
-        )
-        if not os.path.exists(prev_model_path):
-            raise FileNotFoundError(
-                f"模型文件 {prev_model_path} 未找到。请先训练 M_0。"
+        if uni_name is None:
+            train_data = np.load(
+                settings.get_dataset_path(dataset_name, None, "pretrain_data")
+            )
+            train_labels = np.load(
+                settings.get_dataset_path(dataset_name, None, "pretrain_label")
             )
 
-        model_1 = load_custom_model(
-            model_name=model_name, num_classes=num_classes, load_pretrained=False
-        )
-        model_1 = ClassifierWrapper(model_1, num_classes)
-        model_1.load_state_dict(torch.load(prev_model_path))
+            # 打印用于训练的模型和数据
+            print("用于训练的数据: pretrain_data.npy 和 pretrain_label.npy")
+            print("用于训练的模型: ResNet18 初始化")
 
-        print(f"开始训练 M_1 on ({dataset_name})...")
+            model_p0 = load_custom_model(model_name, num_classes)
+            model_p0 = ClassifierWrapper(model_p0, num_classes)
 
-        model_1 = train_model(
-            model_1,
-            num_classes,
-            D_1_plus_data,
-            D_1_plus_labels,
-            D_test_data,
-            D_test_labels,
-            epochs=args.num_epochs,
-            batch_size=args.batch_size,
-            learning_rate=args.learning_rate,
-            weight_decay=args.weight_decay,
-            data_aug=args.data_aug,
-            writer=writer,
-        )
+            print(f"开始训练 Pretrain on ({dataset_name})...")
 
-        model_1_path = settings.get_ckpt_path(
-            dataset_name, case, model_name, "M_1", unique_name=uni_name
-        )
-        subdir = os.path.dirname(model_1_path)
-        os.makedirs(subdir, exist_ok=True)
-        torch.save(model_1.state_dict(), model_1_path)
-        print(f"M_1 训练完毕并保存至 {model_1_path}")
-        return
-
-    elif step == 2:  # Step 2: Repair M_1 using D_1-
-        D_1_minus_data = load_dataset(
-            settings.get_dataset_path(dataset_name, case, "D_1_minus_data")
-        )
-        D_1_minus_labels = load_dataset(
-            settings.get_dataset_path(dataset_name, case, "D_1_minus_labels"),
-            is_data=False,
-        )
-        D_test_data = load_dataset(
-            settings.get_dataset_path(dataset_name, case, "test_data")
-        )
-        D_test_labels = load_dataset(
-            settings.get_dataset_path(dataset_name, case, "test_label"), is_data=False
-        )
-
-        # 使用基于 M_1 的修复方法
-        prev_model_path = settings.get_ckpt_path(
-            dataset_name, case, model_name, "M_1", unique_name=uni_name
-        )
-        if not os.path.exists(prev_model_path):
-            raise FileNotFoundError(
-                f"模型文件 {prev_model_path} 未找到。请先训练 M_1。"
+            model_p0 = train_model(
+                model_p0,
+                num_classes,
+                train_data,
+                train_labels,
+                test_data,
+                test_labels,
+                epochs=args.num_epochs,
+                batch_size=args.batch_size,
+                learning_rate=args.learning_rate,
+                weight_decay=args.weight_decay,
+                data_aug=args.data_aug,
+                writer=writer,
+            )
+            subdir = os.path.dirname(model_p0_path)
+            os.makedirs(subdir, exist_ok=True)
+            torch.save(model_p0.state_dict(), model_p0_path)
+            print(f"Pretrain 训练完毕并保存至 {model_p0_path}")
+        # else:
+        #     copy_model_p0_path = settings.get_ckpt_path(
+        #         dataset_name,
+        #         case,
+        #         model_name,
+        #         "_pretrain",
+        #         unique_name=uni_name,
+        #     )
+        #     if os.path.exists(model_p0_path):
+        #         subdir = os.path.dirname(copy_model_p0_path)
+        #         os.makedirs(subdir, exist_ok=True)
+        #         shutil.copy(model_p0_path, copy_model_p0_path)
+        #         print(f"Copy {model_p0_path} to {copy_model_p0_path}")
+        #     else:
+        #         raise FileNotFoundError(model_p0_path)
+    else:
+        if train_mode == "retrain":  # Step 1: Train M_1 on D_1+ (noisy dataset)
+            train_data = load_dataset(
+                settings.get_dataset_path(dataset_name, case, "train_clean_data")
+            )
+            train_labels = load_dataset(
+                settings.get_dataset_path(dataset_name, case, "train_clean_labels"),
+                is_data=False,
             )
 
-        model_repaired = load_custom_model(
+            # 打印用于训练的模型和数据
+            print("用于训练的数据: train_clean_data 和 train_clean_labels")
+
+            prev_model_path = settings.get_ckpt_path(
+                dataset_name, "pretrain", model_name, "pretrain")
+
+            uni_name = train_mode
+        elif train_mode == "finetune":  # Step 1: Train M_1 on D_1+ (noisy dataset)
+            train_data = load_dataset(
+                settings.get_dataset_path(dataset_name, case, "train_clean_data")
+            )
+            train_labels = load_dataset(
+                settings.get_dataset_path(dataset_name, case, "train_clean_labels"),
+                is_data=False,
+            )
+
+            # 打印用于训练的模型和数据
+            print("用于训练的数据: train_clean_data 和 train_clean_labels")
+
+            prev_model_path = settings.get_ckpt_path(
+                dataset_name, case, model_name, "inc_train")
+
+            uni_name = train_mode
+        elif train_mode == "inc_train":  # Step 1: Train M_1 on D_1+ (noisy dataset)
+            train_clean_data = load_dataset(
+                settings.get_dataset_path(dataset_name, case, "train_clean_data")
+            )
+            train_clean_labels = load_dataset(
+                settings.get_dataset_path(dataset_name, case, "train_clean_labels"),
+                is_data=False,
+            )
+            train_noisy_data = load_dataset(
+                settings.get_dataset_path(dataset_name, case, "train_noisy_data")
+            )
+            train_noisy_labels = load_dataset(
+                settings.get_dataset_path(dataset_name, case, "train_noisy_labels"),
+                is_data=False,
+            )
+            train_data = torch.concatenate([train_clean_data, train_noisy_data])
+            train_labels = torch.concatenate([train_clean_labels, train_noisy_labels])
+
+            # 打印用于训练的模型和数据
+            print("用于训练的数据: train_inc_data 和 train_inc_labels")
+
+            prev_model_path = settings.get_ckpt_path(
+                dataset_name, "pretrain", model_name, "pretrain")
+
+            uni_name = None
+
+        if not os.path.exists(prev_model_path):
+            raise FileNotFoundError(
+                f"模型文件 {prev_model_path} 未找到。请先训练 pretrain。"
+            )
+
+        model_tr= load_custom_model(
             model_name=model_name, num_classes=num_classes, load_pretrained=False
         )
-        model_repaired = ClassifierWrapper(model_repaired, num_classes)
-        model_repaired.load_state_dict(torch.load(prev_model_path))
+        model_tr = ClassifierWrapper(model_tr, num_classes)
+        model_tr.load_state_dict(torch.load(prev_model_path))
+        print(f"开始训练 {train_mode} on ({dataset_name})...")
 
-        print(f"开始修复 M_1 on ({dataset_name}) 使用 D_1_minus...")
-
-        model_repaired = train_model(
-            model_repaired,
+        model_tr = train_model(
+            model_tr,
             num_classes,
-            D_1_minus_data,
-            D_1_minus_labels,
-            D_test_data,
-            D_test_labels,
+            train_data,
+            train_labels,
+            test_data,
+            test_labels,
             epochs=args.num_epochs,
             batch_size=args.batch_size,
             learning_rate=args.learning_rate,
@@ -250,20 +239,22 @@ def train_step(
             writer=writer,
         )
 
-        model_repaired_path = settings.get_ckpt_path(
-            dataset_name, case, model_name, "M_repaired", unique_name=uni_name
+        model_tr_path = settings.get_ckpt_path(
+            dataset_name, case, model_name, train_mode, unique_name=uni_name
         )
-        subdir = os.path.dirname(model_repaired_path)
+        subdir = os.path.dirname(model_tr_path)
         os.makedirs(subdir, exist_ok=True)
-        torch.save(model_repaired.state_dict(), model_repaired_path)
-        print(f"M_1 修复完毕并保存至 {model_repaired_path}")
-        return
+        torch.save(model_tr.state_dict(), model_tr_path)
+        print(f"{train_mode} 训练完毕并保存至 {model_tr_path}")
 
 
 def main():
     args = parse_args()
 
-    writer = SummaryWriter(log_dir="runs/experiment") if args.use_tensorboard else None
+    writer = None
+    if args.use_tensorboard:
+        from torch.utils.tensorboard import SummaryWriter
+        writer = SummaryWriter(log_dir="runs/experiment")
 
     train_step(
         args,

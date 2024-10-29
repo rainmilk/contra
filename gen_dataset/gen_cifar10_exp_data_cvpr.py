@@ -5,6 +5,7 @@ import os
 import argparse
 from torchvision import datasets, transforms
 from configs import settings
+from gen_dataset.split_dataset import split_data
 
 conference_name = "cvpr"
 
@@ -17,66 +18,40 @@ def create_dataset_files(
     noise_ratio=0.5,
     split_ratio=0.5,
 ):
-    rng = np.random.default_rng(42)
-
     transform = transforms.Compose(
         [
             transforms.ToTensor(),
-            (
-                transforms.Normalize([0.491, 0.482, 0.446], [0.247, 0.243, 0.261])
-                if dataset_name == "cifar-10"
-                else transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-            ),
+            transforms.Normalize([0.491, 0.482, 0.446], [0.247, 0.243, 0.261]),
         ]
     )
+    # 加载 CIFAR-10 数据集
+    train_dataset = datasets.CIFAR10(
+        root=data_dir, train=True, download=True, transform=transform
+    )
+    test_dataset = datasets.CIFAR10(
+        root=data_dir, train=False, download=True, transform=transform
+    )
 
-    # 加载数据集
-    if dataset_name == "cifar-10":
-        train_dataset = datasets.CIFAR10(
-            root=data_dir, train=True, download=True, transform=transform
-        )
-        num_classes = 10
-    elif dataset_name == "cifar-100":
-        train_dataset = datasets.CIFAR100(
-            root=data_dir, train=True, download=True, transform=transform
-        )
-        num_classes = 100
-    elif dataset_name == "pets-37":
-        train_dataset = datasets.OxfordIIITPet(
-            root=data_dir, split="trainval", download=True, transform=transform
-        )
-        num_classes = 37
-    else:
-        raise ValueError(f"Unsupported dataset: {dataset_name}")
-
-
-    # 划分训练集为 D_0 和 D_1
-    num_train_samples = len(train_dataset)
-    indices = np.arange(num_train_samples)
-    rng.shuffle(indices)
-    split_point = int(split_ratio * num_train_samples)
-    D_0_indices = indices[:split_point]
-    D_1_indices = indices[split_point:]
-
-    # D_0：无噪声部分
-    D_0_data = [train_dataset[i][0].numpy() for i in D_0_indices]
-    D_0_labels = [train_dataset[i][1] for i in D_0_indices]
-
-    # D_1_minus：无噪声部分
-    D_1_minus_data = [train_dataset[i][0].numpy() for i in D_1_indices]
-    D_1_minus_labels = [train_dataset[i][1] for i in D_1_indices]
+    print("使用类均衡的数据划分方式...")
+    dataset_name = "cifar-10"
+    num_classes = 10
+    D_inc_data, D_inc_labels = split_data(dataset_name, train_dataset, test_dataset, num_classes, 0.5)
 
     # D_1_plus：添加噪声
-    D_1_plus_data = D_1_minus_data.copy()
-    D_1_plus_labels = D_1_minus_labels.copy()
-    num_noisy_samples = int(len(D_1_minus_labels) * noise_ratio)
-    noisy_indices = rng.choice(len(D_1_minus_labels), num_noisy_samples, replace=False)
+    num_noisy_samples = int(len(D_inc_labels) * noise_ratio)
+    noisy_indices = np.random.choice(len(D_inc_labels), num_noisy_samples, replace=False)
+    noisy_sel = np.zeros(len(D_inc_labels), dtype=np.bool_)
+    noisy_sel[noisy_indices] = True
+
+    D_noisy_data = D_inc_data[noisy_sel]
+    D_noisy_true_labels = D_inc_labels[noisy_sel]
+
+    D_normal_data = D_inc_data[~noisy_sel]
+    D_normal_labels = D_inc_labels[~noisy_sel]
+
 
     if noise_type == "symmetric":
-        for idx in noisy_indices:
-            original_label = D_1_plus_labels[idx]
-            possible_labels = list(set(range(num_classes)) - {original_label})
-            D_1_plus_labels[idx] = rng.choice(possible_labels)
+        D_noisy_labels = np.random.choice(num_classes, num_noisy_samples, replace=True)
     else:
         raise ValueError("Invalid noise type.")
 
@@ -87,32 +62,17 @@ def create_dataset_files(
     os.makedirs(save_path, exist_ok=True)
 
     # 保存数据集
-    D_0_data_path = os.path.join(save_path, "D_0_data.npy")
-    D_0_labels_path = os.path.join(save_path, "D_0_labels.npy")
-    np.save(D_0_data_path, np.array(D_0_data))
-    np.save(D_0_labels_path, np.array(D_0_labels))
+    D_1_minus_data_path = os.path.join(save_path, "train_clean_data.npy")
+    D_1_minus_labels_path = os.path.join(save_path, "train_clean_labels.npy")
+    np.save(D_1_minus_data_path, np.array(D_normal_data))
+    np.save(D_1_minus_labels_path, np.array(D_normal_labels))
 
-    D_1_minus_data_path = os.path.join(save_path, "D_1_minus_data.npy")
-    D_1_minus_labels_path = os.path.join(save_path, "D_1_minus_labels.npy")
-    np.save(D_1_minus_data_path, np.array(D_1_minus_data))
-    np.save(D_1_minus_labels_path, np.array(D_1_minus_labels))
-
-    D_1_plus_data_path = os.path.join(save_path, "D_1_plus_data.npy")
-    D_1_plus_labels_path = os.path.join(save_path, "D_1_plus_labels.npy")
-    np.save(D_1_plus_data_path, np.array(D_1_plus_data))
-    np.save(D_1_plus_labels_path, np.array(D_1_plus_labels))
-
-    test_dataset = datasets.CIFAR10(
-        root=data_dir, train=False, download=True, transform=transform
-    )
-    test_data = [test_dataset[i][0].numpy() for i in range(len(test_dataset))]
-    test_labels = [test_dataset[i][1] for i in range(len(test_dataset))]
-
-    # 保存测试数据集
-    test_data_path = os.path.join(save_path, "test_data.npy")
-    test_labels_path = os.path.join(save_path, "test_label.npy")
-    np.save(test_data_path, np.array(test_data))
-    np.save(test_labels_path, np.array(test_labels))
+    D_1_plus_data_path = os.path.join(save_path, "train_noisy_data.npy")
+    D_1_plus_labels_path = os.path.join(save_path, "train_noisy_labels.npy")
+    D_1_plus_true_labels_path = os.path.join(save_path, "train_noisy_true_labels.npy")
+    np.save(D_1_plus_data_path, np.array(D_noisy_data))
+    np.save(D_1_plus_labels_path, np.array(D_noisy_labels))
+    np.save(D_1_plus_true_labels_path, np.array(D_noisy_true_labels))
 
 
     print("D_0、D_1_minus 和 D_1_plus 数据集已生成并保存。")
@@ -128,13 +88,13 @@ def main():
     parser.add_argument(
         "--data_dir",
         type=str,
-        default="./data/cifar-10/normal",
+        default=os.path.join(settings.root_dir, "data/cifar-10/normal"),
         help="原始 CIFAR-10 数据集的目录",
     )
     parser.add_argument(
         "--gen_dir",
         type=str,
-        default="./data/cifar-10/gen/",
+        default=os.path.join(settings.root_dir, "data/cifar-10/gen/"),
         help="生成数据集的保存目录",
     )
     parser.add_argument(
