@@ -58,11 +58,10 @@ def parse_args():
             "cifar-10",
             "cifar-100",
             "pet-37",
-            "flowers-102",
-            "tiny-imagenet-200",
+            "flower-102",
             "food-101",
         ],
-        help="Dataset name, choose from: cifar-10, cifar-100, flowers-102, tiny-imagenet-200, food-101",
+        help="Dataset name, choose from: cifar-10, cifar-100, flower-102, tiny-imagenet-200, food-101",
     )
 
     parser.add_argument(
@@ -163,7 +162,7 @@ def parse_args():
         "--tta_only",
         default=None,
         type=int,
-        choices=[0,1],
+        choices=[0, 1],
         help="",
     )
 
@@ -367,27 +366,6 @@ def main():
     print(f"  Adaptation Iterations: {args.adapt_iter_num}")
 
     print(f"Additional kwargs: {kwargs}")
-
-    # run_experiment(
-    #     dataset_name=args.dataset,
-    #     model_name=args.model,
-    #     condition=args.condition,
-    #     remove_fraction=args.remove_fraction,
-    #     noise_type=args.noise_type,
-    #     noise_fraction=args.noise_fraction,
-    #     use_early_stopping=args.use_early_stopping,
-    #     selected_classes_remove=args.classes_remove,
-    #     selected_classes_noise=args.classes_noise,
-    #     batch_size=args.batch_size,
-    #     learning_rate=args.learning_rate,
-    #     optimizer=args.optimizer,
-    #     momentum=args.momentum,
-    #     weight_decay=args.weight_decay,
-    #     num_epochs=args.num_epochs,
-    #     early_stopping_patience=args.early_stopping_patience,
-    #     early_stopping_accuracy_threshold=args.early_stopping_accuracy_threshold,
-    #     **kwargs,
-    # )
 
 
 if __name__ == "__main__":
