@@ -209,8 +209,6 @@ def train_model(
         batch_size=batch_size,
         drop_last=True,
         shuffle=True,
-        num_workers=32,
-        pin_memory=True,
     )
 
     test_dataset = BaseTensorDataset(test_data, test_labels)
@@ -218,9 +216,7 @@ def train_model(
     test_loader = DataLoader(
         test_dataset,
         batch_size=batch_size,
-        shuffle=False,
-        num_workers=32,
-        pin_memory=True,
+        shuffle=False
     )
 
     # 用于存储训练和测试的损失和准确率

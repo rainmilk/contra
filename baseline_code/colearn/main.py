@@ -145,6 +145,17 @@ def main():
         shuffle=True,
     )
 
+    _, _, forgetloader = get_dataset_loader(
+        custom_args.dataset,
+        "train",
+        case,
+        step,
+        None,
+        None,
+        custom_args.batch_size,
+        shuffle=True,
+    )
+
     _, _, testloader = get_dataset_loader(
         custom_args.dataset,
         "test",
