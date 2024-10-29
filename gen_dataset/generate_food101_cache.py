@@ -5,9 +5,7 @@ import torch
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
-MODEL_NAME = "resnet18"
-
-RESCALE_SIZE = (224, 224)
+RESCALE_SIZE = (32, 32)
 
 def generate_food101_cache(data_dir, gen_dir, batch_size=64, num_workers=4):
 
@@ -17,9 +15,7 @@ def generate_food101_cache(data_dir, gen_dir, batch_size=64, num_workers=4):
 
     data_transforms = transforms.Compose(
         [
-            # transforms.Resize((96, 96)),
             transforms.Resize(RESCALE_SIZE),
-            # transforms.CenterCrop(CROP_SIZE),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ]
@@ -66,5 +62,5 @@ def generate_food101_cache(data_dir, gen_dir, batch_size=64, num_workers=4):
 
 if __name__ == "__main__":
     data_dir = "./data/food-101/normal"  # 数据集目录
-    gen_dir = "./data/food-101/gen/cache"  # 缓存生成目录
+    gen_dir = "./data/food-101/gen/"  # 缓存生成目录
     generate_food101_cache(data_dir, gen_dir)

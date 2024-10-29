@@ -19,7 +19,7 @@ if __name__ == "__main__":
     learning_rate = args.learning_rate
     weight_decay = args.weight_decay
     optimizer_type = args.optimizer
-    num_epochs =args.num_epochs
+    num_epochs = args.num_epochs
     batch_size = args.batch_size
     model_suffix = "teacher_restore" if args.model_suffix is None else args.model_suffix
     step = getattr(args, "step", 0)
@@ -34,11 +34,7 @@ if __name__ == "__main__":
 
     case = "pretrain"
     model_p0_path = settings.get_ckpt_path(
-        dataset,
-        case,
-        model_name,
-        model_suffix,
-        step=0
+        dataset, case, model_name, model_suffix, step=0
     )
 
     case = settings.get_case(noise_ratio, noise_type, balanced)
@@ -62,14 +58,15 @@ if __name__ == "__main__":
     else:
         num_classes = settings.num_classes_dict[dataset]
         backbone = load_custom_model(model_name, num_classes, load_pretrained=True)
-        lip_teacher_model = ClassifierWrapper(backbone, num_classes, spectral_norm=spec_norm)
+        lip_teacher_model = ClassifierWrapper(
+            backbone, num_classes, spectral_norm=spec_norm
+        )
         if step == 0:
             save_model_path = model_p0_path
         # else:
         #     if os.path.exists(save_model_path):
         #         checkpoint = torch.load(model_p0_path)
         #         lip_teacher_model.load_state_dict(checkpoint, strict=False)
-
 
         # 根据用户选择的优化器初始化
         teacher_opt, teacher_lr_scheduler = create_optimizer_scheduler(
@@ -81,5 +78,14 @@ if __name__ == "__main__":
         )
         teacher_criterion = nn.CrossEntropyLoss()
 
-        train_teacher_model(args, step, num_classes, lip_teacher_model, teacher_opt, teacher_lr_scheduler,
-                            teacher_criterion, save_model_path, test_per_it=1)
+        train_teacher_model(
+            args,
+            step,
+            num_classes,
+            lip_teacher_model,
+            teacher_opt,
+            teacher_lr_scheduler,
+            teacher_criterion,
+            save_model_path,
+            test_per_it=1,
+        )

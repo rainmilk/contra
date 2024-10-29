@@ -1,0 +1,2684 @@
+[
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 18,
+        "original_class_name": "Keeshond",
+        "new_label": 35,
+        "new_class_name": "Wheaten Terrier"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 19,
+        "original_class_name": "Leonberger",
+        "new_label": 18,
+        "new_class_name": "Keeshond"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 20,
+        "original_class_name": "Maine Coon",
+        "new_label": 9,
+        "new_class_name": "British Shorthair"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 21,
+        "original_class_name": "Miniature Pinscher",
+        "new_label": 3,
+        "new_class_name": "Basset Hound"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 22,
+        "original_class_name": "Newfoundland",
+        "new_label": 25,
+        "new_class_name": "Pug"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 23,
+        "original_class_name": "Persian",
+        "new_label": 0,
+        "new_class_name": "Abyssinian"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 24,
+        "original_class_name": "Pomeranian",
+        "new_label": 31,
+        "new_class_name": "Shiba Inu"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 25,
+        "original_class_name": "Pug",
+        "new_label": 30,
+        "new_class_name": "Scottish Terrier"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 26,
+        "original_class_name": "Ragdoll",
+        "new_label": 33,
+        "new_class_name": "Sphynx"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    },
+    {
+        "original_label": 27,
+        "original_class_name": "Russian Blue",
+        "new_label": 7,
+        "new_class_name": "Bombay"
+    }
+]
