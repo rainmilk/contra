@@ -64,21 +64,21 @@ def main():
 
     # 加载原始训练数据集
     train_data_path = os.path.join(args.data_dir, "train_data.npy")
-    train_labels_path = os.path.join(args.data_dir, "train_labels.npy")
+    train_labels_path = os.path.join(args.data_dir, "train_label.npy")
     train_data, train_labels = load_npy_files(train_data_path, train_labels_path)
 
     # 加载 D_0, D_1_minus 和 D_1_plus 数据集
     D_0_data, D_0_labels = load_npy_files(
         os.path.join(args.gen_dir, "D_0_data.npy"),
-        os.path.join(args.gen_dir, "D_0_labels.npy"),
+        os.path.join(args.gen_dir, "D_0_label.npy"),
     )
     D_1_minus_data, D_1_minus_labels = load_npy_files(
         os.path.join(args.gen_dir, "D_1_minus_data.npy"),
-        os.path.join(args.gen_dir, "D_1_minus_labels.npy"),
+        os.path.join(args.gen_dir, "D_1_minus_label.npy"),
     )
     D_1_plus_data, D_1_plus_labels = load_npy_files(
         os.path.join(args.gen_dir, "D_1_plus_data.npy"),
-        os.path.join(args.gen_dir, "D_1_plus_labels.npy"),
+        os.path.join(args.gen_dir, "D_1_plus_label.npy"),
     )
 
     # 验证 D_0 和 D_1 的划分

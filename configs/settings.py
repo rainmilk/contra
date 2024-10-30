@@ -23,12 +23,11 @@ cifar100_config = {"mean": [0.5071, 0.4865, 0.4409], "std": [0.2673, 0.2564, 0.2
 
 food101_config = {"mean": [0.485, 0.456, 0.406], "std": [0.229, 0.224, 0.225]}
 
+conf_name = "cvpr"
 
-def get_case(noise_ratio, noise_type, balanced=False):
-    if balanced:
-        return f"nr_{noise_ratio}_nt_{noise_type}_balanced"
 
-    return f"nr_{noise_ratio}_nt_{noise_type}"
+def get_case(noise_ratio, noise_type, suffix=conf_name):
+    return f"nr_{noise_ratio}_nt_{noise_type}_{suffix}"
 
 
 def get_ckpt_path(dataset, case, model, model_suffix, step=None, unique_name=None):

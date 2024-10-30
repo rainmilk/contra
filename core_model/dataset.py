@@ -125,17 +125,27 @@ def get_dataset_loader(
     """
     根据 loader_name 加载相应的数据集：支持增量训练 (inc)、辅助数据 (aux) 、测试数据 (test)和 D0数据集(train)
     """
-    data_path = settings.get_dataset_path(
-        dataset_name, case, f"{loader_name}_data", step
-    )
-    label_path = settings.get_dataset_path(
-        dataset_name, case, f"{loader_name}_label", step
-    )
+    if not isinstance(loader_name, (list, tuple)):
+        loader_name = [loader_name]
 
-    print(f"Loading {data_path}")
+    data = []
+    labels = []
+    for ld_name in loader_name:
+        data_path = settings.get_dataset_path(
+            dataset_name, case, f"{ld_name}_data", step
+        )
+        label_path = settings.get_dataset_path(
+            dataset_name, case, f"{ld_name}_label", step
+        )
 
-    data = np.load(data_path)
-    labels = np.load(label_path)
+        print(f"Loading {data_path}")
+
+        data.append(np.load(data_path))
+        label = np.load(label_path)
+        labels.append(label.astype(np.int64))
+
+    data = np.concatenate(data, axis=0)
+    labels = np.concatenate(labels, axis=0)
 
     transforms = None  # torchvision.transforms.Compose([])
     # if loader_name == "train":
@@ -152,15 +162,15 @@ def get_dataset_loader(
         dataset, batch_size=batch_size, drop_last=drop_last, shuffle=shuffle, num_workers=num_workers
     )
 
-    if dataset_name == "pet-37":
-        data_loader = DataLoader(
-            dataset,
-            batch_size=batch_size,
-            drop_last=drop_last,
-            shuffle=shuffle,
-            num_workers=64,
-            pin_memory=True
-        )
+    # if dataset_name == "pet-37":
+    #     data_loader = DataLoader(
+    #         dataset,
+    #         batch_size=batch_size,
+    #         drop_last=drop_last,
+    #         shuffle=shuffle,
+    #         num_workers=64,
+    #         pin_memory=True
+    #     )
 
     return data, labels, data_loader
 

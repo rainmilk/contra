@@ -128,9 +128,9 @@ def create_food101_npy_files(
     # 从npy文件加载数据
     print("Loading preprocessed training and test datasets from .npy files...")
     train_data = np.load(os.path.join(data_dir, "train_data.npy"))
-    train_labels = np.load(os.path.join(data_dir, "train_labels.npy"))
+    train_labels = np.load(os.path.join(data_dir, "train_label.npy"))
     test_data = np.load(os.path.join(data_dir, "test_data.npy"))
-    test_labels = np.load(os.path.join(data_dir, "test_labels.npy"))
+    test_labels = np.load(os.path.join(data_dir, "test_label.npy"))
 
     # 根据 balanced 参数调整存储路径
     if balanced:
@@ -177,31 +177,31 @@ def create_food101_npy_files(
 
     # # 保存初始数据集、初始增量数据集、重放数据集
     # torch.save(D_0_data, os.path.join(subdir, "D_0.npy"))
-    # torch.save(D_0_labels, os.path.join(subdir, "D_0_labels.npy"))
+    # torch.save(D_0_labels, os.path.join(subdir, "D_0_label.npy"))
 
     # torch.save(D_inc_data, os.path.join(subdir, "D_inc_0_data.npy"))
-    # torch.save(D_inc_labels, os.path.join(subdir, "D_inc_0_labels.npy"))
+    # torch.save(D_inc_labels, os.path.join(subdir, "D_inc_0_label.npy"))
 
     # torch.save(D_a_data, os.path.join(subdir, "D_a.npy"))
-    # torch.save(D_a_labels, os.path.join(subdir, "D_a_labels.npy"))
+    # torch.save(D_a_labels, os.path.join(subdir, "D_a_label.npy"))
 
     # # 保存测试数据集
     # torch.save(test_data, os.path.join(subdir, "test_data.npy"))
-    # torch.save(test_labels, os.path.join(subdir, "test_labels.npy"))
+    # torch.save(test_labels, os.path.join(subdir, "test_label.npy"))
 
     # 保存初始数据集、初始增量数据集、重放数据集
     np.save(os.path.join(subdir, "D_0.npy"), D_0_data)
-    np.save(os.path.join(subdir, "D_0_labels.npy"), D_0_labels)
+    np.save(os.path.join(subdir, "D_0_label.npy"), D_0_labels)
 
     np.save(os.path.join(subdir, "D_inc_0_data.npy"), D_inc_data)
-    np.save(os.path.join(subdir, "D_inc_0_labels.npy"), D_inc_labels)
+    np.save(os.path.join(subdir, "D_inc_0_label.npy"), D_inc_labels)
 
     np.save(os.path.join(subdir, "D_a.npy"), D_a_data)
-    np.save(os.path.join(subdir, "D_a_labels.npy"), D_a_labels)
+    np.save(os.path.join(subdir, "D_a_label.npy"), D_a_labels)
 
     # 保存测试数据集
     np.save(os.path.join(subdir, "test_data.npy"), test_data)
-    np.save(os.path.join(subdir, "test_labels.npy"), test_labels)
+    np.save(os.path.join(subdir, "test_label.npy"), test_labels)
 
     num_classes = 101
 

@@ -66,13 +66,13 @@ def create_dataset_files(
 
     # 保存数据集
     D_1_minus_data_path = os.path.join(save_path, "train_clean_data.npy")
-    D_1_minus_labels_path = os.path.join(save_path, "train_clean_labels.npy")
+    D_1_minus_labels_path = os.path.join(save_path, "train_clean_label.npy")
     np.save(D_1_minus_data_path, np.array(D_normal_data))
     np.save(D_1_minus_labels_path, np.array(D_normal_labels))
 
     D_1_plus_data_path = os.path.join(save_path, "train_noisy_data.npy")
-    D_1_plus_labels_path = os.path.join(save_path, "train_noisy_labels.npy")
-    D_1_plus_true_labels_path = os.path.join(save_path, "train_noisy_true_labels.npy")
+    D_1_plus_labels_path = os.path.join(save_path, "train_noisy_label.npy")
+    D_1_plus_true_labels_path = os.path.join(save_path, "train_noisy_true_label.npy")
     np.save(D_1_plus_data_path, np.array(D_noisy_data))
     np.save(D_1_plus_labels_path, np.array(D_noisy_labels))
     np.save(D_1_plus_true_labels_path, np.array(D_noisy_true_labels))

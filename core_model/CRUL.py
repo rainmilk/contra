@@ -72,8 +72,6 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
                          std, device, args):
     aux_labels_onehot = np.eye(num_classes)[aux_labels]
 
-    # 1. 通过 Mt 获取 D_mix=Da+Ds+Dc,  Train Pp=Mp(Xp_mix), Loss=CrossEntropy(Pp, Yp_mix)
-    # (1) 获取Ds: 通过 Yp=Mp(Xtr), Yt=Mt(Xtr) 两个模型预测分类标签，其中Yp=Yt=Ytr的数据为Ds, Ys为预测相同的标签
     working_inc_predicts, working_inc_probs = model_forward(
         inc_dataloader, working_model
     )
@@ -81,51 +79,40 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
         inc_dataloader, teacher_model, output_embedding=False
     )
 
-    cross_entropy = nn.functional.kl_div(teacher_inc_probs, working_inc_probs, reduction='sum')
-
     agree_idx = working_inc_predicts == teacher_inc_predicts
     select_idx = agree_idx # & (teacher_inc_predicts == inc_labels)
     selected_probs = (args.gamma * teacher_inc_probs[select_idx] +
                       (1 - args.gamma) * working_inc_probs[select_idx])/2
 
-    # (2) 获取Dc: 通过 Mt(Xa+Xs) 计算class embedding centroids (i.e. Class mean): E_centroid
-    # 通过 Mt(Das)获取 E_centroid(Das=Da+Ds)
-    # 获取 Embedding_disa(D_disa=Dtr-D_agree) 距离离每个类c的中心 E_centroid[class=c]最近的Top 10% 的数据为 Dc (通过Lipschitz性质预测的伪标签)
+    # select confident data
+    threshold = 0.9
+    cutoff = 0.25
+    select_probs_max = np.max(selected_probs, axis=-1)  # [N]
+    sample_size = round(len(selected_probs) * cutoff)
+    sample_idx = np.argpartition(select_probs_max, -sample_size)[-sample_size:]
+    conf_idx = select_probs_max >= threshold
+    conf_idx[sample_idx] = True
+
+
     aux_predicts, aux_probs = model_forward(
         aux_dataloader, teacher_model, output_embedding=False
     )
-
-    agree_labels = np.concatenate([aux_labels, selected_labels], axis=0)
 
     disagree_idx = working_inc_predicts != teacher_inc_predicts
     disagree_data = inc_data[disagree_idx]
     teacher_disagree_predicts = teacher_inc_predicts[disagree_idx]
     teacher_disagree_probs = teacher_inc_probs[disagree_idx]
-    teacher_disagree_embeddings = teacher_inc_embeddings[disagree_idx]
+    worker_disagree_probs = working_inc_probs[disagree_idx]
+    teacher_disagree_probs_max = np.max(teacher_disagree_probs, axis=-1)
+    worker_disagree_probs_max = np.max(worker_disagree_probs, axis=-1)
+    joint_disagree_score = np.sqrt(teacher_disagree_probs_max * worker_disagree_probs_max)
+    sample_size = round(len(joint_disagree_score) * cutoff)
+    sample_idx = np.argpartition(joint_disagree_score, -sample_size)[-sample_size:]
+    conf_idx = select_probs_max >= threshold
+    conf_idx[sample_idx] = True
+
 
     centroid_data, centroid_probs = [], []
-
-    for label in list(set(aux_labels)):
-        agree_cls_probs = selected_probs[agree_labels == label]
-        agree_cls_probs_max = np.max(selected_probs, axis=-1)  # [N]
-        sample_size = len(agree_cls_probs) // 2
-        sample_idx = np.argpartition(agree_cls_probs_max, -sample_size)[-sample_size:]
-
-
-        disagree_class_idx = teacher_disagree_predicts == label
-        disagree_class_embeddings = teacher_disagree_embeddings[disagree_class_idx]
-        disagree_class_data = disagree_data[disagree_class_idx]
-        disagree_class_probs = teacher_disagree_probs[disagree_class_idx]
-
-        selected_top_conf_num = len(disagree_class_probs) // 10
-
-
-        centroid_class_data, centroid_class_label = (
-            disagree_class_data[top_idx],
-            disagree_class_probs[top_idx],
-        )
-        centroid_data.extend(centroid_class_data)
-        centroid_probs.extend(centroid_class_label)
 
     centroid_data = np.array(centroid_data)
     centroid_probs = np.array(centroid_probs)
@@ -177,13 +164,6 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
         device=device,
         save_path=teacher_model_save_path,
     )
-
-    # 3. 获取Dconf{Xs, Ys} 用与adapt: Dconf从Ds中top10% 数据(根据Ys_prob排序)
-    select_probs_max = np.max(selected_probs, axis=-1)  # [N]
-    sample_size = len(selected_probs) // 10
-    sample_idx = np.argpartition(select_probs_max, -sample_size)[-sample_size:]
-    conf_data = selected_data[sample_idx]
-    conf_labels = selected_probs[sample_idx]
 
     return conf_data, conf_labels
 

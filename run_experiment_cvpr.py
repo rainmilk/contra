@@ -9,8 +9,6 @@ from core_model.custom_model import ClassifierWrapper, load_custom_model
 from configs import settings
 from train_test_utils import train_model
 
-conference_name = "cvpr"
-
 def get_num_of_classes(dataset_name):
     # 根据 dataset_name 设置分类类别数
     if dataset_name == "cifar-10":
@@ -82,12 +80,11 @@ def train_step(
     model_name = args.model
     train_mode = args.train_mode
     
-    if conference_name is not None:
-        case = f"nr_{args.noise_ratio}_nt_{args.noise_type}_{conference_name}"
+    case = settings.get_case(args.noise_ratio, args.noise_type)
     
     uni_name = args.uni_name
 
-    model_suffix = "worker_restore"
+    model_suffix = "restore"
 
     test_data = load_dataset(
         settings.get_dataset_path(dataset_name, None, "test_data")
@@ -167,7 +164,7 @@ def train_step(
             print("用于训练的数据: train_clean_data 和 train_clean_labels")
 
             prev_model_path = settings.get_ckpt_path(
-                dataset_name, "pretrain", model_name, "pretrain")
+                dataset_name, "pretrain", model_name, model_suffix)
 
             uni_name = train_mode
         elif train_mode == "finetune":  # Step 1: Train M_1 on D_1+ (noisy dataset)
@@ -211,6 +208,7 @@ def train_step(
                 dataset_name, "pretrain", model_name, "pretrain")
 
             uni_name = None
+            model_suffix = train_mode
 
         if not os.path.exists(prev_model_path):
             raise FileNotFoundError(
@@ -240,7 +238,7 @@ def train_step(
         )
 
         model_tr_path = settings.get_ckpt_path(
-            dataset_name, case, model_name, train_mode, unique_name=uni_name
+            dataset_name, case, model_name, model_suffix, unique_name=uni_name
         )
         subdir = os.path.dirname(model_tr_path)
         os.makedirs(subdir, exist_ok=True)
