@@ -7,7 +7,7 @@ config = {
     'root' : './data',
     'noise_type' : 'sym',
     'percent' : 0.2,
-    'seed' : 1,
+    'seed' : 4398,
     # model param
     'model1_type' : 'resnet18',
     'model2_type' : 'resnet18',
@@ -20,7 +20,7 @@ config = {
     'adjust_lr' : 1,
     'co_lambda' : 0.1,
     'num_gradual' : 1,
-    'forget_rate' : None,
+    'forget_rate' : 0.8,
     'epoch_decay_start' : 5,
     # result param
     'save_result' : True}

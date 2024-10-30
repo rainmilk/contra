@@ -115,11 +115,18 @@ def main():
 
     num_test_images = len(testloader.dataset)
 
-    load_model_path = settings.get_ckpt_path(
+    load_model_path1 = settings.get_ckpt_path(
         custom_args.dataset,
         case,
         custom_args.model,
         model_suffix="inc_train"
+    )
+
+    load_model_path2 = settings.get_ckpt_path(
+        custom_args.dataset,
+        "pretrain",
+        custom_args.model,
+        model_suffix="pretrain"
     )
 
     save_model_path = settings.get_ckpt_path(
@@ -143,8 +150,9 @@ def main():
     )
     model.model2 = ClassifierWrapper(loaded_model2, num_classes)
 
-    checkpoint = torch.load(load_model_path)
+    checkpoint = torch.load(load_model_path1)
     model.model1.load_state_dict(checkpoint, strict=False)
+    checkpoint = torch.load(load_model_path2)
     model.model2.load_state_dict(checkpoint, strict=False)
 
     model.model1.to(device)

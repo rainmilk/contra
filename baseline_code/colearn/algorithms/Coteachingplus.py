@@ -119,7 +119,8 @@ class Coteachingplus:
             _, pred2 = torch.max(logits2, dim=1)
 
             inds = torch.where(pred1 != pred2)
-            if len(inds[0]) * (1 - self.rate_schedule[epoch]) < 1:
+            # if len(inds[0]) * (1 - self.rate_schedule[epoch]) < 1
+            if len(inds[0]) < 1:
                 loss_1 = F.cross_entropy(logits1, labels)
                 loss_2 = F.cross_entropy(logits2, labels)
             else:
