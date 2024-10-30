@@ -5,9 +5,12 @@ import argparse
 from torchvision import datasets, transforms
 import json
 
-import collections
 from configs import settings
-from split_dataset import split
+from gen_dataset.split_dataset import split_data
+
+
+conference_name = "cvpr"
+
 
 def load_classes_from_file(file_path):
     """从文件中读取类别列表"""
@@ -55,13 +58,9 @@ def create_cifar100_npy_files(
     data_dir,
     gen_dir,
     noise_type="asymmetric",
-    noise_ratio=0.2,
-    num_versions=3,
-    retention_ratios=[0.5, 0.3, 0.1],
-    balanced=False,
+    noise_ratio=0.5,
     split_ratio=0.5,
 ):
-
     rng = np.random.default_rng(42)
 
     data_transform = transforms.Compose(
@@ -71,7 +70,6 @@ def create_cifar100_npy_files(
         ]
     )
 
-    # 加载 CIFAR-100 数据集
     train_dataset = datasets.CIFAR100(
         root=data_dir, train=True, download=True, transform=data_transform
     )
@@ -79,193 +77,75 @@ def create_cifar100_npy_files(
         root=data_dir, train=False, download=True, transform=data_transform
     )
 
-    case = settings.get_case(noise_ratio, noise_type, balanced)
+    case = settings.get_case(noise_ratio, noise_type)
 
-    print("使用类均衡的数据划分方式...")
+    print("划分训练集...")
     dataset_name = "cifar-100"
     num_classes = 100
-    D_inc_data, D_inc_labels = split(dataset_name, case, train_dataset, test_dataset, num_classes)
+    D_inc_data, D_inc_labels = split_data(
+        dataset_name, train_dataset, test_dataset, num_classes, 0.5
+    )
 
-    # 读取 CIFAR-100 类别
-    cifar100_classes_file = os.path.join(settings.root_dir, "configs/classes/cifar_100_classes.txt")
+    cifar100_classes_file = os.path.join(
+        settings.root_dir, "configs/classes/cifar_100_classes.txt"
+    )
     cifar100_classes = load_classes_from_file(cifar100_classes_file)
 
-    # 读取 CIFAR-100 的 superclass 和 child class 映射
-    cifar100_mapping_file = os.path.join(settings.root_dir, "configs/classes/cifar_100_mapping.json")
+    cifar100_mapping_file = os.path.join(
+        settings.root_dir, "configs/classes/cifar_100_mapping.json"
+    )
     cifar100_superclass_mapping = load_cifar100_superclass_mapping(
         cifar100_mapping_file
     )
 
-    # 打印读取到的类别信息
     print("CIFAR-100 Classes:", cifar100_classes)
 
-    # 构建非对称映射，如果选择了非对称噪声
     if noise_type == "asymmetric":
         asymmetric_mapping = build_asymmetric_mapping(
             cifar100_superclass_mapping, cifar100_classes, rng
         )
 
-    # 定义遗忘类别和噪声类别
-    forget_classes = list(range(50))  # 前50个类别作为遗忘类别
-    noise_classes = list(range(50, 75))  # 后面的25个类别作为噪声类别
+    num_noisy_samples = int(len(D_inc_labels) * noise_ratio)
+    noisy_indices = np.random.choice(
+        len(D_inc_labels), num_noisy_samples, replace=False
+    )
+    noisy_sel = np.zeros(len(D_inc_labels), dtype=np.bool_)
+    noisy_sel[noisy_indices] = True
 
-    # 获取增量数据集中的遗忘类别和噪声类别的索引
-    D_inc_forget_indices = [
-        i for i in range(len(D_inc_labels)) if D_inc_labels[i] in forget_classes
-    ]
-    D_inc_noise_indices = [
-        i for i in range(len(D_inc_labels)) if D_inc_labels[i] in noise_classes
-    ]
+    D_noisy_data = D_inc_data[noisy_sel]
+    D_noisy_true_labels = D_inc_labels[noisy_sel]
+    D_normal_data = D_inc_data[~noisy_sel]
+    D_normal_labels = D_inc_labels[~noisy_sel]
 
-    symmetric_noisy_classes = []
-    asymmetric_noisy_classes = []
-
-    symmetric_noisy_classes_simple = set()
-    asymmetric_noisy_classes_simple = set()
-
-    rng = np.random.default_rng(42)
-
-    # 生成增量版本数据集
-    for t in range(num_versions):
-        retention_ratio = retention_ratios[t]
-
-        # 模拟遗忘：根据保留比例抽取遗忘类别的样本
-        num_forget_samples = int(len(D_inc_forget_indices) * retention_ratio)
-
-        if num_forget_samples > 0:
-            forget_sample_indices = rng.choice(
-                D_inc_forget_indices, num_forget_samples, replace=False
-            )
-            D_f_data = D_inc_data[forget_sample_indices]
-            D_f_labels = D_inc_labels[forget_sample_indices]
+    D_noisy_labels = []
+    for true_label in D_noisy_true_labels:
+        original_class_name = cifar100_classes[true_label]
+        if original_class_name in asymmetric_mapping:
+            new_class_name = asymmetric_mapping[original_class_name]
+            new_label = cifar100_classes.index(new_class_name)
         else:
-            D_f_data = torch.empty(0, 3, 32, 32)
-            D_f_labels = torch.empty(0, dtype=torch.long)
+            new_label = true_label
+        D_noisy_labels.append(new_label)
+    D_noisy_labels = np.array(D_noisy_labels)
 
-        # 噪声注入：对噪声类别的样本注入噪声
-        noise_sample_indices = D_inc_noise_indices
-        num_noisy_samples = int(len(noise_sample_indices) * noise_ratio)
+    save_path = os.path.join(
+        gen_dir, f"nr_{noise_ratio}_nt_{noise_type}_{conference_name}"
+    )
+    os.makedirs(save_path, exist_ok=True)
 
-        if num_noisy_samples > 0:
-            noisy_indices = rng.choice(
-                noise_sample_indices, num_noisy_samples, replace=False
-            )
-        else:
-            noisy_indices = []
+    D_1_minus_data_path = os.path.join(save_path, "train_clean_data.npy")
+    D_1_minus_labels_path = os.path.join(save_path, "train_clean_labels.npy")
+    np.save(D_1_minus_data_path, np.array(D_normal_data))
+    np.save(D_1_minus_labels_path, np.array(D_normal_labels))
 
-        D_n_data = D_inc_data[noise_sample_indices]
-        D_n_labels = D_inc_labels[noise_sample_indices]
+    D_1_plus_data_path = os.path.join(save_path, "train_noisy_data.npy")
+    D_1_plus_labels_path = os.path.join(save_path, "train_noisy_labels.npy")
+    D_1_plus_true_labels_path = os.path.join(save_path, "train_noisy_true_labels.npy")
+    np.save(D_1_plus_data_path, np.array(D_noisy_data))
+    np.save(D_1_plus_labels_path, np.array(D_noisy_labels))
+    np.save(D_1_plus_true_labels_path, np.array(D_noisy_true_labels))
 
-        for idx_in_D_n, D_inc_idx in enumerate(noise_sample_indices):
-            if D_inc_idx in noisy_indices:
-                original_label = int(D_n_labels[idx_in_D_n].item())
-
-                # 确保仅对 noise_classes 中的类别进行替换
-                if original_label in noise_classes:
-                    original_class_name = cifar100_classes[original_label]
-                    original_superclass = next(
-                        (
-                            superclass
-                            for superclass, children in cifar100_superclass_mapping.items()
-                            if original_class_name in children
-                        ),
-                        None,
-                    )
-
-                if noise_type == "symmetric":
-                    new_label = rng.choice(
-                        [i for i in range(100) if i != original_label]
-                    )
-                    D_n_labels[idx_in_D_n] = new_label
-                    new_class_name = cifar100_classes[new_label]
-                    new_superclass = next(
-                        (
-                            superclass
-                            for superclass, children in cifar100_superclass_mapping.items()
-                            if new_class_name in children
-                        ),
-                        None,
-                    )
-                    symmetric_noisy_classes.append(
-                        {
-                            "original_label": int(original_label),
-                            "original_class_name": original_class_name,
-                            "original_superclass": original_superclass,
-                            "new_label": int(new_label),
-                            "new_class_name": new_class_name,
-                            "new_superclass": new_superclass,
-                        }
-                    )
-                    symmetric_noisy_classes_simple.add(
-                        (int(original_label), int(new_label))
-                    )
-
-                elif noise_type == "asymmetric":
-                    if original_class_name in asymmetric_mapping:
-                        new_class_name = asymmetric_mapping[original_class_name]
-                        new_label = cifar100_classes.index(new_class_name)
-                        D_n_labels[idx_in_D_n] = new_label
-                        new_superclass = next(
-                            (
-                                superclass
-                                for superclass, children in cifar100_superclass_mapping.items()
-                                if new_class_name in children
-                            ),
-                            None,
-                        )
-                        asymmetric_noisy_classes.append(
-                            {
-                                "original_label": int(original_label),
-                                "original_class_name": original_class_name,
-                                "original_superclass": original_superclass,
-                                "new_label": int(new_label),
-                                "new_class_name": new_class_name,
-                                "new_superclass": new_superclass,
-                            }
-                        )
-                        asymmetric_noisy_classes_simple.add(
-                            (int(original_label), int(new_label))
-                        )
-                else:
-                    raise ValueError("Invalid noise type.")
-
-        D_tr_data = np.concatenate([D_f_data, D_n_data], axis=0)
-        D_tr_labels = np.concatenate([D_f_labels, D_n_labels], axis=0)
-
-        # 打乱训练数据集
-        perm = rng.permutation(len(D_tr_data))
-        D_tr_data = D_tr_data[perm]
-        D_tr_labels = D_tr_labels[perm]
-
-        # 保存训练数据集
-        train_data_path = settings.get_dataset_path(
-            dataset_name, case, "train_data", t + 1
-        )
-        train_label_path = settings.get_dataset_path(
-            dataset_name, case, "train_label", t + 1
-        )
-
-        subdir = os.path.dirname(train_data_path)
-        os.makedirs(subdir, exist_ok=True)
-
-        np.save(train_data_path, D_tr_data)
-        np.save(train_label_path, D_tr_labels)
-
-        print(f"D_tr 版本 {t+1} 已保存到 {subdir}")
-
-    # 记录噪声注入信息
-    if noise_type == "symmetric":
-        with open(f"{dataset_name}_{noise_type}_{noise_ratio}_symmetric_noisy_classes_detailed.json", "w") as f:
-            json.dump(symmetric_noisy_classes, f, indent=4)
-        with open(f"{dataset_name}_{noise_type}_{noise_ratio}_symmetric_noisy_classes_simple.json", "w") as f:
-            json.dump(list(symmetric_noisy_classes_simple), f, indent=4)
-    elif noise_type == "asymmetric":
-        with open(f"{dataset_name}_{noise_type}_{noise_ratio}_asymmetric_noisy_classes_detailed.json", "w") as f:
-            json.dump(asymmetric_noisy_classes, f, indent=4)
-        with open(f"{dataset_name}_{noise_type}_{noise_ratio}_asymmetric_noisy_classes_simple.json", "w") as f:
-            json.dump(list(asymmetric_noisy_classes_simple), f, indent=4)
-
-    print("所有数据集生成完毕。")
+    print("D_0、D_1_minus 和 D_1_plus 数据集已生成并保存。")
 
 
 def main():
@@ -273,7 +153,7 @@ def main():
     torch.manual_seed(42)
 
     parser = argparse.ArgumentParser(
-        description="Generate CIFAR-100 incremental datasets."
+        description="Generate CIFAR-100 experimental datasets."
     )
     parser.add_argument(
         "--data_dir",
@@ -288,36 +168,27 @@ def main():
         help="生成数据集的保存目录",
     )
     parser.add_argument(
+        "--dataset_name",
+        type=str,
+        choices=["cifar-100"],
+        default="cifar-100",
+        help="数据集仅支持：'cifar-100'",
+    )
+    parser.add_argument(
         "--noise_type",
         type=str,
-        choices=["symmetric", "asymmetric"],
-        default="symmetric",
-        help="标签噪声类型：'symmetric' 或 'asymmetric'",
+        choices=["asymmetric"],
+        default="asymmetric",
+        help="标签噪声类型：目前仅支持 'asymmetric'",
     )
-    parser.add_argument(
-        "--noise_ratio", type=float, default=0.2, help="噪声比例（默认 0.2）"
-    )
-    parser.add_argument(
-        "--num_versions", type=int, default=3, help="生成的增量版本数量（默认 3）"
-    )
-    parser.add_argument(
-        "--retention_ratios",
-        type=float,
-        nargs="+",
-        default=[0.5, 0.3, 0.1],
-        help="各增量版本的保留比例列表",
-    )
-    parser.add_argument(
-        "--balanced",
-        action="store_true",
-        help="是否使用类均衡的数据划分方式。如果不指定，则使用随机划分。",
-    )
-
     parser.add_argument(
         "--split_ratio",
         type=float,
-        default=0.5,
-        help="类均衡划分的比例，默认为 0.5",
+        default=0.6,
+        help="训练集划分比例（默认 0.6）",
+    )
+    parser.add_argument(
+        "--noise_ratio", type=float, default=0.5, help="噪声比例（默认 0.5）"
     )
 
     args = parser.parse_args()
@@ -327,9 +198,6 @@ def main():
         gen_dir=args.gen_dir,
         noise_type=args.noise_type,
         noise_ratio=args.noise_ratio,
-        num_versions=args.num_versions,
-        retention_ratios=args.retention_ratios,
-        balanced=args.balanced,
         split_ratio=args.split_ratio,
     )
 
