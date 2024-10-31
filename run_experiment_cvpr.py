@@ -156,15 +156,15 @@ def train_step(
                 settings.get_dataset_path(dataset_name, case, "train_clean_data")
             )
             train_labels = load_dataset(
-                settings.get_dataset_path(dataset_name, case, "train_clean_labels"),
+                settings.get_dataset_path(dataset_name, case, "train_clean_label"),
                 is_data=False,
             )
 
             # 打印用于训练的模型和数据
-            print("用于训练的数据: train_clean_data 和 train_clean_labels")
+            print("用于训练的数据: train_clean_data 和 train_clean_label")
 
             prev_model_path = settings.get_ckpt_path(
-                dataset_name, "pretrain", model_name, model_suffix)
+                dataset_name, "pretrain", model_name, "pretrain")
 
             uni_name = train_mode
         elif train_mode == "finetune":  # Step 1: Train M_1 on D_1+ (noisy dataset)
@@ -172,12 +172,12 @@ def train_step(
                 settings.get_dataset_path(dataset_name, case, "train_clean_data")
             )
             train_labels = load_dataset(
-                settings.get_dataset_path(dataset_name, case, "train_clean_labels"),
+                settings.get_dataset_path(dataset_name, case, "train_clean_label"),
                 is_data=False,
             )
 
             # 打印用于训练的模型和数据
-            print("用于训练的数据: train_clean_data 和 train_clean_labels")
+            print("用于训练的数据: train_clean_data 和 train_clean_label")
 
             prev_model_path = settings.get_ckpt_path(
                 dataset_name, case, model_name, "inc_train")
@@ -188,21 +188,21 @@ def train_step(
                 settings.get_dataset_path(dataset_name, case, "train_clean_data")
             )
             train_clean_labels = load_dataset(
-                settings.get_dataset_path(dataset_name, case, "train_clean_labels"),
+                settings.get_dataset_path(dataset_name, case, "train_clean_label"),
                 is_data=False,
             )
             train_noisy_data = load_dataset(
                 settings.get_dataset_path(dataset_name, case, "train_noisy_data")
             )
             train_noisy_labels = load_dataset(
-                settings.get_dataset_path(dataset_name, case, "train_noisy_labels"),
+                settings.get_dataset_path(dataset_name, case, "train_noisy_label"),
                 is_data=False,
             )
             train_data = torch.concatenate([train_clean_data, train_noisy_data])
             train_labels = torch.concatenate([train_clean_labels, train_noisy_labels])
 
             # 打印用于训练的模型和数据
-            print("用于训练的数据: train_inc_data 和 train_inc_labels")
+            print("用于训练的数据: train_inc_data 和 train_inc_label")
 
             prev_model_path = settings.get_ckpt_path(
                 dataset_name, "pretrain", model_name, "pretrain")
