@@ -4,11 +4,12 @@ import time
 import torch
 
 import utils
+from train_test_utils import test_model
 
 from .impl import iterative_unlearn
 
 sys.path.append(".")
-from imagenet import get_x_y_from_data_dict
+from utils import get_x_y_from_data_dict
 
 
 def l1_regularization(model):
@@ -79,7 +80,7 @@ def GA(data_loaders, model, criterion, optimizer, epoch, args):
 
             # compute output
             output_clean = model(image)
-            loss = -criterion(output_clean, target)
+            loss = -args.alpha * criterion(output_clean, target)
 
             optimizer.zero_grad()
             loss.backward()
@@ -107,6 +108,12 @@ def GA(data_loaders, model, criterion, optimizer, epoch, args):
 
     print("train_accuracy {top1.avg:.3f}".format(top1=top1))
 
+    test_loader = data_loaders["test"]
+    device = (
+        torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    )
+    test_model(model, test_loader, criterion, device, epoch)
+
     return top1.avg
 
 
@@ -132,7 +139,7 @@ def GA_l1(data_loaders, model, criterion, optimizer, epoch, args):
 
         # compute output
         output_clean = model(image)
-        loss = -criterion(output_clean, target) + args.alpha * l1_regularization(model)
+        loss = -args.alpha * (criterion(output_clean, target) + l1_regularization(model))
 
         optimizer.zero_grad()
         loss.backward()
@@ -159,5 +166,11 @@ def GA_l1(data_loaders, model, criterion, optimizer, epoch, args):
             start = time.time()
 
     print("train_accuracy {top1.avg:.3f}".format(top1=top1))
+
+    test_loader = data_loaders["test"]
+    device = (
+        torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    )
+    test_model(model, test_loader, criterion, device, epoch)
 
     return top1.avg

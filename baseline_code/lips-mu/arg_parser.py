@@ -1,14 +1,15 @@
 import argparse
+from args_paser import make_arg_parser
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="PyTorch Lottery Tickets Experiments")
+    parser = argparse.ArgumentParser(description="Machine unlearning arguments")
 
     ##################################### Dataset #################################################
     parser.add_argument(
         "--data", type=str, default="../data", help="location of the data corpus"
     )
-    parser.add_argument("--dataset", type=str, default="cifar10", help="dataset")
+    # parser.add_argument("--dataset", type=str, default="cifar10", help="dataset")
     parser.add_argument(
         "--input_size", type=int, default=32, help="size of input images"
     )
@@ -50,7 +51,7 @@ def parse_args():
         type=int,
         help="seed for training (default value same as args.seed)",
     )
-    parser.add_argument("--gpu", type=int, default=0, help="gpu device id")
+    # parser.add_argument("--gpu", type=int, default=0, help="gpu device id")
     parser.add_argument(
         "--workers", type=int, default=4, help="number of workers in dataloader"
     )
@@ -139,13 +140,13 @@ def parse_args():
     parser.add_argument("--mask", type=str, default=None, help="sparse model")
 
     ##################################### Training setting #################################################
-    parser.add_argument("--batch_size", type=int, default=256, help="batch size")
+    # parser.add_argument("--batch_size", type=int, default=256, help="batch size")
     parser.add_argument("--lr", default=0.1, type=float, help="initial learning rate")
-    parser.add_argument("--momentum", default=0.9, type=float, help="momentum")
-    parser.add_argument("--weight_decay", default=5e-4, type=float, help="weight decay")
-    parser.add_argument(
-        "--epochs", default=182, type=int, help="number of total epochs to run"
-    )
+    # parser.add_argument("--momentum", default=0.9, type=float, help="momentum")
+    # parser.add_argument("--weight_decay", default=5e-4, type=float, help="weight decay")
+    # parser.add_argument(
+    #     "--epochs", default=182, type=int, help="number of total epochs to run"
+    # )
     parser.add_argument("--warmup", default=0, type=int, help="warm up epochs")
     parser.add_argument("--print_freq", default=50, type=int, help="print frequency")
     parser.add_argument("--decreasing_lr", default="91,136", help="decreasing strategy")
@@ -221,4 +222,7 @@ def parse_args():
         default=4,
         help="The size of trigger of backdoor attack",
     )
+
+    parser = make_arg_parser(parser)
+
     return parser.parse_args()

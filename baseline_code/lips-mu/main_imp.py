@@ -88,7 +88,7 @@ def main():
                 * (
                     1.0
                     + np.cos(
-                        np.pi * ((cur_iter - args.warmup) / (args.epochs - args.warmup))
+                        np.pi * ((cur_iter - args.warmup) / (args.num_epochs - args.warmup))
                     )
                 )
             )
@@ -155,7 +155,7 @@ def main():
         print("******************************************")
 
         check_sparsity(model)
-        for epoch in range(start_epoch, args.epochs):
+        for epoch in range(start_epoch, args.num_epochs):
             start_time = time.time()
             print(optimizer.state_dict()["param_groups"][0]["lr"])
             acc = train(train_loader, model, criterion, optimizer, epoch, args)
@@ -269,7 +269,7 @@ def main():
                         1.0
                         + np.cos(
                             np.pi
-                            * ((cur_iter - args.warmup) / (args.epochs - args.warmup))
+                            * ((cur_iter - args.warmup) / (args.num_epochs - args.warmup))
                         )
                     )
                 )

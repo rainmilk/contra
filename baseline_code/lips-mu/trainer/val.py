@@ -2,7 +2,7 @@ import torch
 import numpy as np
 
 import utils
-from imagenet import get_x_y_from_data_dict
+from utils import get_x_y_from_data_dict
 
 
 def validate(val_loader, model, criterion, args):

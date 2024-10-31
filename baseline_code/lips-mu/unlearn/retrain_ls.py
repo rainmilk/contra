@@ -1,7 +1,7 @@
 import time
 
 import utils
-from LS import LabelSmoothingCrossEntropy
+from .LS import LabelSmoothingCrossEntropy
 
 from .impl import iterative_unlearn
 

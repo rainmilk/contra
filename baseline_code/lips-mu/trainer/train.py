@@ -5,7 +5,7 @@ import time
 import torch
 
 import utils
-from imagenet import get_x_y_from_data_dict
+from utils import get_x_y_from_data_dict
 
 
 def l1_regularization(model):
@@ -126,7 +126,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args, l1=False):
 
 def train_with_rewind(model, optimizer, scheduler, train_loader, criterion, args):
     rewind_state_dict = None
-    for epoch in range(args.epochs):
+    for epoch in range(args.num_epochs):
         start_time = time.time()
         print(optimizer.state_dict()["param_groups"][0]["lr"])
         train(train_loader, model, criterion, optimizer, epoch, args)

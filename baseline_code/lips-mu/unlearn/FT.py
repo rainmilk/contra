@@ -4,11 +4,12 @@ import time
 import torch
 
 import utils
+from train_test_utils import test_model
 
 from .impl import iterative_unlearn
 
 sys.path.append(".")
-from imagenet import get_x_y_from_data_dict
+from utils import get_x_y_from_data_dict
 
 
 def l1_regularization(model):
@@ -48,9 +49,9 @@ def FT_iter(data_loaders, model, criterion, optimizer, epoch, args, with_l1=Fals
 
             # compute output
             output_clean = model(image)
-            if epoch < args.unlearn_epochs - args.no_l1_epochs:
+            if epoch < args.num_epochs - args.no_l1_epochs:
                 current_alpha = args.alpha * (
-                    1 - epoch / (args.unlearn_epochs - args.no_l1_epochs)
+                    1 - epoch / (args.num_epochs - args.no_l1_epochs)
                 )
             else:
                 current_alpha = 0
@@ -89,12 +90,12 @@ def FT_iter(data_loaders, model, criterion, optimizer, epoch, args, with_l1=Fals
 
             image = image.cuda()
             target = target.cuda()
-            if epoch < args.unlearn_epochs - args.no_l1_epochs:
+            if epoch < args.num_epochs - args.no_l1_epochs:
                 current_alpha = args.alpha * (
-                    1 - epoch / (args.unlearn_epochs - args.no_l1_epochs)
+                    1 - epoch / (args.num_epochs - args.no_l1_epochs)
                 )
-                # current_alpha = args.alpha * (epoch / (args.unlearn_epochs-args.no_l1_epochs))
-            elif args.unlearn_epochs - args.no_l1_epochs == 0:
+                # current_alpha = args.alpha * (epoch / (args.num_epochs-args.no_l1_epochs))
+            elif args.num_epochs - args.no_l1_epochs == 0:
                 current_alpha = args.alpha
             else:
                 current_alpha = 0
@@ -129,6 +130,12 @@ def FT_iter(data_loaders, model, criterion, optimizer, epoch, args, with_l1=Fals
                 start = time.time()
 
     print("train_accuracy {top1.avg:.3f}".format(top1=top1))
+
+    test_loader = data_loaders["test"]
+    device = (
+        torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    )
+    test_model(model, test_loader, criterion, device, epoch)
 
     return top1.avg
 

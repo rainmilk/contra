@@ -42,11 +42,11 @@ def parse_kwargs(kwargs):
     return parsed_kwargs
 
 
-# 命令行解析
-def parse_args():
-    parser = argparse.ArgumentParser(
-        description="Run experiments with different datasets, models, and conditions."
-    )
+def make_arg_parser(parser=None):
+    if parser is None:
+        parser = argparse.ArgumentParser(
+            description="Run experiments with different datasets, models, and conditions."
+        )
 
     # 添加参数
     parser.add_argument(
@@ -315,6 +315,12 @@ def parse_args():
         "--use_tensorboard", action="store_true", help="Use TensorBoard for logging."
     )
 
+    return parser
+
+
+# 命令行解析
+def parse_args():
+    parser = make_arg_parser()
     # 返回解析的参数
     return parser.parse_args()
 
