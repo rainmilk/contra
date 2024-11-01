@@ -7,10 +7,11 @@ from configs import settings
 
 class BaseTensorDataset(Dataset):
 
-    def __init__(self, data, labels, transforms=None):
+    def __init__(self, data, labels, transforms=None, output_index=False):
         self.data = data
         self.labels = labels
         self.transforms = transforms
+        self.output_index = output_index
 
     def __len__(self) -> int:
         return len(self.data)
@@ -18,21 +19,32 @@ class BaseTensorDataset(Dataset):
     def __getitem__(self, index):
         data = self.data[index]
         if self.transforms is not None:
-            self.transforms(data)
+            data = self.transforms(data)
+        if self.output_index:
+            return data, self.labels[index], index
 
         return data, self.labels[index]
 
 
-def normalize_dataset(dataset, mean=None, std=None):
+def normalize_dataset(dataset, channel_first=True, mean=None, std=None):
     shape = dataset.shape
     channel_idx = np.where(np.array(shape)[1:] == 3)[0]
 
     # modify shape to [N, C, H, W]
-    if channel_idx == 2:
-        dataset = np.transpose(dataset, [0, 2, 1, 3])
-    if channel_idx == 3:
-        dataset = np.transpose(dataset, [0, 3, 1, 2])
+    axes = None
+    if channel_first:
+        if channel_idx == 2:
+            axes = [0, 2, 1, 3]
+        elif channel_idx == 3:
+            axes = [0, 3, 1, 2]
+    else:
+        if channel_idx == 1:
+            axes = [0, 2, 3, 1]
+        elif channel_idx == 2:
+            axes = [0, 1, 3, 2]
 
+    if axes is not None:
+        dataset = np.transpose(dataset, axes)
     # [2024-10-10 Add by sunzekun]
     # 下面的代码会引发bug，因为目前数据集都是已经经过了归一化的
     # 此时有部分值会超出1，为1.xxx。但它不是像素值
@@ -73,8 +85,8 @@ class MixupDataset(Dataset):
         # modify shape to [N, H, W, C]
         self.data_first = data_pair[0]
         self.data_second = data_pair[1]
-        self.data_first = normalize_dataset(self.data_first, mean, std)
-        self.data_second = normalize_dataset(self.data_second, mean, std)
+        self.data_first = normalize_dataset(self.data_first, mean=mean, std=std)
+        self.data_second = normalize_dataset(self.data_second, mean=mean, std=std)
         self.label_first = label_pair[0]
         self.label_second = label_pair[1]
         self.mixup_alpha = mixup_alpha
@@ -105,9 +117,10 @@ class MixupDataset(Dataset):
 
 
 class NormalizeDataset(BaseTensorDataset):
-    def __init__(self, data, labels, transforms=None, mean=None, std=None):
-        super().__init__(data, labels, transforms)
-        self.data = normalize_dataset(data, mean, std)
+    def __init__(self, data, labels, transforms=None, output_index=False,
+                 channel_first=True, mean=None, std=None):
+        super().__init__(data, labels, transforms, output_index)
+        self.data = normalize_dataset(data, channel_first, mean, std)
 
 
 def get_dataset_loader(
@@ -122,6 +135,8 @@ def get_dataset_loader(
     drop_last=False,
     shuffle=False,
     onehot_enc=False,
+    transforms=None,
+    output_index=False,
     num_workers=0,
 ):
     """
@@ -149,7 +164,6 @@ def get_dataset_loader(
     data = np.concatenate(data, axis=0)
     labels = np.concatenate(labels, axis=0)
 
-    transforms = None  # torchvision.transforms.Compose([])
     # if loader_name == "train":
     #     transform = True
 
@@ -157,7 +171,7 @@ def get_dataset_loader(
         labels = np.eye(num_classes)[labels]
 
     # 构建自定义数据集
-    dataset = NormalizeDataset(data, labels, transforms=transforms, mean=mean, std=std)
+    dataset = NormalizeDataset(data, labels, transforms=transforms, output_index=output_index, mean=mean, std=std)
     # dataset = BaseTensorDataset(data, labels, transforms=transforms)
 
     data_loader = DataLoader(
