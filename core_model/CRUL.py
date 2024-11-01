@@ -90,7 +90,7 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
                          teacher_disagree_probs_max >= disagree_threshold)
 
     mix_data = disagree_data[disagree_conf_idx]
-    loss_lambda = -0.1  # Gradient Ascend
+    loss_lambda = -0.2  # Gradient Ascend
 
     unlearn_worker = True
     mix_worker_labels = worker_disagree_preds[disagree_conf_idx]
