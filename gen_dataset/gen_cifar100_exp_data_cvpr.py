@@ -83,7 +83,7 @@ def create_cifar100_npy_files(
     dataset_name = "cifar-100"
     num_classes = 100
     D_inc_data, D_inc_labels = split_data(
-        dataset_name, train_dataset, test_dataset, num_classes, split_data
+        dataset_name, train_dataset, test_dataset, num_classes, split_ratio
     )
 
     cifar100_classes_file = os.path.join(
