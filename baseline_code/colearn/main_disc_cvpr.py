@@ -150,6 +150,10 @@ def main():
         # nni.report_intermediate_result(test_acc)
         if best_acc < test_acc:
             best_acc, best_epoch = test_acc, epoch
+            # save model
+            os.makedirs(os.path.dirname(save_model_path), exist_ok=True)
+            torch.save(model.model_scratch.state_dict(), save_model_path)
+            print("model saved to:", save_model_path)
 
         print(
             "Epoch [%d/%d] Test Accuracy on the %s test images: %.4f %%"
@@ -160,10 +164,6 @@ def main():
             acc_list.extend([test_acc])
         acc_all_list.extend([test_acc])
 
-        # save model1
-        os.makedirs(os.path.dirname(save_model_path), exist_ok=True)
-        torch.save(model.model_scratch.state_dict(), save_model_path)
-        print("model saved to:", save_model_path)
 
     if config["save_result"]:
         acc_np = np.array(acc_list)

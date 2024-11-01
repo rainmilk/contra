@@ -519,6 +519,7 @@ class TransformGJS(object):
         return self.normalize(weak), self.normalize(strong1), self.normalize(strong2)
 
 
+from torchvision.transforms import v2
 class TransformFixMatchForAll(object):
     def __init__(self):
         self.weak = transforms.Compose([
@@ -528,8 +529,7 @@ class TransformFixMatchForAll(object):
         )
         self.strong = transforms.Compose([
             torch.from_numpy,
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomRotation((-20, 20))
+            v2.RandAugment()
         ])
 
     def __call__(self, x):
