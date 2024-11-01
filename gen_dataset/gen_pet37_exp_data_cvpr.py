@@ -56,8 +56,8 @@ def create_pet37_npy_files(
     data_dir,
     gen_dir,
     noise_type="symmetric",
-    noise_ratio=0.2,
-    split_ratio=0.5,
+    noise_ratio=0.25,
+    split_ratio=0.6,
 ):
     rng = np.random.default_rng(42)
 
@@ -97,7 +97,7 @@ def create_pet37_npy_files(
         )
 
     num_noisy_samples = int(len(D_inc_labels) * noise_ratio)
-    noisy_indices = np.random.choice(
+    noisy_indices = rng.choice(
         len(D_inc_labels), num_noisy_samples, replace=False
     )
     noisy_sel = np.zeros(len(D_inc_labels), dtype=np.bool_)
@@ -109,7 +109,7 @@ def create_pet37_npy_files(
     D_normal_labels = D_inc_labels[~noisy_sel]
 
     if noise_type == "symmetric":
-        D_noisy_labels = np.random.choice(num_classes, num_noisy_samples, replace=True)
+        D_noisy_labels = rng.choice(num_classes, num_noisy_samples, replace=True)
     elif noise_type == "asymmetric":
         D_noisy_labels = []
         for true_label in D_noisy_true_labels:
@@ -174,8 +174,8 @@ def main():
     parser.add_argument(
         "--split_ratio",
         type=float,
-        default=0.5,
-        help="训练集划分比例（默认 0.5）",
+        default=0.6,
+        help="训练集划分比例（默认 0.6）",
     )
     parser.add_argument(
         "--noise_type",
@@ -185,7 +185,7 @@ def main():
         help="标签器歪差类型：'symmetric' 或 'asymmetric'",
     )
     parser.add_argument(
-        "--noise_ratio", type=float, default=0.2, help="噪音比例（默认 0.2）"
+        "--noise_ratio", type=float, default=0.25, help="噪音比例（默认 0.25）"
     )
 
     args = parser.parse_args()

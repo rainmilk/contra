@@ -8,6 +8,7 @@ from .retrain import retrain
 from .retrain_ls import retrain_ls
 from .retrain_sam import retrain_sam
 from .Wfisher import Wfisher
+from .SAM import SAM
 
 
 def raw(data_loaders, model, criterion, args):
@@ -22,14 +23,14 @@ def get_unlearn_method(name):
         return raw
     elif name == "GA":
         return GA
+    elif name == "GA_l1":
+        return GA_l1
     elif name == "FT":
         return FT
     elif name == "FT_l1":
         return FT_l1
     elif name == "fisher":
         return fisher
-    elif name == "retrain":
-        return retrain
     elif name == "fisher_new":
         return fisher_new
     elif name == "wfisher":
@@ -38,8 +39,8 @@ def get_unlearn_method(name):
         return FT_prune
     elif name == "FT_prune_bi":
         return FT_prune_bi
-    elif name == "GA_l1":
-        return GA_l1
+    elif name == "retrain":
+        return retrain
     elif name == "retrain_ls":
         return retrain_ls
     elif name == "retrain_sam":
