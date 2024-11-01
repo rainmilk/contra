@@ -25,7 +25,7 @@ class BaseTensorDataset(Dataset):
 
 def normalize_dataset(dataset, mean=None, std=None):
     shape = dataset.shape
-    channel_idx = np.where(np.array(shape) == 3)[0]
+    channel_idx = np.where(np.array(shape)[1:] == 3)[0]
 
     # modify shape to [N, C, H, W]
     if channel_idx == 2:
@@ -68,6 +68,7 @@ class MixupDataset(Dataset):
         transforms=None,
         mean=None,
         std=None,
+        first_max=True
     ):
         # modify shape to [N, H, W, C]
         self.data_first = data_pair[0]
@@ -78,13 +79,14 @@ class MixupDataset(Dataset):
         self.label_second = label_pair[1]
         self.mixup_alpha = mixup_alpha
         self.transforms = transforms
+        self.first_max = first_max
 
     def __len__(self):
         return len(self.label_first)
 
     def __getitem__(self, index):
         lbd = np.random.beta(self.mixup_alpha, self.mixup_alpha)
-        if lbd < 0.5:
+        if self.first_max and lbd < 0.5:
             lbd = 1 - lbd
 
         data_first = self.data_first[index]

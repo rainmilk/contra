@@ -15,10 +15,11 @@ def model_train(
     epochs=5,
     args=None,
     device="cuda",
-    save_path=".",
+    save_path=None,
     mix_classes=0,
     test_loader=None,
-    test_per_it=1
+    test_per_it=1,
+    loss_lambda=1.0
 ):
     # todo opt 重置
     # 训练模型并显示进度
@@ -36,24 +37,32 @@ def model_train(
         total = 0
 
         # 更新学习率调度器
-        lr_scheduler.step(epoch)
         model.train()
 
         # 用 tqdm 显示训练进度条
+        batches = len(train_loader)
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for i, (inputs, labels) in enumerate(train_loader):
+                last_input, last_labels = inputs, labels
+                if len(labels) == 1:
+                    last_input[-1] = inputs
+                    last_labels[-1] = labels
+                    inputs, labels = last_input, last_labels
+
                 if mix_classes > 0:
                     transform = np.random.choice([cutmix_transform, mixup_transform])
                     labels = labels.to(torch.long)
                     inputs, labels = transform(inputs, labels)
 
                 inputs, labels = inputs.to(device), labels.to(device)
+
                 optimizer.zero_grad()  # 清除上一步的梯度
                 outputs = model(inputs)
 
-                loss = criterion(outputs, labels)
+                loss = loss_lambda * criterion(outputs, labels)
                 loss.backward()  # 反向传播
                 optimizer.step()  # 更新参数
+                lr_scheduler.step(epoch)
                 running_loss += loss.item()
 
                 # 计算准确率
@@ -76,7 +85,7 @@ def model_train(
             model_test(test_loader, model, device)
 
         # 仅在最后一次保存模型，避免每个 epoch 都保存
-        if epoch == epochs - 1:
+        if epoch == epochs - 1 and save_path is not None:
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
             torch.save(model.state_dict(), save_path)
             print(
