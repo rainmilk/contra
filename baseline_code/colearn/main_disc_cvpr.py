@@ -12,6 +12,7 @@ from utils import (
 from datasets.randaugment import TransformFixMatchForAll
 import algorithms
 import numpy as np
+
 # import nni
 import torch
 import os
@@ -42,9 +43,7 @@ def main():
     # print_config(config)
 
     custom_args = parse_args()
-    case = settings.get_case(
-        custom_args.noise_ratio, custom_args.noise_type
-    )
+    case = settings.get_case(custom_args.noise_ratio, custom_args.noise_type)
     step = custom_args.step
     uni_name = custom_args.uni_name
     num_classes = settings.num_classes_dict[custom_args.dataset]
@@ -65,17 +64,16 @@ def main():
     set_seed(config["seed"])
 
     # 根据配置中的算法选择对应的模型
-    if config['algorithm'] == 'DISC':
-        model = algorithms.DISC(config,
-                                input_channel=config['input_channel'],
-                                num_classes=num_classes)
+    if config["algorithm"] == "DISC":
+        model = algorithms.DISC(
+            config, input_channel=config["input_channel"], num_classes=num_classes
+        )
     else:
         model = algorithms.__dict__[config["algorithm"]](
             config,
             input_channel=config["input_channel"],
             num_classes=num_classes,
         )
-
 
     # get corrected dataset and model path
     _, _, trainloader = get_dataset_loader(
@@ -85,7 +83,7 @@ def main():
         batch_size=custom_args.batch_size,
         shuffle=True,
         transforms=TransformFixMatchForAll(),
-        output_index=True
+        output_index=True,
     )
 
     _, _, testloader = get_dataset_loader(
@@ -99,10 +97,7 @@ def main():
     num_test_images = len(testloader.dataset)
 
     load_model_path = settings.get_ckpt_path(
-        custom_args.dataset,
-        case,
-        custom_args.model,
-        model_suffix="inc_train"
+        custom_args.dataset, case, custom_args.model, model_suffix="inc_train"
     )
 
     save_model_path = settings.get_ckpt_path(
@@ -121,11 +116,14 @@ def main():
         custom_args.model, num_classes, load_pretrained=False
     )
     model.model_scratch = ClassifierWrapper(loaded_model, num_classes)
-    model.optimizer = optim.AdamW(model.model_scratch.parameters(),
-                                  lr=custom_args.learning_rate, weight_decay=custom_args.weight_decay)
+    model.optimizer = optim.AdamW(
+        model.model_scratch.parameters(),
+        lr=custom_args.learning_rate,
+        weight_decay=custom_args.weight_decay,
+    )
     model.scheduler = optim.lr_scheduler.ConstantLR(
-            model.optimizer, factor=0.95, total_iters=custom_args.num_epochs
-        )
+        model.optimizer, factor=0.95, total_iters=custom_args.num_epochs
+    )
 
     checkpoint = torch.load(load_model_path)
     model.model_scratch.load_state_dict(checkpoint, strict=False)
@@ -163,7 +161,6 @@ def main():
         if epoch >= custom_args.num_epochs - 10:
             acc_list.extend([test_acc])
         acc_all_list.extend([test_acc])
-
 
     if config["save_result"]:
         acc_np = np.array(acc_list)

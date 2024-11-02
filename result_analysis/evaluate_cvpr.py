@@ -10,15 +10,18 @@ from core_model.train_test import model_forward
 
 
 def execute(args):
-    case = settings.get_case(
-        args.noise_ratio, args.noise_type
-    )
+    case = settings.get_case(args.noise_ratio, args.noise_type)
     uni_name = args.uni_name
     num_classes = settings.num_classes_dict[args.dataset]
 
     loaded_model = load_custom_model(args.model, num_classes, load_pretrained=False)
-    model_ckpt_path = settings.get_ckpt_path(args.dataset, case, args.model,
-                                             model_suffix=args.model_suffix, unique_name=uni_name)
+    model_ckpt_path = settings.get_ckpt_path(
+        args.dataset,
+        case,
+        args.model,
+        model_suffix=args.model_suffix,
+        unique_name=uni_name,
+    )
     model = ClassifierWrapper(loaded_model, num_classes)
 
     print(f"Loading model from {model_ckpt_path}")
@@ -39,8 +42,9 @@ def execute(args):
 def model_test(data_loader, model, device="cuda"):
     eval_results = {}
 
-    predicts, probs, embedding, labels = model_forward(data_loader, model, device,
-                                            output_embedding=True, output_targets=True)
+    predicts, probs, embedding, labels = model_forward(
+        data_loader, model, device, output_embedding=True, output_targets=True
+    )
 
     # global acc
     global_acc = np.mean(predicts == labels)
@@ -56,7 +60,6 @@ def model_test(data_loader, model, device="cuda"):
         eval_results["label_" + str(label.item())] = class_acc.item()
 
     return eval_results, embedding
-
 
 
 if __name__ == "__main__":
