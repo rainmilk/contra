@@ -44,7 +44,7 @@ def load_custom_model(model_name, num_classes, load_pretrained=True, ckpt_path=N
     elif model_name == "cifar-resnet101":
         model = resnet101(num_classes=num_classes)
     elif model_name == "cifar-wideresnet40":
-        model = wideresnet(num_classes=num_classes)
+        model = wideresnet(num_classes=num_classes, widen_factor=2)
     else:
         model = None
 
