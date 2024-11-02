@@ -37,10 +37,10 @@ def create_flower102_npy_files(
 
     # Load FLOWER-102 dataset
     train_dataset = datasets.Flowers102(
-        root=data_dir, split="test", download=False, transform=data_transform
+        root=data_dir, split="train", download=True, transform=data_transform
     )
     test_dataset = datasets.Flowers102(
-        root=data_dir, split="train", download=False, transform=data_transform
+        root=data_dir, split="test", download=True, transform=data_transform
     )
 
     print("Using class-balanced data splitting...")

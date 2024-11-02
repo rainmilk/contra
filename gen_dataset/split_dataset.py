@@ -24,6 +24,9 @@ def sample_class_balanced_data(class_data, split_ratio):
     for class_label, samples in class_data.items():
         num_samples = len(samples)
         split_idx = int(num_samples * split_ratio)
+        if split_idx < 10:
+            split_idx = num_samples
+
         shuffled_indices = np.random.permutation(num_samples)
 
         # D_0 获取前半部分数据
@@ -51,6 +54,9 @@ def sample_replay_data(D_0_data, D_0_labels, replay_ratio, num_classes=1000):
     for class_label, samples in class_data.items():
         num_samples = len(samples)
         num_replay_samples = int(num_samples * replay_ratio)
+        if num_replay_samples < 10:
+            num_replay_samples = num_samples
+
         replay_indices = np.random.choice(num_samples, num_replay_samples, replace=False)
 
         D_a_data.extend([samples[i] for i in replay_indices])
