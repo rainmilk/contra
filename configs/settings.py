@@ -6,7 +6,8 @@ root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardi
 dataset_paths = {
     "cifar-10": os.path.join(root_dir, "data", "cifar-10"),
     "cifar-100": os.path.join(root_dir, "data", "cifar-100"),
-    "food-101": os.path.join(root_dir, "data", "foot-101"),
+    "food-101": os.path.join(root_dir, "data", "food-101"),
+    "flower-102": os.path.join(root_dir, "data", "flower-102"),
     "pet-37": os.path.join(root_dir, "data", "pet-37"),
 }
 
@@ -14,6 +15,7 @@ num_classes_dict = {
     "cifar-10": 10,
     "cifar-100": 100,
     "food-101": 101,
+    "flower-102": 102,
     "pet-37": 37,
 }
 
