@@ -45,7 +45,7 @@ def model_test(data_loader, model, device="cuda"):
 
     # global acc
     global_acc = np.mean(predicts == labels)
-    print("test_acc: %.2f" % (global_acc * 100))
+    print("Global ACC: %.2f" % (global_acc * 100))
     eval_results["global"] = global_acc.item()
 
     # class acc
@@ -53,7 +53,7 @@ def model_test(data_loader, model, device="cuda"):
     for label in label_list:
         cls_index = labels == label
         class_acc = np.mean(predicts[cls_index] == labels[cls_index])
-        print("label: %s, acc: %.2f" % (label, class_acc * 100))
+        print("Label: %s, Acc: %.2f" % (label, class_acc * 100))
         eval_results["label_" + str(label.item())] = class_acc.item()
 
     return eval_results, embedding
