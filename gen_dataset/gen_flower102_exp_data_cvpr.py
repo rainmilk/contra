@@ -37,28 +37,34 @@ def create_flower102_npy_files(
 
     # Load FLOWER-102 dataset
     train_dataset = datasets.Flowers102(
-        root=data_dir, split="train", download=False, transform=data_transform
+        root=data_dir, split="test", download=False, transform=data_transform
     )
     test_dataset = datasets.Flowers102(
-        root=data_dir, split="test", download=False, transform=data_transform
+        root=data_dir, split="train", download=False, transform=data_transform
     )
 
     print("Using class-balanced data splitting...")
     dataset_name = "flower-102"
     num_classes = 102
 
-    # Convert train dataset to numpy format
-    train_data = [train_dataset[i][0].numpy() for i in range(len(train_dataset))]
-    train_labels = [train_dataset[i][1] for i in range(len(train_dataset))]
-    train_data = np.array(train_data)
-    train_labels = np.array(train_labels)
+    # # Convert train dataset to numpy format
+    # train_data = [train_dataset[i][0].numpy() for i in range(len(train_dataset))]
+    # train_labels = [train_dataset[i][1] for i in range(len(train_dataset))]
+    # train_data = np.array(train_data)
+    # train_labels = np.array(train_labels)
 
-    # Split training data by class
-    class_data = split_by_class(train_data, train_labels, num_classes)
+    # # Split training data by class
+    # class_data = split_by_class(train_data, train_labels, num_classes)
 
     # Create class-balanced D_0 and D_inc datasets
-    D_0_data, D_0_labels, D_inc_data, D_inc_labels = sample_class_balanced_data(
-        class_data, split_ratio
+    # D_0_data, D_0_labels, D_inc_data, D_inc_labels = sample_class_balanced_data(
+    #     class_data, split_ratio
+    # )
+    
+    print(f"class:",num_classes)
+
+    D_inc_data, D_inc_labels = split_data(
+        dataset_name, train_dataset, test_dataset, num_classes, split_ratio
     )
 
     # D_1_plus: Adding noise
@@ -112,23 +118,23 @@ def create_flower102_npy_files(
     }
 
     # 保存重放数据集D_a，如果生成失败则保留为空
-    try:
-        D_a_data, D_a_labels = sample_replay_data(
-            D_0_data, D_0_labels, replay_ratio=0.1, num_classes=num_classes
-        )
-        np.save(save_paths["aux_data"], D_a_data)
-        np.save(save_paths["aux_label"], D_a_labels)
-    except ValueError as e:
-        print(f"Warning: {e}. No replay data generated.")
+    # try:
+    #     D_a_data, D_a_labels = sample_replay_data(
+    #         D_0_data, D_0_labels, replay_ratio=0.1, num_classes=num_classes
+    #     )
+    #     np.save(save_paths["aux_data"], D_a_data)
+    #     np.save(save_paths["aux_label"], D_a_labels)
+    # except ValueError as e:
+    #     print(f"Warning: {e}. No replay data generated.")
 
     # 将数据保存到npy文件
     data_to_save = {
         "inc_data": D_inc_data,
         "inc_label": D_inc_labels,
-        "pretrain_data": D_0_data,
-        "pretrain_label": D_0_labels,
-        "train_data": train_data,
-        "train_label": train_labels,
+        # "pretrain_data": D_0_data,
+        # "pretrain_label": D_0_labels,
+        # "train_data": train_data,
+        # "train_label": train_labels,
     }
 
     # 加载测试数据集并保存
