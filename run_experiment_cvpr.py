@@ -222,6 +222,9 @@ def train_step(
         model_tr.load_state_dict(torch.load(prev_model_path))
         print(f"开始训练 {train_mode} on ({dataset_name})...")
 
+        if len(train_data) == 0:
+            print(f"len of train data is 0")
+
         model_tr = train_model(
             model_tr,
             num_classes,

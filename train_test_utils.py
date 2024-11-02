@@ -236,7 +236,8 @@ def train_model(
         # dataset, batch_size=batch_size, drop_last=True, shuffle=True
         dataset,
         batch_size=batch_size,
-        drop_last=True,
+        # drop_last=True,
+        drop_last=False,
         shuffle=True,
     )
 
@@ -272,6 +273,14 @@ def train_model(
                     inputs, targets = transform(inputs, targets)
 
                 targets = targets.to(torch.long)
+                
+                last_input, last_labels = inputs, targets
+                if len(targets) == 1:
+                    last_input[-1] = inputs
+                    last_labels[-1] = targets
+                    inputs, targets = last_input, last_labels
+
+                
                 inputs, targets = inputs.to(device), targets.to(device)
 
                 optimizer.zero_grad()
