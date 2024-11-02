@@ -25,7 +25,7 @@ def sample_class_balanced_data(class_data, split_ratio):
         num_samples = len(samples)
         split_idx = int(num_samples * split_ratio)
         if split_idx < 10:
-            split_idx = num_samples
+            split_idx = num_samples // 2
 
         shuffled_indices = np.random.permutation(num_samples)
 
