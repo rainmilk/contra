@@ -17,8 +17,21 @@ from train_test import model_train, model_test, model_forward
 from configs import settings
 
 
-def train_teacher_model(args, step, num_classes, teacher_model, teacher_opt, teacher_lr_scheduler, teacher_criterion,
-                        save_path, mean=None, std=None, train_dataloader=None, test_dataloader=None, test_per_it=1):
+def train_teacher_model(
+    args,
+    step,
+    num_classes,
+    teacher_model,
+    teacher_opt,
+    teacher_lr_scheduler,
+    teacher_criterion,
+    save_path,
+    mean=None,
+    std=None,
+    train_dataloader=None,
+    test_dataloader=None,
+    test_per_it=1,
+):
 
     case = settings.get_case(args.noise_ratio, args.noise_type, args.balanced)
     if train_dataloader is None:
@@ -66,9 +79,24 @@ def train_teacher_model(args, step, num_classes, teacher_model, teacher_opt, tea
     )
 
 
-def iterate_repair_model(working_model, working_opt, working_lr_schedule, working_criterion,
-                         teacher_model, teacher_opt, teacher_lr_schedule, teacher_criterion,
-                         inc_data, inc_labels, inc_dataloader, num_classes, mean, std, device, args):
+def iterate_repair_model(
+    working_model,
+    working_opt,
+    working_lr_schedule,
+    working_criterion,
+    teacher_model,
+    teacher_opt,
+    teacher_lr_schedule,
+    teacher_criterion,
+    inc_data,
+    inc_labels,
+    inc_dataloader,
+    num_classes,
+    mean,
+    std,
+    device,
+    args,
+):
     working_inc_predicts, working_inc_probs = model_forward(
         inc_dataloader, working_model
     )
@@ -76,7 +104,7 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
         inc_dataloader, teacher_model, output_embedding=False
     )
 
-    '''1. Unlearning confident disagreement data'''
+    """1. Unlearning confident disagreement data"""
     disagree_threshold = 0.6
     disagree_idx = working_inc_predicts != teacher_inc_predicts
     disagree_data = inc_data[disagree_idx]
@@ -86,8 +114,10 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
     teacher_disagree_preds = teacher_inc_predicts[disagree_idx]
     teacher_disagree_probs_max = np.max(teacher_disagree_probs, axis=-1)
     worker_disagree_probs_max = np.max(worker_disagree_probs, axis=-1)
-    disagree_conf_idx = np.logical_and(worker_disagree_probs_max >= disagree_threshold,
-                         teacher_disagree_probs_max >= disagree_threshold)
+    disagree_conf_idx = np.logical_and(
+        worker_disagree_probs_max >= disagree_threshold,
+        teacher_disagree_probs_max >= disagree_threshold,
+    )
 
     mix_data = disagree_data[disagree_conf_idx]
     loss_lambda = -0.2  # Gradient Ascend
@@ -98,9 +128,12 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
     if unlearn_worker and len(mix_worker_labels) > 0:
         print("Unlearning high-confidence workers...")
 
-        forget_dataset = NormalizeDataset(mix_data, mix_worker_labels, mean=mean, std=std)
-        forget_dataloader_shuffled = DataLoader(forget_dataset, batch_size=args.batch_size, drop_last=False,
-                                                shuffle=True)
+        forget_dataset = NormalizeDataset(
+            mix_data, mix_worker_labels, mean=mean, std=std
+        )
+        forget_dataloader_shuffled = DataLoader(
+            forget_dataset, batch_size=args.batch_size, drop_last=False, shuffle=True
+        )
         model_train(
             forget_dataloader_shuffled,
             working_model,
@@ -110,16 +143,19 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
             args.num_epochs,
             args,
             device=device,
-            loss_lambda=loss_lambda
+            loss_lambda=loss_lambda,
         )
 
     unlearn_teacher = False
     mix_teacher_labels = teacher_disagree_preds[disagree_conf_idx]
     mix_teacher_labels = label_smooth(mix_teacher_labels, num_classes, gamma=0.3)
     if unlearn_teacher and len(mix_teacher_labels) > 0:
-        forget_dataset = NormalizeDataset(mix_data, mix_teacher_labels, mean=mean, std=std)
-        forget_dataloader_shuffled = DataLoader(forget_dataset, batch_size=args.batch_size, drop_last=False,
-                                                shuffle=True)
+        forget_dataset = NormalizeDataset(
+            mix_data, mix_teacher_labels, mean=mean, std=std
+        )
+        forget_dataloader_shuffled = DataLoader(
+            forget_dataset, batch_size=args.batch_size, drop_last=False, shuffle=True
+        )
         model_train(
             forget_dataloader_shuffled,
             teacher_model,
@@ -129,10 +165,10 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
             args.num_epochs,
             args,
             device=device,
-            loss_lambda=loss_lambda
+            loss_lambda=loss_lambda,
         )
 
-    '''2. Refine low-confidence agreement and disagreement data'''
+    """2. Refine low-confidence agreement and disagreement data"""
     cutoff = 0.2
     alpha = 0.6
     agree_threshold = 0.65
@@ -143,7 +179,9 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
     agree_predicts = teacher_inc_predicts[agree_idx]
     teacher_agree_probs_max = np.max(teacher_agree_probs, axis=-1)
     worker_agree_probs_max = np.max(worker_agree_probs, axis=-1)
-    joint_agree_score_max = alpha * teacher_agree_probs_max + (1-alpha) * worker_agree_probs_max
+    joint_agree_score_max = (
+        alpha * teacher_agree_probs_max + (1 - alpha) * worker_agree_probs_max
+    )
     sample_size = round(len(joint_agree_score_max) * cutoff)
     sample_idx = np.argpartition(joint_agree_score_max, -sample_size)[-sample_size:]
     conf_idx = joint_agree_score_max >= agree_threshold
@@ -161,8 +199,12 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
     teacher_disagree_lc_probs = teacher_disagree_probs[~disagree_conf_idx]
     teacher_agree_lc_probs = teacher_agree_probs[~conf_idx]
 
-    disagree_mix_labels = alpha * teacher_disagree_lc_probs + (1-alpha) * worker_disagree_lc_probs
-    agree_mix_labels = alpha * teacher_agree_lc_probs + (1 - alpha) * worker_agree_lc_probs
+    disagree_mix_labels = (
+        alpha * teacher_disagree_lc_probs + (1 - alpha) * worker_disagree_lc_probs
+    )
+    agree_mix_labels = (
+        alpha * teacher_agree_lc_probs + (1 - alpha) * worker_agree_lc_probs
+    )
     if len(disagree_mix_labels) > 0:
         print("Mix up lower confidence worker...")
 
@@ -204,11 +246,15 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
             device=device,
         )
 
-    '''3. Refine high-confidence agreement data by label smoothing'''
+    """3. Refine high-confidence agreement data by label smoothing"""
     print("Refine high-confidence worker...")
     conf_agree_probs = label_smooth(conf_agree_labels, num_classes, gamma=0.3)
-    conf_dataset = NormalizeDataset(conf_agree_data, conf_agree_probs, mean=mean, std=std)
-    conf_data_loader = DataLoader(conf_dataset, batch_size=args.batch_size, drop_last=True, shuffle=True)
+    conf_dataset = NormalizeDataset(
+        conf_agree_data, conf_agree_probs, mean=mean, std=std
+    )
+    conf_data_loader = DataLoader(
+        conf_dataset, batch_size=args.batch_size, drop_last=True, shuffle=True
+    )
 
     model_train(
         conf_data_loader,
@@ -218,7 +264,7 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
         working_criterion,
         args.num_epochs,
         args,
-        device=device
+        device=device,
     )
 
     model_train(
@@ -229,7 +275,7 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
         teacher_criterion,
         args.num_epochs,
         args,
-        device=device
+        device=device,
     )
 
 
@@ -243,7 +289,7 @@ def mix_up_dataloader(
     batch_size,
     alpha=1.0,
     transforms=None,
-    shuffle=True
+    shuffle=True,
 ):
     mixed_dataset = MixupDataset(
         data_pair=(inc_data, aug_data),
@@ -252,7 +298,7 @@ def mix_up_dataloader(
         transforms=transforms,
         mean=mean,
         std=std,
-        first_max=True
+        first_max=True,
     )
     return DataLoader(mixed_dataset, batch_size, drop_last=False, shuffle=shuffle)
 
@@ -289,10 +335,23 @@ def execute(args):
     uni_name = getattr(args, "uni_name", None)
     spec_norm = not args.no_spnorm
 
-    working_model_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="inc_train") # model_paths["working_model_path"]
-    working_model_repair_save_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="restore", unique_name=uni_name)
-    teacher_model_path = settings.get_ckpt_path(args.dataset, "pretrain", args.model, model_suffix="pretrain")
-    teacher_model_repair_save_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="teacher_restore", step=step, unique_name=uni_name)
+    working_model_path = settings.get_ckpt_path(
+        args.dataset, case, args.model, model_suffix="inc_train"
+    )  # model_paths["working_model_path"]
+    working_model_repair_save_path = settings.get_ckpt_path(
+        args.dataset, case, args.model, model_suffix="restore", unique_name=uni_name
+    )
+    teacher_model_path = settings.get_ckpt_path(
+        args.dataset, "pretrain", args.model, model_suffix="pretrain"
+    )
+    teacher_model_repair_save_path = settings.get_ckpt_path(
+        args.dataset,
+        case,
+        args.model,
+        model_suffix="teacher_restore",
+        step=step,
+        unique_name=uni_name,
+    )
 
     mean, std = None, None
 
@@ -340,8 +399,7 @@ def execute(args):
 
     checkpoint = torch.load(teacher_model_path)
     teacher_model.load_state_dict(checkpoint, strict=False)
-    print('load teacher model from :', teacher_model_path)
-
+    print("load teacher model from :", teacher_model_path)
 
     # 3. 迭代修复过程
     # (1) 测试修复前 Dts 在 Mp 的表现
@@ -360,7 +418,14 @@ def execute(args):
 
     # (2) 构造修复过程数据集: Dtr、 Da、Dts
     inc_data, inc_labels, inc_dataloader = get_dataset_loader(
-        args.dataset, ["train_clean", "train_noisy"], case, step, mean, std, args.batch_size, shuffle=False
+        args.dataset,
+        ["train_clean", "train_noisy"],
+        case,
+        step,
+        mean,
+        std,
+        args.batch_size,
+        shuffle=False,
     )
 
     # (3) 迭代修复过程：根据 Dtr 迭代 Mp 、 Mt
@@ -368,31 +433,45 @@ def execute(args):
     best_teacher = 0
     for i in range(repair_iter_num):
         print("-----------restore iterate %d ----------------------" % i)
-        iterate_repair_model(working_model, working_opt, working_lr_scheduler, working_criterion,
-                             teacher_model, teacher_opt, teacher_lr_scheduler, teacher_criterion,
-                             inc_data, inc_labels, inc_dataloader,
-                             num_classes, mean, std, device, args)
-
-        working_model_evals = model_test(
-            test_dataloader, working_model, device=device
+        iterate_repair_model(
+            working_model,
+            working_opt,
+            working_lr_scheduler,
+            working_criterion,
+            teacher_model,
+            teacher_opt,
+            teacher_lr_scheduler,
+            teacher_criterion,
+            inc_data,
+            inc_labels,
+            inc_dataloader,
+            num_classes,
+            mean,
+            std,
+            device,
+            args,
         )
+
+        working_model_evals = model_test(test_dataloader, working_model, device=device)
         if best_worker < working_model_evals["global"]:
             best_worker = working_model_evals["global"]
             os.makedirs(os.path.dirname(working_model_repair_save_path), exist_ok=True)
             torch.save(working_model.state_dict(), working_model_repair_save_path)
             print(f"Worker model has saved to {working_model_repair_save_path}.")
 
-        teacher_model_evals = model_test(
-            test_dataloader, teacher_model, device=device
-        )
+        teacher_model_evals = model_test(test_dataloader, teacher_model, device=device)
         if best_teacher < teacher_model_evals["global"]:
             best_teacher = teacher_model_evals["global"]
             os.makedirs(os.path.dirname(teacher_model_repair_save_path), exist_ok=True)
             torch.save(teacher_model.state_dict(), teacher_model_repair_save_path)
             print(f"Teacher model has saved to {teacher_model_repair_save_path}.")
 
-    logging.info(f"Test results before restore: Worker: {working_model_test_before}, Teacher: {teacher_model_test_before}")
-    logging.info(f"Test results after restore: Worker: {working_model_evals}, Teacher: {teacher_model_evals}")
+    logging.info(
+        f"Test results before restore: Worker: {working_model_test_before}, Teacher: {teacher_model_test_before}"
+    )
+    logging.info(
+        f"Test results after restore: Worker: {working_model_evals}, Teacher: {teacher_model_evals}"
+    )
 
 
 if __name__ == "__main__":
