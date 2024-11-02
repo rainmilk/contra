@@ -152,9 +152,7 @@ def test_model(model, test_loader, criterion, device, epoch):
     correct_test = 0
     total_test = 0
     with torch.no_grad():
-        with tqdm(
-                total=len(test_loader), desc=f"Epoch {epoch + 1} Testing"
-        ) as pbar:
+        with tqdm(total=len(test_loader), desc=f"Epoch {epoch + 1} Testing") as pbar:
             for test_inputs, test_targets in test_loader:
                 test_inputs, test_targets = test_inputs.to(device), test_targets.to(
                     device
@@ -174,6 +172,7 @@ def test_model(model, test_loader, criterion, device, epoch):
     test_accuracy = 100 * correct_test / total_test
     print(f"Test Accuracy after Epoch {epoch + 1}: {test_accuracy:.2f}%")
     return test_accuracy, test_loss  # 返回准确率，以用于 early stopping 机制
+
 
 def train_model(
     model,
@@ -243,11 +242,7 @@ def train_model(
 
     test_dataset = BaseTensorDataset(test_data, test_labels)
     # test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
-    test_loader = DataLoader(
-        test_dataset,
-        batch_size=batch_size,
-        shuffle=False
-    )
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     # 用于存储训练和测试的损失和准确率
     train_losses = []
@@ -268,19 +263,19 @@ def train_model(
         # tqdm 进度条显示
         with tqdm(total=len(dataloader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for inputs, targets in dataloader:
-                if data_aug:
-                    transform = np.random.choice([mixup_transform, cutmix_transform])
-                    inputs, targets = transform(inputs, targets)
 
-                targets = targets.to(torch.long)
-                
                 last_input, last_labels = inputs, targets
                 if len(targets) == 1:
                     last_input[-1] = inputs
                     last_labels[-1] = targets
                     inputs, targets = last_input, last_labels
 
+                targets = targets.to(torch.long)
                 
+                if data_aug:
+                    transform = np.random.choice([mixup_transform, cutmix_transform])
+                    inputs, targets = transform(inputs, targets)
+
                 inputs, targets = inputs.to(device), targets.to(device)
 
                 optimizer.zero_grad()
@@ -313,7 +308,9 @@ def train_model(
             writer.add_scalar("Train/Accuracy", accuracy * 100, epoch)
 
         # 测试集评估
-        test_accuracy, test_loss = test_model(model, test_loader, criterion, device, epoch)
+        test_accuracy, test_loss = test_model(
+            model, test_loader, criterion, device, epoch
+        )
         test_accuracies.append(test_accuracy)
 
         if writer:
