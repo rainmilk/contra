@@ -13,17 +13,13 @@ def execute(args):
     case = settings.get_case(
         args.noise_ratio, args.noise_type
     )
-    uni_name = args.uni_name
+    uni_names = args.uni_name
+    uni_names = [uni_names] if uni_names is None else uni_names.split(',')
+
     num_classes = settings.num_classes_dict[args.dataset]
 
     loaded_model = load_custom_model(args.model, num_classes, load_pretrained=False)
-    model_ckpt_path = settings.get_ckpt_path(args.dataset, case, args.model,
-                                             model_suffix=args.model_suffix, unique_name=uni_name)
     model = ClassifierWrapper(loaded_model, num_classes)
-
-    print(f"Loading model from {model_ckpt_path}")
-    checkpoint = torch.load(model_ckpt_path)
-    model.load_state_dict(checkpoint, strict=False)
 
     _, _, test_loader = get_dataset_loader(
         args.dataset,
@@ -33,7 +29,14 @@ def execute(args):
         shuffle=False,
     )
 
-    results, embedding = model_test(test_loader, model)
+    for uni_name in uni_names:
+        print(f"Evaluating {uni_name}:")
+        model_ckpt_path = settings.get_ckpt_path(args.dataset, case, args.model,
+                                                 model_suffix=args.model_suffix, unique_name=uni_name)
+        print(f"Loading model from {model_ckpt_path}")
+        checkpoint = torch.load(model_ckpt_path)
+        model.load_state_dict(checkpoint, strict=False)
+        results, embedding = model_test(test_loader, model)
 
 
 def model_test(data_loader, model, device="cuda"):
@@ -44,7 +47,7 @@ def model_test(data_loader, model, device="cuda"):
 
     # global acc
     global_acc = np.mean(predicts == labels)
-    print("test_acc: %.2f" % (global_acc * 100))
+    print("Global acc: %.2f" % (global_acc * 100))
     eval_results["global"] = global_acc.item()
 
     # class acc
