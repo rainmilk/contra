@@ -44,7 +44,7 @@ def train_teacher_model(
             std,
             args.batch_size,
             num_classes=num_classes,
-            drop_last=True,
+            drop_last=False,
             shuffle=True,
             onehot_enc=False,
         )
@@ -253,7 +253,7 @@ def iterate_repair_model(
         conf_agree_data, conf_agree_probs, mean=mean, std=std
     )
     conf_data_loader = DataLoader(
-        conf_dataset, batch_size=args.batch_size, drop_last=True, shuffle=True
+        conf_dataset, batch_size=args.batch_size, drop_last=False, shuffle=True
     )
 
     model_train(
