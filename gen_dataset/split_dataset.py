@@ -6,7 +6,7 @@ import numpy as np
 import torch
 
 
-def split_by_class(data, labels, num_classes=100):
+def split_by_class(data, labels, num_classes=1000):
     """按类别划分数据集"""
     class_data = {i: [] for i in range(num_classes)}
     for i, label in enumerate(labels):
@@ -42,7 +42,7 @@ def sample_class_balanced_data(class_data, split_ratio):
     return D_0_data, D_0_labels, D_inc_data, D_inc_labels
 
 
-def sample_replay_data(D_0_data, D_0_labels, replay_ratio, num_classes=100):
+def sample_replay_data(D_0_data, D_0_labels, replay_ratio, num_classes=1000):
     """从 D_0 中均衡抽取样本作为重放数据集 D_a"""
     class_data = split_by_class(D_0_data, D_0_labels, num_classes)
     D_a_data = []
@@ -61,7 +61,7 @@ def sample_replay_data(D_0_data, D_0_labels, replay_ratio, num_classes=100):
 
     return D_a_data, D_a_labels
 
-def split(dataset_name, case, train_dataset=None, test_dataset=None, num_classes=100):
+def split(dataset_name, case, train_dataset=None, test_dataset=None, num_classes=1000):
     rawcase = None
     train_data_path = settings.get_dataset_path(dataset_name, rawcase, "train_data")
     train_label_path = settings.get_dataset_path(dataset_name, rawcase, "train_label")
@@ -95,7 +95,7 @@ def split(dataset_name, case, train_dataset=None, test_dataset=None, num_classes
 
         # 构建重放数据集 D_a（从 D_0 中随机抽取 10% 的样本）
         D_a_data, D_a_labels = sample_replay_data(
-            D_0_data, D_0_labels, replay_ratio=0.1
+            D_0_data, D_0_labels, replay_ratio=0.1, num_classes=num_classes
         )
 
         subdir = os.path.dirname(train_data_path)
@@ -148,7 +148,7 @@ def split(dataset_name, case, train_dataset=None, test_dataset=None, num_classes
     return np.load(inc_data_path), np.load(inc_label_path)
 
 
-def split_data(dataset_name, train_dataset=None, test_dataset=None, num_classes=100, split_ratio=0.5):
+def split_data(dataset_name, train_dataset=None, test_dataset=None, num_classes=1000, split_ratio=0.5):
     rawcase = None
     train_data_path = settings.get_dataset_path(dataset_name, rawcase, "train_data")
     train_label_path = settings.get_dataset_path(dataset_name, rawcase, "train_label")
@@ -182,7 +182,7 @@ def split_data(dataset_name, train_dataset=None, test_dataset=None, num_classes=
 
         # 构建重放数据集 D_a（从 D_0 中随机抽取 10% 的样本）
         D_a_data, D_a_labels = sample_replay_data(
-            D_0_data, D_0_labels, replay_ratio=0.1
+            D_0_data, D_0_labels, replay_ratio=0.1, num_classes=num_classes
         )
 
         subdir = os.path.dirname(train_data_path)
