@@ -12,7 +12,7 @@ from core_model.train_test import model_forward
 def execute(args):
     case = settings.get_case(args.noise_ratio, args.noise_type)
     uni_names = args.uni_name
-    uni_names = [uni_names] if uni_names is None else uni_names.split(',')
+    uni_names = [uni_names] if uni_names is None else uni_names.split(",")
     num_classes = settings.num_classes_dict[args.dataset]
 
     loaded_model = load_custom_model(args.model, num_classes, load_pretrained=False)
@@ -28,8 +28,13 @@ def execute(args):
 
     for uni_name in uni_names:
         print(f"Evaluating {uni_name}:")
-        model_ckpt_path = settings.get_ckpt_path(args.dataset, case, args.model,
-                                                 model_suffix=args.model_suffix, unique_name=uni_name)
+        model_ckpt_path = settings.get_ckpt_path(
+            args.dataset,
+            case,
+            args.model,
+            model_suffix=args.model_suffix,
+            unique_name=uni_name,
+        )
         print(f"Loading model from {model_ckpt_path}")
         checkpoint = torch.load(model_ckpt_path)
         model.load_state_dict(checkpoint, strict=False)
