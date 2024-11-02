@@ -66,8 +66,8 @@ def train_teacher_model(args, step, num_classes, teacher_model, teacher_opt, tea
     )
 
 
-def iterate_repair_model(working_model, working_opt, working_lr_schedule, working_criterion, working_model_save_path,
-                         teacher_model, teacher_opt, teacher_lr_schedule, teacher_criterion, teacher_model_save_path,
+def iterate_repair_model(working_model, working_opt, working_lr_schedule, working_criterion,
+                         teacher_model, teacher_opt, teacher_lr_schedule, teacher_criterion,
                          inc_data, inc_labels, inc_dataloader, num_classes, mean, std, device, args):
     working_inc_predicts, working_inc_probs = model_forward(
         inc_dataloader, working_model
@@ -218,8 +218,7 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
         working_criterion,
         args.num_epochs,
         args,
-        device=device,
-        save_path=working_model_save_path,
+        device=device
     )
 
     model_train(
@@ -230,8 +229,7 @@ def iterate_repair_model(working_model, working_opt, working_lr_schedule, workin
         teacher_criterion,
         args.num_epochs,
         args,
-        device=device,
-        save_path=teacher_model_save_path,
+        device=device
     )
 
 
@@ -293,7 +291,7 @@ def execute(args):
 
     working_model_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="inc_train") # model_paths["working_model_path"]
     working_model_repair_save_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="restore", unique_name=uni_name)
-    lip_teacher_model_path = settings.get_ckpt_path(args.dataset, "pretrain", args.model, model_suffix="pretrain")
+    teacher_model_path = settings.get_ckpt_path(args.dataset, "pretrain", args.model, model_suffix="pretrain")
     teacher_model_repair_save_path = settings.get_ckpt_path(args.dataset, case, args.model, model_suffix="teacher_restore", step=step, unique_name=uni_name)
 
     mean, std = None, None
@@ -340,9 +338,9 @@ def execute(args):
     working_model.load_state_dict(checkpoint, strict=False)
     # working_model.to(device)
 
-    checkpoint = torch.load(lip_teacher_model_path)
+    checkpoint = torch.load(teacher_model_path)
     teacher_model.load_state_dict(checkpoint, strict=False)
-    print('load teacher model from :', lip_teacher_model_path)
+    print('load teacher model from :', teacher_model_path)
 
 
     # 3. 迭代修复过程
@@ -366,25 +364,35 @@ def execute(args):
     )
 
     # (3) 迭代修复过程：根据 Dtr 迭代 Mp 、 Mt
-    conf_data, conf_labels = None, None
+    best_worker = 0
+    best_teacher = 0
     for i in range(repair_iter_num):
         print("-----------restore iterate %d ----------------------" % i)
-        iterate_repair_model(working_model, working_opt, working_lr_scheduler,
-                             working_criterion, working_model_repair_save_path,
-                             teacher_model, teacher_opt, teacher_lr_scheduler,
-                             teacher_criterion, teacher_model_repair_save_path,
+        iterate_repair_model(working_model, working_opt, working_lr_scheduler, working_criterion,
+                             teacher_model, teacher_opt, teacher_lr_scheduler, teacher_criterion,
                              inc_data, inc_labels, inc_dataloader,
                              num_classes, mean, std, device, args)
 
-        working_model_after_repair = model_test(
+        working_model_evals = model_test(
             test_dataloader, working_model, device=device
         )
-        teacher_model_after_repair = model_test(
+        if best_worker < working_model_evals["global"]:
+            best_worker = working_model_evals["global"]
+            os.makedirs(os.path.dirname(working_model_repair_save_path), exist_ok=True)
+            torch.save(working_model.state_dict(), working_model_repair_save_path)
+            print(f"Worker model has saved to {working_model_repair_save_path}.")
+
+        teacher_model_evals = model_test(
             test_dataloader, teacher_model, device=device
         )
+        if best_teacher < teacher_model_evals["global"]:
+            best_teacher = teacher_model_evals["global"]
+            os.makedirs(os.path.dirname(teacher_model_repair_save_path), exist_ok=True)
+            torch.save(teacher_model.state_dict(), teacher_model_repair_save_path)
+            print(f"Teacher model has saved to {teacher_model_repair_save_path}.")
 
     logging.info(f"Test results before restore: Worker: {working_model_test_before}, Teacher: {teacher_model_test_before}")
-    logging.info(f"Test results after restore: Worker: {working_model_after_repair}, Teacher: {teacher_model_after_repair}")
+    logging.info(f"Test results after restore: Worker: {working_model_evals}, Teacher: {teacher_model_evals}")
 
 
 if __name__ == "__main__":
