@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch
 from torchvision import models
 from core_model.wideresidual import wideresnet
-from core_model.resnet import resnet18
+from core_model.resnet import resnet18, resnet34, resnet50, resnet101
 
 
 def load_custom_model(model_name, num_classes, load_pretrained=True, ckpt_path=None):
@@ -31,16 +31,20 @@ def load_custom_model(model_name, num_classes, load_pretrained=True, ckpt_path=N
             model = models.wide_resnet50_2(weights=weights)
         else:
             model = models.wide_resnet50_2(num_classes=num_classes)
-    elif model_name == "cifar-resnet18":
-        model = resnet18(num_classes=num_classes)
-    elif model_name == "cifar-wideresnet40":
-        model = wideresnet(num_classes=num_classes)
     elif model_name == "vgg19":
         if load_pretrained:
             weights = models.VGG19_BN_Weights.DEFAULT
             model = models.vgg19_bn(weights=weights)
         else:
             model = models.vgg19_bn(num_classes=num_classes)
+    elif model_name == "cifar-resnet18":
+        model = resnet18(num_classes=num_classes)
+    elif model_name == "cifar-resnet50":
+        model = resnet50(num_classes=num_classes)
+    elif model_name == "cifar-resnet101":
+        model = resnet101(num_classes=num_classes)
+    elif model_name == "cifar-wideresnet40":
+        model = wideresnet(num_classes=num_classes)
     else:
         model = None
 
