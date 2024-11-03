@@ -4,6 +4,7 @@ import argparse
 
 import torch
 import torch.nn as nn
+from torch import optim
 from torch.utils.data import DataLoader
 import numpy as np
 import sys
@@ -88,6 +89,8 @@ def iterate_repair_model(
     teacher_opt,
     teacher_lr_schedule,
     teacher_criterion,
+    unlearn_opt,
+    unlearn_lr_schedule,
     inc_data,
     inc_labels,
     inc_dataloader,
@@ -95,8 +98,7 @@ def iterate_repair_model(
     mean,
     std,
     device,
-    args,
-    ga_loss_alpha  # Gradient Ascend
+    args
 ):
     working_inc_predicts, working_inc_probs = model_forward(
         inc_dataloader, working_model
@@ -106,7 +108,7 @@ def iterate_repair_model(
     )
 
     """1. Unlearning confident disagreement data"""
-    disagree_threshold = 0.6
+    disagree_threshold = 0.65
     tradeoff_alpha = 0.65
     disagree_idx = working_inc_predicts != teacher_inc_predicts
     disagree_data = inc_data[disagree_idx]
@@ -123,8 +125,9 @@ def iterate_repair_model(
     mix_data = disagree_data[disagree_conf_idx]
 
     unlearn_worker = True
+    ga_loss_alpha = -1.0  # GA
     mix_worker_labels = worker_disagree_preds[disagree_conf_idx]
-    mix_worker_labels = label_smooth(mix_worker_labels, num_classes, gamma=0.2)
+    mix_worker_labels = label_smooth(mix_worker_labels, num_classes, gamma=0.4)
     if unlearn_worker and len(mix_worker_labels) > 0:
         print("Unlearning high-confidence for worker model...")
 
@@ -137,8 +140,8 @@ def iterate_repair_model(
         model_train(
             forget_dataloader_shuffled,
             working_model,
-            working_opt,
-            working_lr_schedule,
+            unlearn_opt,
+            unlearn_lr_schedule,
             working_criterion,
             args.num_epochs,
             args,
@@ -146,32 +149,32 @@ def iterate_repair_model(
             loss_lambda=ga_loss_alpha,
         )
 
-    unlearn_teacher = False
-    mix_teacher_labels = teacher_disagree_preds[disagree_conf_idx]
-    mix_teacher_labels = label_smooth(mix_teacher_labels, num_classes, gamma=0.3)
-    if unlearn_teacher and len(mix_teacher_labels) > 0:
-        print("Unlearning high-confidence for worker model...")
-
-        forget_dataset = NormalizeDataset(
-            mix_data, mix_teacher_labels, mean=mean, std=std
-        )
-        forget_dataloader_shuffled = DataLoader(
-            forget_dataset, batch_size=args.batch_size, drop_last=False, shuffle=True
-        )
-        model_train(
-            forget_dataloader_shuffled,
-            teacher_model,
-            teacher_opt,
-            teacher_lr_schedule,
-            teacher_criterion,
-            args.num_epochs,
-            args,
-            device=device,
-            loss_lambda=ga_loss_alpha,
-        )
+    # unlearn_teacher = False
+    # mix_teacher_labels = teacher_disagree_preds[disagree_conf_idx]
+    # mix_teacher_labels = label_smooth(mix_teacher_labels, num_classes, gamma=0.3)
+    # if unlearn_teacher and len(mix_teacher_labels) > 0:
+    #     print("Unlearning high-confidence for worker model...")
+    #
+    #     forget_dataset = NormalizeDataset(
+    #         mix_data, mix_teacher_labels, mean=mean, std=std
+    #     )
+    #     forget_dataloader_shuffled = DataLoader(
+    #         forget_dataset, batch_size=args.batch_size, drop_last=False, shuffle=True
+    #     )
+    #     model_train(
+    #         forget_dataloader_shuffled,
+    #         teacher_model,
+    #         teacher_opt,
+    #         teacher_lr_schedule,
+    #         teacher_criterion,
+    #         args.num_epochs,
+    #         args,
+    #         device=device,
+    #         loss_lambda=ga_loss_alpha,
+    #     )
 
     """2. Refine low-confidence agreement and disagreement data"""
-    cutoff = 0.25
+    cutoff = 0.2
     agree_threshold = 0.65
     agree_idx = working_inc_predicts == teacher_inc_predicts
     agree_data = inc_data[agree_idx]
@@ -205,12 +208,12 @@ def iterate_repair_model(
     agree_mix_labels = (
         tradeoff_alpha * teacher_agree_lc_probs + (1 - tradeoff_alpha) * worker_agree_lc_probs
     )
+    # agree_mix_labels = sharpen(agree_mix_labels, T=0.8)
     if len(disagree_mix_labels) > 0:
         print("Mix up lower confidence for worker model...")
 
         mix_lc_data = np.concatenate([disagree_mix_data, agree_mix_data], axis=0)
         mix_lc_label = np.concatenate([disagree_mix_labels, agree_mix_labels], axis=0)
-
         mix_dataloader_shuffled = mix_up_dataloader(
             mix_lc_data,
             mix_lc_label,
@@ -385,9 +388,14 @@ def execute(args):
     )
     teacher_criterion = nn.CrossEntropyLoss()
 
-    aux_data, aux_labels, aux_dataloader = get_dataset_loader(
-        args.dataset, "aux", None, None, mean, std, args.batch_size, shuffle=False
-    )
+    ul_lr = 0.5 * learning_rate
+    unlearn_opt = optim.SGD(working_model.parameters(), lr=ul_lr)
+    unlearn_lr_scheduler = optim.lr_scheduler.ConstantLR(unlearn_opt, factor=0.9, total_iters=args.num_epochs)
+
+
+    # aux_data, aux_labels, aux_dataloader = get_dataset_loader(
+    #     args.dataset, "aux", None, None, mean, std, args.batch_size, shuffle=False
+    # )
 
     test_data, test_labels, test_dataloader = get_dataset_loader(
         args.dataset, "test", None, None, mean, std, args.batch_size, shuffle=False
@@ -443,6 +451,8 @@ def execute(args):
             teacher_opt,
             teacher_lr_scheduler,
             teacher_criterion,
+            unlearn_opt,
+            unlearn_lr_scheduler,
             inc_data,
             inc_labels,
             inc_dataloader,
@@ -450,8 +460,7 @@ def execute(args):
             mean,
             std,
             device,
-            args,
-            ga_loss_alpha
+            args
         )
 
         working_model_evals = model_test(test_dataloader, working_model, device=device)
