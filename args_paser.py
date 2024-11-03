@@ -297,6 +297,13 @@ def make_arg_parser(parser=None):
         help="Scale the working model lr",
     )
 
+    parser.add_argument(
+        "--ls_gamma",
+        type=float,
+        default=0.3,
+        help="Label smoothing factor",
+    )
+
     # 捕获其他 kwargs
     parser.add_argument(
         "--kwargs", nargs="*", help="Additional key=value arguments for hyperparameters"

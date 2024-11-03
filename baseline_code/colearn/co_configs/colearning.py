@@ -1,5 +1,5 @@
 config = {
-    'algorithm': 'colearning',
+    'algorithm': 'Colearning',
     # dataset param
     'dataset': 'cifar-10',
     'input_channel': 3,

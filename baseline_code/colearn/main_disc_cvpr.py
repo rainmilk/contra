@@ -52,6 +52,8 @@ def main():
     # 根据 uni_name 动态加载对应的配置文件
     config_modules = {
         "DISC": "co_configs.DISC",
+        "ELR": "co_configs.ELR",
+        "GJS": "co_configs.GJS",
     }
 
     if uni_name not in config_modules:
@@ -60,20 +62,11 @@ def main():
     # 动态导入配置模块
     config_module = importlib.import_module(config_modules[uni_name])
     config = config_module.config
+    config.update(custom_args.__dict__)
+    config["lr"] = config["learning_rate"]
+    config["epoch"] = config["num_epochs"]
 
     set_seed(config["seed"])
-
-    # 根据配置中的算法选择对应的模型
-    if config["algorithm"] == "DISC":
-        model = algorithms.DISC(
-            config, input_channel=config["input_channel"], num_classes=num_classes
-        )
-    else:
-        model = algorithms.__dict__[config["algorithm"]](
-            config,
-            input_channel=config["input_channel"],
-            num_classes=num_classes,
-        )
 
     # get corrected dataset and model path
     _, _, trainloader = get_dataset_loader(
@@ -109,25 +102,17 @@ def main():
     )
     # checkpoint = torch.load(load_model_path)
 
-    model.set_config(trainloader.dataset, num_classes)
-    model.epochs = custom_args.num_epochs
-
     loaded_model = load_custom_model(
         custom_args.model, num_classes, load_pretrained=False
     )
-    model.model_scratch = ClassifierWrapper(loaded_model, num_classes)
-    model.optimizer = optim.AdamW(
-        model.model_scratch.parameters(),
-        lr=custom_args.learning_rate,
-        weight_decay=custom_args.weight_decay,
-    )
-    model.scheduler = optim.lr_scheduler.ConstantLR(
-        model.optimizer, factor=0.95, total_iters=custom_args.num_epochs
-    )
-
+    model_scratch = ClassifierWrapper(loaded_model, num_classes)
     checkpoint = torch.load(load_model_path)
-    model.model_scratch.load_state_dict(checkpoint, strict=False)
-    model.model_scratch.to(device)
+    model_scratch.load_state_dict(checkpoint, strict=False)
+    model_scratch.to(device)
+
+    # 根据配置中的算法选择对应的模型
+    model = algorithms.__dict__[config["algorithm"]](model_scratch)
+    model.set_optimizer(trainloader.dataset, num_classes, config)
 
     epoch = 0
     # evaluate models with random weights

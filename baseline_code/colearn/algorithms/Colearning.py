@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-from models import Model_r18
 from tqdm import tqdm
 from torch.distributions.beta import Beta
 from torchvision import models
@@ -23,12 +22,14 @@ from losses import loss_structrue_t
 
 class Colearning:
     def __init__(
-            self, 
-            config: dict = None, 
-            input_channel: int = 3, 
-            num_classes: int = 10,
-        ):
+            self,
+            model1=None,
+            model2=None
+    ):
+        self.model1 = model1
+        self.model2 = model2
 
+    def set_optimizer(self, dataset, num_classes, config):
         self.batch_size = config['batch_size']
         self.lr = config['lr']
 
@@ -39,17 +40,15 @@ class Colearning:
         self.beta1_plan = [mom1] * config['epochs']
 
         for i in range(config['epoch_decay_start'], config['epochs']):
-            self.alpha_plan[i] = float(config['epochs'] - i) / (config['epochs'] - config['epoch_decay_start']) * self.lr
+            self.alpha_plan[i] = float(config['epochs'] - i) / (
+                        config['epochs'] - config['epoch_decay_start']) * self.lr
             self.beta1_plan[i] = mom2
 
         self.device = device
         self.epochs = config['epochs']
 
-        # scratch
-        self.model_scratch = Model_r18(feature_dim=config['feature_dim'], is_linear=True, num_classes=num_classes).to(device)
-
-        self.optimizer1 = torch.optim.Adam(self.model_scratch.parameters(), lr=self.lr)
-        self.optimizer2 = torch.optim.Adam(list(self.model_scratch.fc.parameters()), lr=self.lr / 5)
+        self.optimizer1 = torch.optim.Adam(self.model1.parameters(), lr=self.lr)
+        self.optimizer2 = torch.optim.Adam(list(self.model1.fc.parameters()), lr=self.lr / 5)
         self.adjust_lr = config['adjust_lr']
         self.ntxent = NTXentLoss(self.device, self.batch_size, temperature=0.5, use_cosine_similarity=True)
         self.param_v = None
@@ -69,13 +68,13 @@ class Colearning:
     def evaluate(self, test_loader):
         print('Evaluating ...')
 
-        self.model_scratch.eval()  # Change model to 'eval' mode
+        self.model1.eval()  # Change model to 'eval' mode
 
         correct2 = 0
         total2 = 0
         for images, labels in test_loader:
             images = Variable(images).to(self.device)
-            _, _, logits2 = self.model_scratch(images)
+            logits2 = self.model1(images)
 
             outputs2 = F.softmax(logits2, dim=1)
             _, pred2 = torch.max(outputs2.data, 1)
@@ -88,7 +87,7 @@ class Colearning:
     def train(self, train_loader, epoch):
         print('Training ...')
 
-        self.model_scratch.train()
+        self.model1.train()
 
         if self.adjust_lr:
             self.adjust_learning_rate(self.optimizer1, epoch)
@@ -101,7 +100,7 @@ class Colearning:
             labels = Variable(labels).to(self.device)
             raw = Variable(raw).to(self.device, non_blocking=True)
 
-            feat, outs, logits = self.model_scratch(raw)
+            feat, outs, logits = self.model1(raw)
             if self.param_v is None:
                 loss_feat = loss_structrue(outs.detach(), logits)
             else:
@@ -111,15 +110,15 @@ class Colearning:
             self.optimizer2.step()
 
             # Self-learning
-            out_1 = self.model_scratch(pos_1, ignore_feat=True, forward_fc=False)
-            out_2 = self.model_scratch(pos_2, ignore_feat=True, forward_fc=False)
+            out_1 = self.model1(pos_1, ignore_feat=True, forward_fc=False)
+            out_2 = self.model1(pos_2, ignore_feat=True, forward_fc=False)
             loss_con = self.ntxent(out_1, out_2)
 
-            feat, outs, logits = self.model_scratch(raw)
+            feat, outs, logits = self.model1(raw)
 
             # Supervised-learning
             inputs, targets_a, targets_b, lam = self.mixup_data(raw, labels, alpha=5.0)
-            _, logits = self.model_scratch(inputs, ignore_feat=True)
+            _, logits = self.model1(inputs, ignore_feat=True)
             loss_sup = self.mixup_criterion(logits, targets_a, targets_b, lam)
 
             # Loss

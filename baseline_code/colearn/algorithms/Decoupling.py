@@ -11,11 +11,13 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 class Decoupling:
     def __init__(
             self, 
-            config: dict = None, 
-            input_channel: int = 3, 
-            num_classes: int = 10,
+            model1=None,
+            model2=None
         ):
+        self.model1 = model1
+        self.model2 = model2
 
+    def set_optimizer(self, dataset, num_classes, config):
         self.lr = config['lr']
         # Adjust learning rate and betas for Adam Optimizer
         mom1 = 0.9
@@ -31,9 +33,6 @@ class Decoupling:
         self.epochs = config['epochs']
 
         # model
-        self.model1 = get_model(config['model1_type'], input_channel, num_classes, device)
-        self.model2 = get_model(config['model2_type'], input_channel, num_classes, device)
-
         self.optimizer = torch.optim.Adam(list(self.model1.parameters()) + list(self.model2.parameters()), lr=self.lr)
         self.loss_fn = torch.nn.CrossEntropyLoss()
         self.adjust_lr = config['adjust_lr']

@@ -96,6 +96,7 @@ def iterate_repair_model(
     std,
     device,
     args,
+    ga_loss_alpha  # Gradient Ascend
 ):
     working_inc_predicts, working_inc_probs = model_forward(
         inc_dataloader, working_model
@@ -106,6 +107,7 @@ def iterate_repair_model(
 
     """1. Unlearning confident disagreement data"""
     disagree_threshold = 0.6
+    tradeoff_alpha = 0.65
     disagree_idx = working_inc_predicts != teacher_inc_predicts
     disagree_data = inc_data[disagree_idx]
     teacher_disagree_probs = teacher_inc_probs[disagree_idx]
@@ -114,19 +116,17 @@ def iterate_repair_model(
     teacher_disagree_preds = teacher_inc_predicts[disagree_idx]
     teacher_disagree_probs_max = np.max(teacher_disagree_probs, axis=-1)
     worker_disagree_probs_max = np.max(worker_disagree_probs, axis=-1)
-    disagree_conf_idx = np.logical_and(
-        worker_disagree_probs_max >= disagree_threshold,
-        teacher_disagree_probs_max >= disagree_threshold,
-    )
+    joint_disagree_score_max = (tradeoff_alpha * worker_disagree_probs_max
+                                + (1 - tradeoff_alpha) * teacher_disagree_probs_max)
+    disagree_conf_idx = joint_disagree_score_max >= disagree_threshold
 
     mix_data = disagree_data[disagree_conf_idx]
-    loss_lambda = -0.2  # Gradient Ascend
 
     unlearn_worker = True
     mix_worker_labels = worker_disagree_preds[disagree_conf_idx]
     mix_worker_labels = label_smooth(mix_worker_labels, num_classes, gamma=0.2)
     if unlearn_worker and len(mix_worker_labels) > 0:
-        print("Unlearning high-confidence workers...")
+        print("Unlearning high-confidence for worker model...")
 
         forget_dataset = NormalizeDataset(
             mix_data, mix_worker_labels, mean=mean, std=std
@@ -143,13 +143,15 @@ def iterate_repair_model(
             args.num_epochs,
             args,
             device=device,
-            loss_lambda=loss_lambda,
+            loss_lambda=ga_loss_alpha,
         )
 
     unlearn_teacher = False
     mix_teacher_labels = teacher_disagree_preds[disagree_conf_idx]
     mix_teacher_labels = label_smooth(mix_teacher_labels, num_classes, gamma=0.3)
     if unlearn_teacher and len(mix_teacher_labels) > 0:
+        print("Unlearning high-confidence for worker model...")
+
         forget_dataset = NormalizeDataset(
             mix_data, mix_teacher_labels, mean=mean, std=std
         )
@@ -165,12 +167,11 @@ def iterate_repair_model(
             args.num_epochs,
             args,
             device=device,
-            loss_lambda=loss_lambda,
+            loss_lambda=ga_loss_alpha,
         )
 
     """2. Refine low-confidence agreement and disagreement data"""
-    cutoff = 0.2
-    alpha = 0.6
+    cutoff = 0.25
     agree_threshold = 0.65
     agree_idx = working_inc_predicts == teacher_inc_predicts
     agree_data = inc_data[agree_idx]
@@ -179,9 +180,8 @@ def iterate_repair_model(
     agree_predicts = teacher_inc_predicts[agree_idx]
     teacher_agree_probs_max = np.max(teacher_agree_probs, axis=-1)
     worker_agree_probs_max = np.max(worker_agree_probs, axis=-1)
-    joint_agree_score_max = (
-        alpha * teacher_agree_probs_max + (1 - alpha) * worker_agree_probs_max
-    )
+    joint_agree_score_max = (tradeoff_alpha * teacher_agree_probs_max
+                             + (1 - tradeoff_alpha) * worker_agree_probs_max)
     sample_size = round(len(joint_agree_score_max) * cutoff)
     sample_idx = np.argpartition(joint_agree_score_max, -sample_size)[-sample_size:]
     conf_idx = joint_agree_score_max >= agree_threshold
@@ -200,13 +200,13 @@ def iterate_repair_model(
     teacher_agree_lc_probs = teacher_agree_probs[~conf_idx]
 
     disagree_mix_labels = (
-        alpha * teacher_disagree_lc_probs + (1 - alpha) * worker_disagree_lc_probs
+        tradeoff_alpha * teacher_disagree_lc_probs + (1 - tradeoff_alpha) * worker_disagree_lc_probs
     )
     agree_mix_labels = (
-        alpha * teacher_agree_lc_probs + (1 - alpha) * worker_agree_lc_probs
+        tradeoff_alpha * teacher_agree_lc_probs + (1 - tradeoff_alpha) * worker_agree_lc_probs
     )
     if len(disagree_mix_labels) > 0:
-        print("Mix up lower confidence worker...")
+        print("Mix up lower confidence for worker model...")
 
         mix_lc_data = np.concatenate([disagree_mix_data, agree_mix_data], axis=0)
         mix_lc_label = np.concatenate([disagree_mix_labels, agree_mix_labels], axis=0)
@@ -234,7 +234,7 @@ def iterate_repair_model(
             device=device,
         )
 
-        print("Mix up lower confidence teacher...")
+        print("Mix up lower confidence for teacher model...")
         model_train(
             mix_dataloader_shuffled,
             teacher_model,
@@ -247,8 +247,8 @@ def iterate_repair_model(
         )
 
     """3. Refine high-confidence agreement data by label smoothing"""
-    print("Refine high-confidence worker...")
-    conf_agree_probs = label_smooth(conf_agree_labels, num_classes, gamma=0.3)
+    print("Refine high-confidence for worker model...")
+    conf_agree_probs = label_smooth(conf_agree_labels, num_classes, gamma=args.ls_gamma)
     conf_dataset = NormalizeDataset(
         conf_agree_data, conf_agree_probs, mean=mean, std=std
     )
@@ -433,6 +433,7 @@ def execute(args):
     best_teacher = 0
     for i in range(repair_iter_num):
         print("-----------restore iterate %d ----------------------" % i)
+        ga_loss_alpha = -0.5 * (1 - i/repair_iter_num)
         iterate_repair_model(
             working_model,
             working_opt,
@@ -450,6 +451,7 @@ def execute(args):
             std,
             device,
             args,
+            ga_loss_alpha
         )
 
         working_model_evals = model_test(test_dataloader, working_model, device=device)

@@ -54,6 +54,10 @@ def main():
         "Coteachingplus": "co_configs.coteachingplus",
         "Coteaching": "co_configs.coteaching",
         "JoCoR": "co_configs.jocor",
+        "Colearning": "co_configs.colearning",
+        "Decoupling": "co_configs.decoupling",
+        "NegativeLearning": "co_configs.NL",
+        "PENCIL": "co_configs.PENCIL",
     }
 
     if uni_name not in config_modules:
@@ -62,47 +66,21 @@ def main():
     # 动态导入配置模块
     config_module = importlib.import_module(config_modules[uni_name])
     config = config_module.config
+    config.update(custom_args.__dict__)
+    config["lr"] = config["learning_rate"]
+    config["epoch"] = config["num_epochs"]
 
     set_seed(config["seed"])
 
-    # 根据配置中的算法选择对应的模型
-    if config["algorithm"] == "Coteachingplus":
-        model = algorithms.Coteachingplus(
-            config,
-            input_channel=config["input_channel"],
-            num_classes=num_classes,
-        )
-        train_mode = "train"
-    elif config["algorithm"] == "Coteaching":
-        model = algorithms.Coteaching(
-            config,
-            input_channel=config["input_channel"],
-            num_classes=num_classes,
-        )
-        train_mode = "train_single"
-    elif config["algorithm"] == "JoCoR":
-        model = algorithms.JoCoR(
-            config,
-            input_channel=config["input_channel"],
-            num_classes=num_classes,
-        )
-        train_mode = "train_single"
-    else:
-        model = algorithms.__dict__[config["algorithm"]](
-            config,
-            input_channel=config["input_channel"],
-            num_classes=num_classes,
-        )
-        train_mode = "train_single"
-
-
     # get corrected dataset and model path
+    output_index = config["output_idx"] if "output_idx" in config else False
     _, _, trainloader = get_dataset_loader(
         custom_args.dataset,
         ["train_clean", "train_noisy"],
         case,
         batch_size=custom_args.batch_size,
         shuffle=True,
+        output_index=output_index
     )
 
     _, _, testloader = get_dataset_loader(
@@ -110,7 +88,7 @@ def main():
         "test",
         None,
         batch_size=custom_args.batch_size,
-        shuffle=False,
+        shuffle=False
     )
 
     num_test_images = len(testloader.dataset)
@@ -138,27 +116,27 @@ def main():
     )
     # checkpoint = torch.load(load_model_path)
 
-    model.epochs = custom_args.num_epochs
-
     loaded_model1 = load_custom_model(
         custom_args.model, num_classes, load_pretrained=False
     )
-    model.model1 = ClassifierWrapper(loaded_model1, num_classes)
+    model1 = ClassifierWrapper(loaded_model1, num_classes)
 
     loaded_model2 = load_custom_model(
         custom_args.model, num_classes, load_pretrained=False
     )
-    model.model2 = ClassifierWrapper(loaded_model2, num_classes)
+    model2 = ClassifierWrapper(loaded_model2, num_classes)
 
     checkpoint = torch.load(load_model_path1)
-    model.model1.load_state_dict(checkpoint, strict=False)
+    model1.load_state_dict(checkpoint, strict=False)
     checkpoint = torch.load(load_model_path2)
-    model.model2.load_state_dict(checkpoint, strict=False)
+    model2.load_state_dict(checkpoint, strict=False)
 
-    model.model1.to(device)
-    model.model2.to(device)
-    # model.model1.load_state_dict(checkpoint, strict=False)
-    # model.model2.load_state_dict(checkpoint, strict=False)
+    model1.to(device)
+    model2.to(device)
+
+    # 根据配置中的算法选择对应的模型
+    model = algorithms.__dict__[config["algorithm"]](model1, model2)
+    model.set_optimizer(trainloader.dataset, num_classes, config)
 
     epoch = 0
     # evaluate models with random weights
@@ -179,6 +157,10 @@ def main():
         # nni.report_intermediate_result(test_acc)
         if best_acc < test_acc:
             best_acc, best_epoch = test_acc, epoch
+            # save model1
+            os.makedirs(os.path.dirname(save_model_path), exist_ok=True)
+            torch.save(model.model1.state_dict(), save_model_path)
+            print("model saved to:", save_model_path)
 
         print(
             "Epoch [%d/%d] Test Accuracy on the %s test images: %.4f %%"
@@ -189,10 +171,6 @@ def main():
             acc_list.extend([test_acc])
         acc_all_list.extend([test_acc])
 
-        # save model1
-        os.makedirs(os.path.dirname(save_model_path), exist_ok=True)
-        torch.save(model.model1.state_dict(), save_model_path)
-        print("model saved to:", save_model_path)
 
     if config["save_result"]:
         acc_np = np.array(acc_list)

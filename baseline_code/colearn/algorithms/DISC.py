@@ -6,6 +6,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch import optim
 from torch.autograd import Variable
 
 import numpy as np
@@ -16,14 +17,11 @@ import os
 
 class DISC:
     def __init__(
-            self, 
-            config: dict = None, 
-            input_channel: int = 3, 
-            num_classes: int = 10,
-        ):
-        self.model_scratch = None
-        self.optimizer = None
-        self.scheduler = None
+            self,
+            model_scratch=None):
+        self.model_scratch = model_scratch
+
+    def set_optimizer(self, dataset, num_classes, config):
         self.num_classes = num_classes
         device = torch.device('cuda:%s'%config['gpu']) if torch.cuda.is_available() else torch.device('cpu')
         self.device = device
@@ -42,7 +40,15 @@ class DISC:
         self.sigma = 0.5
         self.momentum = config['momentum']
 
-        
+        self.optimizer = optim.AdamW(
+            self.model_scratch.parameters(),
+            lr=config['lr'],
+            weight_decay=config['weight_decay'],
+        )
+        self.scheduler = optim.lr_scheduler.ConstantLR(
+            self.optimizer, factor=0.95, total_iters=config['epochs']
+        )
+
         # Variable definition
         self.accs = np.zeros(self.epochs)
         self.acc_list = list()
@@ -53,7 +59,6 @@ class DISC:
         self.mixup_loss = Mixup(gpu=config['gpu'], num_classes=num_classes, alpha=config['alpha'])
         self.criterion = nn.CrossEntropyLoss()
 
-    def set_config(self, dataset, num_classes):
         N = len(dataset)
         self.s_prev_confidence = torch.ones(N).to(self.device) * 1 / N
         self.w_prev_confidence = torch.ones(N).to(self.device) * 1 / N

@@ -13,12 +13,14 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 
 class Coteachingplus:
     def __init__(
-        self,
-        config: dict = None,
-        input_channel: int = 3,
-        num_classes: int = 10,
+            self,
+            model1=None,
+            model2=None
     ):
+        self.model1 = model1
+        self.model2 = model2
 
+    def set_optimizer(self, dataset, num_classes, config):
         self.lr = config["lr"]
 
         if config["forget_rate"] is None:
@@ -54,15 +56,6 @@ class Coteachingplus:
 
         # model
         # dora modify resnet
-        # self.model1 = get_model(config['model1_type'], input_channel, num_classes, device)
-        # self.model2 = get_model(config['model2_type'], input_channel, num_classes, device)
-        self.model1 = models.resnet18(
-            pretrained=False, num_classes=config["num_classes"]
-        ).to(self.device)
-        self.model2 = models.resnet18(
-            pretrained=False, num_classes=config["num_classes"]
-        ).to(self.device)
-
         self.optimizer = torch.optim.Adam(
             list(self.model1.parameters()) + list(self.model2.parameters()), lr=self.lr
         )
