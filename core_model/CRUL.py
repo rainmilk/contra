@@ -143,7 +143,7 @@ def iterate_repair_model(
             unlearn_opt,
             unlearn_lr_schedule,
             working_criterion,
-            args.num_epochs,
+            args.ul_epochs,
             args,
             device=device,
             loss_lambda=ga_loss_alpha,
@@ -265,7 +265,7 @@ def iterate_repair_model(
         working_opt,
         working_lr_schedule,
         working_criterion,
-        args.num_epochs,
+        args.agree_epochs,
         args,
         device=device,
     )
@@ -276,7 +276,7 @@ def iterate_repair_model(
         teacher_opt,
         teacher_lr_schedule,
         teacher_criterion,
-        args.num_epochs,
+        args.agree_epochs,
         args,
         device=device,
     )

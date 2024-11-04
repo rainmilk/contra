@@ -14,8 +14,11 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 class JoCoR:
     def __init__(
             self,
-            model_scratch=None):
-        self.model_scratch = model_scratch
+            model1=None,
+            model2=None
+    ):
+        self.model1 = model1
+        self.model2 = model2
 
     def set_optimizer(self, dataset, num_classes, config):
         self.lr = config["lr"]

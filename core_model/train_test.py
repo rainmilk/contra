@@ -40,7 +40,6 @@ def model_train(
         model.train()
 
         # 用 tqdm 显示训练进度条
-        batches = len(train_loader)
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for i, (inputs, labels) in enumerate(train_loader):
                 last_input, last_labels = inputs, labels

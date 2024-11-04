@@ -244,6 +244,20 @@ def make_arg_parser(parser=None):
         help="Number of epochs to train the model (default: 200)",
     )
 
+    parser.add_argument(
+        "--ul_epochs",
+        type=int,
+        default=2,
+        help="Number of unlearning epochs (default: 2)",
+    )
+
+    parser.add_argument(
+        "--agree_epochs",
+        type=int,
+        default=3,
+        help="Number of unlearning epochs (default: 3)",
+    )
+
     # 添加 early_stopping_patience 参数
     parser.add_argument(
         "--early_stopping_patience",
