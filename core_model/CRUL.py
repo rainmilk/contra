@@ -109,7 +109,7 @@ def iterate_repair_model(
 
     """1. Unlearning confident disagreement data"""
     disagree_threshold = 0.65
-    tradeoff_alpha = 0.65
+    tradeoff_alpha = 0.5
     disagree_idx = working_inc_predicts != teacher_inc_predicts
     disagree_data = inc_data[disagree_idx]
     teacher_disagree_probs = teacher_inc_probs[disagree_idx]
@@ -124,11 +124,10 @@ def iterate_repair_model(
 
     mix_data = disagree_data[disagree_conf_idx]
 
-    unlearn_worker = True
     ga_loss_alpha = -1.0  # GA
     mix_worker_labels = worker_disagree_preds[disagree_conf_idx]
-    mix_worker_labels = label_smooth(mix_worker_labels, num_classes, gamma=0.4)
-    if unlearn_worker and len(mix_worker_labels) > 0:
+    mix_worker_labels = label_smooth(mix_worker_labels, num_classes, gamma=0.5)
+    if args.ul_epochs > 0 and len(mix_worker_labels) > 0:
         print("Unlearning high-confidence for worker model...")
 
         forget_dataset = NormalizeDataset(
@@ -174,7 +173,7 @@ def iterate_repair_model(
     #     )
 
     """2. Refine low-confidence agreement and disagreement data"""
-    cutoff = 0.2
+    top_conf = 0.3
     agree_threshold = 0.65
     agree_idx = working_inc_predicts == teacher_inc_predicts
     agree_data = inc_data[agree_idx]
@@ -185,14 +184,17 @@ def iterate_repair_model(
     worker_agree_probs_max = np.max(worker_agree_probs, axis=-1)
     joint_agree_score_max = (tradeoff_alpha * teacher_agree_probs_max
                              + (1 - tradeoff_alpha) * worker_agree_probs_max)
-    sample_size = round(len(joint_agree_score_max) * cutoff)
+    sample_size = round(len(joint_agree_score_max) * top_conf)
     sample_idx = np.argpartition(joint_agree_score_max, -sample_size)[-sample_size:]
     conf_idx = joint_agree_score_max >= agree_threshold
     conf_idx[sample_idx] = True
 
     conf_agree_data = agree_data[conf_idx]
     conf_agree_labels = agree_predicts[conf_idx]
-    conf_agree_labels_onehot = np.eye(num_classes)[conf_agree_labels]
+    # conf_agree_mix_labels = np.eye(num_classes)[conf_agree_labels]
+    conf_agree_mix_labels = (tradeoff_alpha * teacher_agree_probs[conf_idx]
+                                + (1 - tradeoff_alpha) * worker_agree_probs[conf_idx])
+
     disagree_mix_data = disagree_data[~disagree_conf_idx]
     agree_mix_data = agree_data[~conf_idx]
 
@@ -209,20 +211,22 @@ def iterate_repair_model(
         tradeoff_alpha * teacher_agree_lc_probs + (1 - tradeoff_alpha) * worker_agree_lc_probs
     )
     # agree_mix_labels = sharpen(agree_mix_labels, T=0.8)
-    if len(disagree_mix_labels) > 0:
+    if args.num_epochs > 0 and len(disagree_mix_labels) > 0:
         print("Mix up lower confidence for worker model...")
 
         mix_lc_data = np.concatenate([disagree_mix_data, agree_mix_data], axis=0)
         mix_lc_label = np.concatenate([disagree_mix_labels, agree_mix_labels], axis=0)
+        mix_lc_label = sharpen(mix_lc_label, T=1.1)
+        conf_agree_mix_labels = sharpen(conf_agree_mix_labels, T=1.1)
         mix_dataloader_shuffled = mix_up_dataloader(
             mix_lc_data,
             mix_lc_label,
             conf_agree_data,
-            conf_agree_labels_onehot,
+            conf_agree_mix_labels,
             mean,
             std,
             batch_size=args.batch_size,
-            alpha=1.0,
+            alpha=-0.5,
             transforms=None,
         )
 
@@ -250,36 +254,37 @@ def iterate_repair_model(
         )
 
     """3. Refine high-confidence agreement data by label smoothing"""
-    print("Refine high-confidence for worker model...")
-    conf_agree_probs = label_smooth(conf_agree_labels, num_classes, gamma=args.ls_gamma)
-    conf_dataset = NormalizeDataset(
-        conf_agree_data, conf_agree_probs, mean=mean, std=std
-    )
-    conf_data_loader = DataLoader(
-        conf_dataset, batch_size=args.batch_size, drop_last=False, shuffle=True
-    )
+    if args.agree_epochs > 0:
+        print("Refine high-confidence for worker model...")
+        conf_agree_probs = label_smooth(conf_agree_labels, num_classes, gamma=args.ls_gamma)
+        conf_dataset = NormalizeDataset(
+            conf_agree_data, conf_agree_probs, mean=mean, std=std
+        )
+        conf_data_loader = DataLoader(
+            conf_dataset, batch_size=args.batch_size, drop_last=False, shuffle=True
+        )
 
-    model_train(
-        conf_data_loader,
-        working_model,
-        working_opt,
-        working_lr_schedule,
-        working_criterion,
-        args.agree_epochs,
-        args,
-        device=device,
-    )
+        model_train(
+            conf_data_loader,
+            working_model,
+            working_opt,
+            working_lr_schedule,
+            working_criterion,
+            args.agree_epochs,
+            args,
+            device=device,
+        )
 
-    model_train(
-        conf_data_loader,
-        teacher_model,
-        teacher_opt,
-        teacher_lr_schedule,
-        teacher_criterion,
-        args.agree_epochs,
-        args,
-        device=device,
-    )
+        model_train(
+            conf_data_loader,
+            teacher_model,
+            teacher_opt,
+            teacher_lr_schedule,
+            teacher_criterion,
+            args.agree_epochs,
+            args,
+            device=device,
+        )
 
 
 def mix_up_dataloader(
@@ -301,7 +306,6 @@ def mix_up_dataloader(
         transforms=transforms,
         mean=mean,
         std=std,
-        first_max=True,
     )
     return DataLoader(mixed_dataset, batch_size, drop_last=False, shuffle=shuffle)
 
@@ -328,8 +332,8 @@ def execute(args):
     logging.basicConfig(filename=log_path, level=logging.INFO)
 
     learning_rate = getattr(args, "learning_rate", 0.001)
-    lr_scale = getattr(args, "lr_scale", 2.0)
-    working_lr = learning_rate * lr_scale
+    lr_scale = getattr(args, "lr_scale", 1.0)
+    working_lr = learning_rate
     weight_decay = getattr(args, "weight_decay", 5e-4)
     repair_iter_num = getattr(args, "repair_iter_num", 10)
     optimizer_type = getattr(args, "optimizer", "adam")
@@ -388,7 +392,7 @@ def execute(args):
     )
     teacher_criterion = nn.CrossEntropyLoss()
 
-    ul_lr = 0.5 * learning_rate
+    ul_lr = lr_scale * learning_rate
     unlearn_opt = optim.SGD(working_model.parameters(), lr=ul_lr)
     unlearn_lr_scheduler = optim.lr_scheduler.ConstantLR(unlearn_opt, factor=0.9, total_iters=args.num_epochs)
 
@@ -437,6 +441,8 @@ def execute(args):
     )
 
     # (3) 迭代修复过程：根据 Dtr 迭代 Mp 、 Mt
+    worker_history = []
+    teacher_history = []
     best_worker = 0
     best_teacher = 0
     for i in range(repair_iter_num):
@@ -464,15 +470,19 @@ def execute(args):
         )
 
         working_model_evals = model_test(test_dataloader, working_model, device=device)
-        if best_worker < working_model_evals["global"]:
-            best_worker = working_model_evals["global"]
+        worker_eval_result = working_model_evals["global"]
+        worker_history.append(worker_eval_result)
+        if best_worker < worker_eval_result:
+            best_worker = worker_eval_result
             os.makedirs(os.path.dirname(working_model_repair_save_path), exist_ok=True)
             torch.save(working_model.state_dict(), working_model_repair_save_path)
             print(f"Worker model has saved to {working_model_repair_save_path}.")
 
         teacher_model_evals = model_test(test_dataloader, teacher_model, device=device)
-        if best_teacher < teacher_model_evals["global"]:
-            best_teacher = teacher_model_evals["global"]
+        teacher_eval_result = teacher_model_evals["global"]
+        teacher_history.append(teacher_eval_result)
+        if best_teacher < teacher_eval_result:
+            best_teacher = teacher_eval_result
             os.makedirs(os.path.dirname(teacher_model_repair_save_path), exist_ok=True)
             torch.save(teacher_model.state_dict(), teacher_model_repair_save_path)
             print(f"Teacher model has saved to {teacher_model_repair_save_path}.")

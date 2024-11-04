@@ -80,7 +80,6 @@ class MixupDataset(Dataset):
         transforms=None,
         mean=None,
         std=None,
-        first_max=True
     ):
         # modify shape to [N, H, W, C]
         self.data_first = data_pair[0]
@@ -91,15 +90,19 @@ class MixupDataset(Dataset):
         self.label_second = label_pair[1]
         self.mixup_alpha = mixup_alpha
         self.transforms = transforms
-        self.first_max = first_max
 
     def __len__(self):
         return len(self.label_first)
 
     def __getitem__(self, index):
-        lbd = np.random.beta(self.mixup_alpha, self.mixup_alpha)
-        if self.first_max and lbd < 0.5:
-            lbd = 1 - lbd
+        if self.mixup_alpha >= 0:
+            lbd = np.random.beta(self.mixup_alpha, self.mixup_alpha)
+            if lbd < 0.5:
+                lbd = 1 - lbd
+        else:
+            lbd = np.random.beta(-self.mixup_alpha, -self.mixup_alpha)
+            if lbd > 0.5:
+                lbd = 1 - lbd
 
         data_first = self.data_first[index]
         label_first = self.label_first[index]

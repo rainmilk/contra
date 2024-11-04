@@ -247,7 +247,7 @@ def make_arg_parser(parser=None):
     parser.add_argument(
         "--ul_epochs",
         type=int,
-        default=2,
+        default=3,
         help="Number of unlearning epochs (default: 2)",
     )
 
@@ -307,14 +307,14 @@ def make_arg_parser(parser=None):
     parser.add_argument(
         "--lr_scale",
         type=float,
-        default=2.0,
+        default=1.0,
         help="Scale the working model lr",
     )
 
     parser.add_argument(
         "--ls_gamma",
         type=float,
-        default=0.3,
+        default=0.25,
         help="Label smoothing factor",
     )
 
