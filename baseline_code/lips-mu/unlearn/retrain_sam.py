@@ -74,7 +74,7 @@ def retrain_sam(data_loaders, model, criterion, optimizer, epoch, args):
         base_optimizer,
         rho=2.0,
         adaptive=True,
-        lr=args.lr,
+        lr=args.learning_rate,
         momentum=args.momentum,
         weight_decay=args.weight_decay,
     )
