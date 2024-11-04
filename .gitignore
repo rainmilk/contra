@@ -26,6 +26,8 @@ model/
 # logs
 logs/
 log/
+logs_backup/
+
 runs/
 .out
 
