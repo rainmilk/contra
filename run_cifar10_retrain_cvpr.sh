@@ -21,10 +21,10 @@ export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "PYTHONPATH is set to: $PYTHONPATH"
 
 
-python ./run_experiment_cvpr.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 0 --learning_rate 0.005 --optimizer adam --batch_size 32 --uni_name raw --model_suffix worker_restore --noise_ratio 0.5
+python ./run_experiment_cvpr.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 0 --learning_rate 0.005 --optimizer adam --batch_size 32 --uni_name raw --model_suffix worker_restore --noise_ratio 0.25
 
-python ./run_experiment_cvpr.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 1 --learning_rate 0.005 --optimizer adam --batch_size 32 --uni_name raw --model_suffix worker_restore --noise_ratio 0.5
+python ./run_experiment_cvpr.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 1 --learning_rate 0.005 --optimizer adam --batch_size 32 --uni_name raw --model_suffix worker_restore --noise_ratio 0.25
 
-python ./run_experiment_cvpr.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 2 --learning_rate 0.005 --optimizer adam --batch_size 32 --uni_name raw --model_suffix worker_restore --noise_ratio 0.5
+python ./run_experiment_cvpr.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 2 --learning_rate 0.005 --optimizer adam --batch_size 32 --uni_name raw --model_suffix worker_restore --noise_ratio 0.25
 
-python ./run_experiment_cvpr.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 3 --learning_rate 0.005 --optimizer adam --batch_size 32 --uni_name raw --model_suffix worker_restore --noise_ratio 0.5
+python ./run_experiment_cvpr.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 3 --learning_rate 0.005 --optimizer adam --batch_size 32 --uni_name raw --model_suffix worker_restore --noise_ratio 0.25

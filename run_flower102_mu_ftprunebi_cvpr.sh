@@ -15,7 +15,7 @@ echo "CUDA_VISIBLE_DEVICES is set to: $CUDA_VISIBLE_DEVICES"
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "PYTHONPATH is set to: $PYTHONPATH"
 
-python ./baseline_code/lips-mu/main_mu_cvpr.py --model wideresnet50 --dataset flower-102 --num_epochs 10 --uni_name FT_prune_bi --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type symmetric --noise_ratio 0.5
+python ./baseline_code/lips-mu/main_mu_cvpr.py --model wideresnet50 --dataset flower-102 --num_epochs 10 --uni_name FT_prune_bi --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type symmetric --noise_ratio 0.25
 
 # python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 0 --batch_size 32 --balanced --uni_name JoCoR --learning_rate 5e-3
 
