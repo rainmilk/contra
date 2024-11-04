@@ -47,9 +47,7 @@ class PENCIL:
         # self.model1 = get_model(config['model1_type'], input_channel, num_classes, device)
         self.optimizer = torch.optim.SGD(self.model1.parameters(), lr=self.lr, 
                                          momentum=0.9, weight_decay=1e-4)
-        if 'cifar' in config['dataset']:
-            N = 50000
-            self.N = N
+        self.N = len(dataset)
         self.new_y = torch.zeros(self.N, self.num_classes).to(self.device)
         
         # loss function
