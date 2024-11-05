@@ -25,4 +25,4 @@ python ./core_model/CRUL.py --uni_name CRUL --model wideresnet50 --dataset pet-3
 python ./core_model/CRUL.py --uni_name CRUL --model wideresnet50 --dataset pet-37 --learning_rate 2e-5 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.25 --repair_iter_num 3 --ls_gamma 0.3 --num_epochs 3 --ul_epochs 2 --agree_epochs 0
 
 # w/o Unlearning and High-confidence agreement label smoothing
-python ./core_model/CRUL.py --uni_name CRUL --model wideresnet50 -dataset pet-37 --learning_rate 2e-5 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.25 --repair_iter_num 3 --ls_gamma 0.3 --num_epochs 3 --ul_epochs 0 --agree_epochs 0
+python ./core_model/CRUL.py --uni_name CRUL --model wideresnet50 --dataset pet-37 --learning_rate 2e-5 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.25 --repair_iter_num 3 --ls_gamma 0.3 --num_epochs 3 --ul_epochs 0 --agree_epochs 0
