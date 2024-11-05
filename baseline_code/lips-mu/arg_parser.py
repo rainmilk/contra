@@ -210,7 +210,7 @@ def parse_args():
         default=None,
         help="Specific index data to forget",
     )
-    parser.add_argument("--alpha", default=0.2, type=float, help="unlearn noise")
+    parser.add_argument("--alpha", default=0.5, type=float, help="unlearn noise")
 
     ##################################### Attack setting #################################################
     parser.add_argument(

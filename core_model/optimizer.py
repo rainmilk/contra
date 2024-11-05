@@ -5,11 +5,11 @@ def create_optimizer_scheduler(
     optimizer_type,
     parameters,
     epochs,
-    learning_rate=1e-2,
-    weight_decay=1e-3,
-    gamma=0,
+    learning_rate=1e-3,
+    weight_decay=5e-4,
+    eta_min=None,
     min_epochs_for_decay=10,
-    factor=0.99
+    factor=0.95
 ):
     # 根据用户选择的优化器初始化
     if optimizer_type == "adam":
@@ -19,9 +19,10 @@ def create_optimizer_scheduler(
     else:
         raise ValueError(f"Unsupported optimizer type: {optimizer_type}")
 
+    if eta_min is None: eta_min = 0.01 * learning_rate
     if epochs >= min_epochs_for_decay:
         lr_scheduler = optim.lr_scheduler.CosineAnnealingLR(
-            optimizer, T_max=epochs, eta_min=gamma
+            optimizer, T_max=epochs, eta_min=eta_min
         )
     else:
         lr_scheduler = optim.lr_scheduler.ConstantLR(

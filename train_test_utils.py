@@ -214,6 +214,7 @@ def train_model(
         learning_rate=learning_rate,
         weight_decay=weight_decay,
         epochs=epochs,
+        eta_min=0.01 * learning_rate
     )
 
     # weights = torchvision.models.ResNet18_Weights.DEFAULT
@@ -249,7 +250,7 @@ def train_model(
     test_accuracies = []
 
     if data_aug:
-        cutmix_transform = v2.CutMix(alpha=1.0, num_classes=num_classes)
+        # cutmix_transform = v2.CutMix(alpha=1.0, num_classes=num_classes)
         mixup_transform = v2.MixUp(alpha=0.5, num_classes=num_classes)
 
     for epoch in tqdm(range(epochs), desc="Training Progress"):
@@ -273,7 +274,7 @@ def train_model(
                 targets = targets.to(torch.long)
                 
                 if data_aug:
-                    transform = np.random.choice([mixup_transform, cutmix_transform])
+                    transform = mixup_transform  # np.random.choice([mixup_transform, cutmix_transform])
                     inputs, targets = transform(inputs, targets)
 
                 inputs, targets = inputs.to(device), targets.to(device)
