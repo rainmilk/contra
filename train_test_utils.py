@@ -220,9 +220,10 @@ def train_model(
     # weights = torchvision.models.ResNet18_Weights.DEFAULT
     transform_train = transforms.Compose(
         [
-            transforms.RandomCrop(32, padding=4),
+            torch.tensor,
+            # transforms.RandomCrop(32, padding=4),
             transforms.RandomHorizontalFlip(),
-            # transforms.RandomRotation(15)
+            transforms.RandomRotation(15)
         ]
     )
     transform_test = transforms.Compose(
@@ -231,7 +232,7 @@ def train_model(
         ]
     )
 
-    dataset = BaseTensorDataset(data, labels)
+    dataset = BaseTensorDataset(data, labels, transform_train)
     dataloader = DataLoader(
         # dataset, batch_size=batch_size, drop_last=True, shuffle=True
         dataset,
