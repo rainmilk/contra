@@ -223,7 +223,7 @@ def train_model(
     if "cifar-100" == dataset_name:
         transform_train = transforms.Compose(
             [
-                # torch.tensor,
+                torch.tensor,
                 transforms.RandomCrop(32, padding=4),
                 transforms.RandomHorizontalFlip(),
                 transforms.RandomRotation(15),
