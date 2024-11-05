@@ -17,10 +17,10 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 
 # lnl
 ## best lnl method: ex.ct
-python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name Colearning --learning_rate 1e-4 --noise_type symmetric --noise_ratio 0
-python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name Colearning --learning_rate 1e-4 --noise_type symmetric --noise_ratio 0.25
+python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name Coteaching --learning_rate 1e-4 --noise_type symmetric --noise_ratio 0
+python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name Coteaching --learning_rate 1e-4 --noise_type symmetric --noise_ratio 0.25
 # python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name Colearning --learning_rate 1e-4 --noise_type symmetric --noise_ratio 0.5
-python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name Colearning --learning_rate 1e-4 --noise_type symmetric --noise_ratio 0.75
+python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name Coteaching --learning_rate 1e-4 --noise_type symmetric --noise_ratio 0.75
 ## second best  lnl method: ex.ct+
 python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name Coteachingplus --learning_rate 1e-4 --noise_type symmetric --noise_ratio 0
 python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name Coteachingplus --learning_rate 1e-4 --noise_type symmetric --noise_ratio 0.25
