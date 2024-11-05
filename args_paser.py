@@ -232,7 +232,7 @@ def make_arg_parser(parser=None):
     parser.add_argument(
         "--weight_decay",
         type=check_positive,
-        default=0.0001,
+        default=5e-4,
         help="Weight decay for the optimizer (default: 0.0001).",
     )
 
@@ -314,7 +314,7 @@ def make_arg_parser(parser=None):
     parser.add_argument(
         "--ls_gamma",
         type=float,
-        default=0.25,
+        default=0.35,
         help="Label smoothing factor",
     )
 

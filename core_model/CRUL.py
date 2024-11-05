@@ -84,13 +84,15 @@ def iterate_repair_model(
     working_model,
     working_opt,
     working_lr_schedule,
+    ul_worker_opt,
+    ul_worker_lr_scheduler,
     working_criterion,
     teacher_model,
     teacher_opt,
-    teacher_lr_schedule,
+    teacher_lr_scheduler,
+    ul_teacher_opt,
+    ul_teacher_lr_scheduler,
     teacher_criterion,
-    unlearn_opt,
-    unlearn_lr_schedule,
     inc_data,
     inc_labels,
     inc_dataloader,
@@ -109,24 +111,24 @@ def iterate_repair_model(
 
     """1. Unlearning confident disagreement data"""
     disagree_threshold = 0.65
-    tradeoff_alpha = 0.5
+    tradeoff_alpha = 2/3
     disagree_idx = working_inc_predicts != teacher_inc_predicts
     disagree_data = inc_data[disagree_idx]
     teacher_disagree_probs = teacher_inc_probs[disagree_idx]
     worker_disagree_probs = working_inc_probs[disagree_idx]
     worker_disagree_preds = working_inc_predicts[disagree_idx]
     teacher_disagree_preds = teacher_inc_predicts[disagree_idx]
-    teacher_disagree_probs_max = np.max(teacher_disagree_probs, axis=-1)
-    worker_disagree_probs_max = np.max(worker_disagree_probs, axis=-1)
-    joint_disagree_score_max = (tradeoff_alpha * worker_disagree_probs_max
-                                + (1 - tradeoff_alpha) * teacher_disagree_probs_max)
-    disagree_conf_idx = joint_disagree_score_max >= disagree_threshold
+    teacher_disagree_model_conf = np.max(teacher_disagree_probs, axis=-1)
+    worker_disagree_model_conf = np.max(worker_disagree_probs, axis=-1)
+    joint_disagree_model_conf = (tradeoff_alpha * worker_disagree_model_conf
+                                + (1 - tradeoff_alpha) * teacher_disagree_model_conf)
+    disagree_conf_idx = joint_disagree_model_conf >= disagree_threshold
 
     mix_data = disagree_data[disagree_conf_idx]
 
     ga_loss_alpha = -1.0  # GA
     mix_worker_labels = worker_disagree_preds[disagree_conf_idx]
-    mix_worker_labels = label_smooth(mix_worker_labels, num_classes, gamma=0.5)
+    mix_worker_labels = label_smooth(mix_worker_labels, num_classes, gamma=0.4)
     if args.ul_epochs > 0 and len(mix_worker_labels) > 0:
         print("Unlearning high-confidence for worker model...")
 
@@ -139,8 +141,8 @@ def iterate_repair_model(
         model_train(
             forget_dataloader_shuffled,
             working_model,
-            unlearn_opt,
-            unlearn_lr_schedule,
+            ul_worker_opt,
+            ul_worker_lr_scheduler,
             working_criterion,
             args.ul_epochs,
             args,
@@ -149,44 +151,44 @@ def iterate_repair_model(
         )
 
     # unlearn_teacher = False
-    # mix_teacher_labels = teacher_disagree_preds[disagree_conf_idx]
-    # mix_teacher_labels = label_smooth(mix_teacher_labels, num_classes, gamma=0.3)
-    # if unlearn_teacher and len(mix_teacher_labels) > 0:
-    #     print("Unlearning high-confidence for worker model...")
-    #
-    #     forget_dataset = NormalizeDataset(
-    #         mix_data, mix_teacher_labels, mean=mean, std=std
-    #     )
-    #     forget_dataloader_shuffled = DataLoader(
-    #         forget_dataset, batch_size=args.batch_size, drop_last=False, shuffle=True
-    #     )
-    #     model_train(
-    #         forget_dataloader_shuffled,
-    #         teacher_model,
-    #         teacher_opt,
-    #         teacher_lr_schedule,
-    #         teacher_criterion,
-    #         args.num_epochs,
-    #         args,
-    #         device=device,
-    #         loss_lambda=ga_loss_alpha,
-    #     )
+    mix_teacher_labels = teacher_disagree_preds[disagree_conf_idx]
+    mix_teacher_labels = label_smooth(mix_teacher_labels, num_classes, gamma=0.4)
+    if args.ul_epochs > 0 and len(mix_teacher_labels) > 0:
+        print("Unlearning high-confidence for teacher model...")
+
+        forget_dataset = NormalizeDataset(
+            mix_data, mix_teacher_labels, mean=mean, std=std
+        )
+        forget_dataloader_shuffled = DataLoader(
+            forget_dataset, batch_size=args.batch_size, drop_last=False, shuffle=True
+        )
+        model_train(
+            forget_dataloader_shuffled,
+            teacher_model,
+            ul_teacher_opt,
+            ul_teacher_lr_scheduler,
+            teacher_criterion,
+            args.ul_epochs,
+            args,
+            device=device,
+            loss_lambda=ga_loss_alpha,
+        )
 
     """2. Refine low-confidence agreement and disagreement data"""
-    top_conf = 0.3
+    top_conf = 0.25
     agree_threshold = 0.65
     agree_idx = working_inc_predicts == teacher_inc_predicts
     agree_data = inc_data[agree_idx]
     teacher_agree_probs = teacher_inc_probs[agree_idx]
     worker_agree_probs = teacher_inc_probs[agree_idx]
     agree_predicts = teacher_inc_predicts[agree_idx]
-    teacher_agree_probs_max = np.max(teacher_agree_probs, axis=-1)
-    worker_agree_probs_max = np.max(worker_agree_probs, axis=-1)
-    joint_agree_score_max = (tradeoff_alpha * teacher_agree_probs_max
-                             + (1 - tradeoff_alpha) * worker_agree_probs_max)
-    sample_size = round(len(joint_agree_score_max) * top_conf)
-    sample_idx = np.argpartition(joint_agree_score_max, -sample_size)[-sample_size:]
-    conf_idx = joint_agree_score_max >= agree_threshold
+    teacher_agree_model_conf = np.max(teacher_agree_probs, axis=-1)
+    worker_agree_model_conf = np.max(worker_agree_probs, axis=-1)
+    joint_agree_model_conf = (tradeoff_alpha * teacher_agree_model_conf
+                             + (1 - tradeoff_alpha) * worker_agree_model_conf)
+    sample_size = round(len(joint_agree_model_conf) * top_conf)
+    sample_idx = np.argpartition(joint_agree_model_conf, -sample_size)[-sample_size:]
+    conf_idx = joint_agree_model_conf >= agree_threshold
     conf_idx[sample_idx] = True
 
     conf_agree_data = agree_data[conf_idx]
@@ -214,10 +216,11 @@ def iterate_repair_model(
     if args.num_epochs > 0 and len(disagree_mix_labels) > 0:
         print("Mix up lower confidence for worker model...")
 
+        temperature = 1.0
         mix_lc_data = np.concatenate([disagree_mix_data, agree_mix_data], axis=0)
         mix_lc_label = np.concatenate([disagree_mix_labels, agree_mix_labels], axis=0)
-        mix_lc_label = sharpen(mix_lc_label, T=1.1)
-        conf_agree_mix_labels = sharpen(conf_agree_mix_labels, T=1.1)
+        mix_lc_label = sharpen(mix_lc_label, T=temperature)
+        conf_agree_mix_labels = sharpen(conf_agree_mix_labels, T=temperature)
         mix_dataloader_shuffled = mix_up_dataloader(
             mix_lc_data,
             mix_lc_label,
@@ -226,7 +229,7 @@ def iterate_repair_model(
             mean,
             std,
             batch_size=args.batch_size,
-            alpha=-0.5,
+            alpha=-0.1,
             transforms=None,
         )
 
@@ -246,7 +249,7 @@ def iterate_repair_model(
             mix_dataloader_shuffled,
             teacher_model,
             teacher_opt,
-            teacher_lr_schedule,
+            teacher_lr_scheduler,
             teacher_criterion,
             args.num_epochs,
             args,
@@ -279,7 +282,7 @@ def iterate_repair_model(
             conf_data_loader,
             teacher_model,
             teacher_opt,
-            teacher_lr_schedule,
+            teacher_lr_scheduler,
             teacher_criterion,
             args.agree_epochs,
             args,
@@ -348,16 +351,17 @@ def execute(args):
     working_model_repair_save_path = settings.get_ckpt_path(
         args.dataset, case, args.model, model_suffix="restore", unique_name=uni_name
     )
+    working_history_save_path = settings.get_ckpt_path(
+        args.dataset, case, args.model, model_suffix="history", unique_name=uni_name
+    )
     teacher_model_path = settings.get_ckpt_path(
         args.dataset, "pretrain", args.model, model_suffix="pretrain"
     )
     teacher_model_repair_save_path = settings.get_ckpt_path(
-        args.dataset,
-        case,
-        args.model,
-        model_suffix="teacher_restore",
-        step=step,
-        unique_name=uni_name,
+        args.dataset, case, args.model, model_suffix="teacher_restore", unique_name=uni_name,
+    )
+    teacher_history_save_path = settings.get_ckpt_path(
+        args.dataset, case, args.model, model_suffix="teacher_history", unique_name=uni_name,
     )
 
     mean, std = None, None
@@ -393,8 +397,10 @@ def execute(args):
     teacher_criterion = nn.CrossEntropyLoss()
 
     ul_lr = lr_scale * learning_rate
-    unlearn_opt = optim.SGD(working_model.parameters(), lr=ul_lr)
-    unlearn_lr_scheduler = optim.lr_scheduler.ConstantLR(unlearn_opt, factor=0.9, total_iters=args.num_epochs)
+    ul_worker_opt = optim.SGD(working_model.parameters(), lr=ul_lr)
+    ul_worker_lr_scheduler = optim.lr_scheduler.ConstantLR(ul_worker_opt, factor=0.9, total_iters=args.num_epochs)
+    ul_teacher_opt = optim.SGD(teacher_model.parameters(), lr=ul_lr)
+    ul_teacher_lr_scheduler = optim.lr_scheduler.ConstantLR(ul_teacher_opt, factor=0.9, total_iters=args.num_epochs)
 
 
     # aux_data, aux_labels, aux_dataloader = get_dataset_loader(
@@ -452,13 +458,15 @@ def execute(args):
             working_model,
             working_opt,
             working_lr_scheduler,
+            ul_worker_opt,
+            ul_worker_lr_scheduler,
             working_criterion,
             teacher_model,
             teacher_opt,
             teacher_lr_scheduler,
+            ul_teacher_opt,
+            ul_teacher_lr_scheduler,
             teacher_criterion,
-            unlearn_opt,
-            unlearn_lr_scheduler,
             inc_data,
             inc_labels,
             inc_dataloader,
@@ -487,6 +495,8 @@ def execute(args):
             torch.save(teacher_model.state_dict(), teacher_model_repair_save_path)
             print(f"Teacher model has saved to {teacher_model_repair_save_path}.")
 
+    torch.save(worker_history, working_history_save_path)
+    torch.save(teacher_history, teacher_history_save_path)
     logging.info(
         f"Test results before restore: Worker: {working_model_test_before}, Teacher: {teacher_model_test_before}"
     )
