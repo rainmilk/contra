@@ -140,6 +140,8 @@ def get_dataset_loader(
     onehot_enc=False,
     transforms=None,
     output_index=False,
+    data_name=None,
+    label_name=None,
     num_workers=0,
 ):
     """
@@ -151,11 +153,15 @@ def get_dataset_loader(
     data = []
     labels = []
     for ld_name in loader_name:
+        if data_name is None:
+            data_name = f"{ld_name}_data"
         data_path = settings.get_dataset_path(
-            dataset_name, case, f"{ld_name}_data", step
+            dataset_name, case, data_name, step
         )
+        if label_name is None:
+            label_name = f"{ld_name}_label"
         label_path = settings.get_dataset_path(
-            dataset_name, case, f"{ld_name}_label", step
+            dataset_name, case, label_name, step
         )
 
         print(f"Loading {data_path}")
