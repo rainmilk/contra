@@ -220,7 +220,7 @@ def train_model(
 
     # weights = torchvision.models.ResNet18_Weights.DEFAULT
     transform_train = None
-    if "cifar100" == dataset_name:
+    if "cifar-100" == dataset_name:
         transform_train = transforms.Compose(
             [
                 # torch.tensor,
