@@ -15,10 +15,10 @@ echo "CUDA_VISIBLE_DEVICES is set to: $CUDA_VISIBLE_DEVICES"
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "PYTHONPATH is set to: $PYTHONPATH"
 
-python ./run_experiment_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 5 --train_mode finetune --learning_rate 1e-4 --optimizer adam --batch_size 16 --noise_type asymmetric --noise_ratio 0
-python ./run_experiment_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 5 --train_mode finetune --learning_rate 1e-4 --optimizer adam --batch_size 16 --noise_type asymmetric --noise_ratio 0.25
-python ./run_experiment_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 5 --train_mode finetune --learning_rate 1e-4 --optimizer adam --batch_size 16 --noise_type asymmetric --noise_ratio 0.5
-python ./run_experiment_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 5 --train_mode finetune --learning_rate 1e-4 --optimizer adam --batch_size 16 --noise_type asymmetric --noise_ratio 0.75
+python ./run_experiment_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --train_mode finetune --learning_rate 1e-4 --optimizer adam --batch_size 16 --noise_type asymmetric --noise_ratio 0
+# python ./run_experiment_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --train_mode finetune --learning_rate 1e-4 --optimizer adam --batch_size 16 --noise_type asymmetric --noise_ratio 0.25
+python ./run_experiment_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --train_mode finetune --learning_rate 1e-4 --optimizer adam --batch_size 16 --noise_type asymmetric --noise_ratio 0.5
+python ./run_experiment_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --train_mode finetune --learning_rate 1e-4 --optimizer adam --batch_size 16 --noise_type asymmetric --noise_ratio 0.75
 
 # python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 0 --batch_size 32 --balanced --uni_name Coteaching --learning_rate 5e-3
 
