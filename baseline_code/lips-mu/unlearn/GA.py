@@ -139,7 +139,7 @@ def GA_l1(data_loaders, model, criterion, optimizer, epoch, args):
 
         # compute output
         output_clean = model(image)
-        loss = -args.alpha * (criterion(output_clean, target) + l1_regularization(model))
+        loss = -(criterion(output_clean, target) + args.alpha * l1_regularization(model))
 
         optimizer.zero_grad()
         loss.backward()
