@@ -314,8 +314,15 @@ def make_arg_parser(parser=None):
     parser.add_argument(
         "--ls_gamma",
         type=float,
-        default=0.35,
+        default=0.3,
         help="Label smoothing factor",
+    )
+
+    parser.add_argument(
+        "--mixup_alpha",
+        type=float,
+        default=-0.5,
+        help="Mixup factor",
     )
 
     # 捕获其他 kwargs

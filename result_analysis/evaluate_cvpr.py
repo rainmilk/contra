@@ -25,6 +25,14 @@ def execute(args):
         batch_size=args.batch_size,
         shuffle=False,
     )
+    _, _, noisy_loader = get_dataset_loader(
+        args.dataset,
+        "train_noisy",
+        case,
+        batch_size=args.batch_size,
+        shuffle=False,
+        label_name="train_noisy_true_label"
+    )
 
     for uni_name in uni_names:
         print(f"Evaluating {uni_name}:")
@@ -38,7 +46,13 @@ def execute(args):
         print(f"Loading model from {model_ckpt_path}")
         checkpoint = torch.load(model_ckpt_path)
         model.load_state_dict(checkpoint, strict=False)
+        print(f"Evaluating test_data:")
         results, embedding = model_test(test_loader, model)
+        print("Results: %.4f" % results)
+        print(f"Evaluating train_noisy_data:")
+        n_results, n_embedding = model_test(noisy_loader, model)
+        print("Results: %.4f" % results)
+
 
 
 def model_test(data_loader, model, device="cuda"):
@@ -50,7 +64,6 @@ def model_test(data_loader, model, device="cuda"):
 
     # global acc
     global_acc = np.mean(predicts == labels)
-    print("Global ACC: %.2f" % (global_acc * 100))
     eval_results["global"] = global_acc.item()
 
     # class acc
@@ -58,7 +71,6 @@ def model_test(data_loader, model, device="cuda"):
     for label in label_list:
         cls_index = labels == label
         class_acc = np.mean(predicts[cls_index] == labels[cls_index])
-        print("Label: %s, Acc: %.2f" % (label, class_acc * 100))
         eval_results["label_" + str(label.item())] = class_acc.item()
 
     return eval_results, embedding
