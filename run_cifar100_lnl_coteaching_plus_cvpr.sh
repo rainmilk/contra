@@ -17,23 +17,3 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 
 
 python ./baseline_code/colearn/main_cvpr.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 10 --batch_size 256 --uni_name Coteachingplus --learning_rate 1e-3  --noise_type asymmetric --noise_ratio 0.25
-
-# python baseline_code/colearn/main.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 10 --step 1 --batch_size 256 --balanced --uni_name Coteachingplus --noise_type asymmetric --learning_rate 1e-3 
-
-# python baseline_code/colearn/main.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 10 --step 2 --batch_size 256 --balanced --uni_name Coteachingplus --noise_type asymmetric --learning_rate 1e-3 
-
-# python baseline_code/colearn/main.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 10 --step 3 --batch_size 256 --balanced --uni_name Coteachingplus --noise_type asymmetric --learning_rate 1e-3 
-
-# python ./run_experiment.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 10 --step 0 --batch_size 256 --balanced --uni_name Coteachingplus --noise_type asymmetric --learning_rate 1e-3 
-
-# python ./run_experiment.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 10 --step 1 --batch_size 256 --balanced --model_suffix worker_raw --uni_name Coteachingplus --noise_type asymmetric --learning_rate 1e-3 
-
-# python baseline_code/colearn/main.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 10 --step 1 --batch_size 256 --balanced --uni_name Coteachingplus --noise_type asymmetric --learning_rate 1e-3 
-
-# python ./run_experiment.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 10 --step 2 --batch_size 256 --balanced --model_suffix worker_raw --uni_name Coteachingplus --noise_type asymmetric --learning_rate 1e-3 
-
-# python baseline_code/colearn/main.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 10 --step 2 --batch_size 256 --balanced --uni_name Coteachingplus --noise_type asymmetric --learning_rate 1e-3 
-
-# python ./run_experiment.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 10 --step 3 --batch_size 256 --balanced --model_suffix worker_raw --uni_name Coteachingplus --noise_type asymmetric --learning_rate 1e-3 
-
-# python baseline_code/colearn/main.py --model cifar-wideresnet40 --dataset cifar-100 --num_epochs 10 --step 3 --batch_size 256 --balanced --uni_name Coteachingplus --noise_type asymmetric --learning_rate 1e-3 

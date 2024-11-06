@@ -16,11 +16,3 @@ export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "PYTHONPATH is set to: $PYTHONPATH"
 
 python ./baseline_code/colearn/main_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 5 --uni_name Decoupling --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.25
-
-# python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 0 --learning_rate 0.0001 --optimizer adam --batch_size 16 --uni_name raw --balanced --model_suffix worker_restore
-
-# python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 1 --learning_rate 0.0001 --optimizer adam --batch_size 16 --uni_name raw --balanced --model_suffix worker_restore
-
-# python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 2 --learning_rate 0.0001 --optimizer adam --batch_size 16 --uni_name raw --balanced --model_suffix worker_restore
-
-# python ./run_experiment.py --model wideresnet50 --dataset pet-37 --num_epochs 20 --step 3 --learning_rate 0.0001 --optimizer adam --batch_size 16 --uni_name raw --balanced --model_suffix worker_restore
