@@ -15,10 +15,10 @@ echo "CUDA_VISIBLE_DEVICES is set to: $CUDA_VISIBLE_DEVICES"
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "PYTHONPATH is set to: $PYTHONPATH"
 
-python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 2e-5 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0
+# python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 2e-5 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0
 # python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 2e-5 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.25
-python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 2e-5 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.5
-python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 2e-5 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.75
+python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 5 --repair_iter_num 20 --uni_name CRUL --learning_rate 2e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.5 --mixup_alpha 0.5
+# python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 2e-5 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.75
 
 # python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 0 --batch_size 32 --balanced --uni_name Coteaching --learning_rate 5e-3
 
