@@ -17,26 +17,13 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 
 # lnl
 ## best lnl method: ex.ct
-python ./baseline_code/colearn/main_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --uni_name Coteaching --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0
-# python ./baseline_code/colearn/main_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --uni_name Coteaching --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.25
+# python ./baseline_code/colearn/main_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --uni_name Coteaching --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0
+python ./baseline_code/colearn/main_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --uni_name Coteaching --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.25
 python ./baseline_code/colearn/main_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --uni_name Coteaching --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.5
 python ./baseline_code/colearn/main_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --uni_name Coteaching --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.75
+
 ## second best  lnl method: ex.ct+
-python ./baseline_code/colearn/main_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --uni_name Coteachingplus --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0
-# python ./baseline_code/colearn/main_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --uni_name Coteachingplus --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.25
+# python ./baseline_code/colearn/main_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --uni_name Coteachingplus --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0
+python ./baseline_code/colearn/main_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --uni_name Coteachingplus --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.25
 python ./baseline_code/colearn/main_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --uni_name Coteachingplus --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.5
 python ./baseline_code/colearn/main_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 10 --uni_name Coteachingplus --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.75
-
-# python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 0 --batch_size 32 --balanced --uni_name Coteaching --learning_rate 5e-3
-
-# python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 1 --batch_size 32 --balanced --model_suffix worker_raw --uni_name Coteaching --learning_rate 5e-3
-
-# python baseline_code/colearn/main.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 1 --batch_size 32 --balanced --uni_name Coteaching --learning_rate 5e-3
-
-# python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 2 --batch_size 32 --balanced --model_suffix worker_raw --uni_name Coteaching --learning_rate 5e-3
-
-# python baseline_code/colearn/main.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 2 --batch_size 32 --balanced --uni_name Coteaching --learning_rate 5e-3
-
-# python ./run_experiment.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 3 --batch_size 32 --balanced --model_suffix worker_raw --uni_name Coteaching --learning_rate 5e-3
-
-# python baseline_code/colearn/main.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --step 3 --batch_size 32 --balanced --uni_name Coteaching --learning_rate 5e-3
