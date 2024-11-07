@@ -25,8 +25,8 @@ def create_optimizer_scheduler(
             optimizer, T_max=epochs, eta_min=eta_min
         )
     else:
-        lr_scheduler = optim.lr_scheduler.ConstantLR(
-            optimizer, factor=factor, total_iters=epochs
+        lr_scheduler = optim.lr_scheduler.StepLR(
+            optimizer, 1, gamma=factor
         )
 
     return optimizer, lr_scheduler
