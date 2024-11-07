@@ -8,7 +8,7 @@ def create_optimizer_scheduler(
     learning_rate=1e-3,
     weight_decay=5e-4,
     eta_min=None,
-    min_epochs_for_decay=10,
+    min_epochs_for_decay=20,
     factor=0.95
 ):
     # 根据用户选择的优化器初始化

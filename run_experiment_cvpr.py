@@ -93,7 +93,7 @@ def train_step(
         settings.get_dataset_path(dataset_name, None, "test_label"), is_data=False
     )
 
-    if train_mode == "pretrain":  # 基于$D_0$数据集和原始的resnet网络训练一个模型 M_p0
+    if train_mode == "pretrain" or train_mode == "train":  # 基于$D_0$数据集和原始的resnet网络训练一个模型 M_p0
         # model_p0_path = settings.get_pretrain_ckpt_path(
         #     dataset_name, case, model_name, "worker_restore", step=step
         # )
@@ -102,17 +102,18 @@ def train_step(
 
         if uni_name is None:
             train_data = np.load(
-                settings.get_dataset_path(dataset_name, None, "pretrain_data")
+                settings.get_dataset_path(dataset_name, None, f"{train_mode}_data")
             )
             train_labels = np.load(
-                settings.get_dataset_path(dataset_name, None, "pretrain_label")
+                settings.get_dataset_path(dataset_name, None, f"{train_mode}_label")
             )
 
             # 打印用于训练的模型和数据
             print("用于训练的数据: pretrain_data.npy 和 pretrain_label.npy")
             print("用于训练的模型: ResNet18 初始化")
 
-            model_p0 = load_custom_model(model_name, num_classes)
+            load_pretrained = True  #False if dataset_name == "cifar-10" or dataset_name == "cifar-100" else True
+            model_p0 = load_custom_model(model_name, num_classes, load_pretrained=load_pretrained)
             model_p0 = ClassifierWrapper(model_p0, num_classes)
 
             print(f"开始训练 Pretrain on ({dataset_name})...")

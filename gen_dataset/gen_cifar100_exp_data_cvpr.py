@@ -61,7 +61,7 @@ def create_cifar100_npy_files(
     noise_ratio=0.25,
     split_ratio=0.6,
 ):
-    rng = np.random.default_rng(42)
+    rng = np.random.default_rng(87)
 
     data_transform = transforms.Compose(
         [
@@ -149,8 +149,8 @@ def create_cifar100_npy_files(
 
 
 def main():
-    np.random.seed(42)
-    torch.manual_seed(42)
+    np.random.seed(31)
+    torch.manual_seed(47)
 
     parser = argparse.ArgumentParser(
         description="Generate CIFAR-100 experimental datasets."
