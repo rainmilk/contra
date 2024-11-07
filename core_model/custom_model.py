@@ -31,6 +31,18 @@ def load_custom_model(model_name, num_classes, load_pretrained=True, ckpt_path=N
             model = models.wide_resnet50_2(weights=weights)
         else:
             model = models.wide_resnet50_2(num_classes=num_classes)
+    elif model_name == "efficientnet_s":
+        if load_pretrained:
+            weights = models.EfficientNet_V2_S_Weights.DEFAULT
+            model = models.efficientnet_v2_s(weights=weights)
+        else:
+            model = models.efficientnet_v2_s(num_classes=num_classes)
+    elif model_name == "efficientnet_m":
+        if load_pretrained:
+            weights = models.EfficientNet_V2_M_Weights.DEFAULT
+            model = models.efficientnet_v2_m(weights=weights)
+        else:
+            model = models.efficientnet_v2_m(num_classes=num_classes)
     elif model_name == "vgg19":
         if load_pretrained:
             weights = models.VGG19_BN_Weights.DEFAULT
@@ -69,6 +81,14 @@ class ClassifierWrapper(nn.Module):
                 param.requires_grad = False
 
         all_modules = list(backbone.children())
+
+        children = list(all_modules[-1].children())
+        while len(children) > 1:
+            last_module = list(children)
+            all_modules.pop()
+            all_modules += last_module
+            children = list(all_modules[-1].children())
+
         features = all_modules[-1].in_features
         modules = [*all_modules[:-1], nn.Flatten()]
 

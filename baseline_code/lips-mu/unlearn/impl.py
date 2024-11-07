@@ -9,6 +9,9 @@ import torch
 import pruner
 import utils
 from pruner import extract_mask, prune_model_custom, remove_prune
+from core_model.train_test import model_test
+
+from configs import settings
 
 sys.path.append(".")
 from trainer import validate
@@ -59,6 +62,8 @@ def load_unlearn_checkpoint(model, device, args, filename="checkpoint.pth.tar"):
 
 def _iterative_unlearn_impl(unlearn_iter_func):
     def _wrapped(data_loaders, model, criterion, args):
+        test_loader = data_loaders["test"]
+        model_history = []
         decreasing_lr = list(map(int, args.decreasing_lr.split(",")))
         if args.rewind_epoch != 0:
             initialization = torch.load(
@@ -120,7 +125,13 @@ def _iterative_unlearn_impl(unlearn_iter_func):
             )
             scheduler.step()
 
+            if test_loader is not None:
+                eval_results = model_test(test_loader, model)
+                model_history.append(eval_results)
+
             print("one epoch duration:{}".format(time.time() - start_time))
+
+        return model_history
 
     return _wrapped
 

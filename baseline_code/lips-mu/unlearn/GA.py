@@ -167,10 +167,10 @@ def GA_l1(data_loaders, model, criterion, optimizer, epoch, args):
 
     print("train_accuracy {top1.avg:.3f}".format(top1=top1))
 
-    test_loader = data_loaders["test"]
-    device = (
-        torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-    )
-    test_model(model, test_loader, criterion, device, epoch)
+    # test_loader = data_loaders["test"]
+    # device = (
+    #     torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    # )
+    # test_model(model, test_loader, criterion, device, epoch)
 
     return top1.avg

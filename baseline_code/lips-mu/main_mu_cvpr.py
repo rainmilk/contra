@@ -68,6 +68,10 @@ def main():
         unique_name=uni_name,
     )
 
+    history_save_path = settings.get_ckpt_path(
+        args.dataset, case, args.model, model_suffix="history", unique_name=uni_name
+    )
+
     unlearn_data_loaders = OrderedDict(
         retain=retain_loader, forget=forget_loader, val=test_loader, test=test_loader
     )
@@ -84,12 +88,15 @@ def main():
     model.load_state_dict(checkpoint, strict=False)
     model.to(device)
 
-    unlearn_method(unlearn_data_loaders, model, criterion, args)
+    model_history = unlearn_method(unlearn_data_loaders, model, criterion, args)
 
     # save model
     os.makedirs(os.path.dirname(save_model_path), exist_ok=True)
     torch.save(model.state_dict(), save_model_path)
     print("model saved to:", save_model_path)
+
+    #save history
+    torch.save(model_history, history_save_path)
 
 
 if __name__ == "__main__":

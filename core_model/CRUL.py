@@ -133,13 +133,13 @@ def iterate_repair_model(
     conf_agree_mix_labels = (tradeoff_alpha * teacher_agree_probs[conf_idx]
                                 + (1 - tradeoff_alpha) * worker_agree_probs[conf_idx])
 
-    disagree_mix_data = disagree_data  # [~disagree_conf_idx]
+    disagree_mix_data = disagree_data[~disagree_conf_idx]
     agree_mix_data = agree_data[~conf_idx]
 
-    worker_disagree_lc_probs = worker_disagree_probs  # [~disagree_conf_idx]
+    worker_disagree_lc_probs = worker_disagree_probs[~disagree_conf_idx]
     worker_agree_lc_probs = worker_agree_probs[~conf_idx]
 
-    teacher_disagree_lc_probs = teacher_disagree_probs  # [~disagree_conf_idx]
+    teacher_disagree_lc_probs = teacher_disagree_probs[~disagree_conf_idx]
     teacher_agree_lc_probs = teacher_agree_probs[~conf_idx]
 
     disagree_mix_labels = (

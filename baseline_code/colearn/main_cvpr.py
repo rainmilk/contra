@@ -18,6 +18,7 @@ import os
 import shutil
 
 from core_model.dataset import get_dataset_loader
+from core_model.train_test import model_test
 from args_paser import parse_args
 from configs import settings
 from core_model.custom_model import load_custom_model, ClassifierWrapper
@@ -114,6 +115,10 @@ def main():
         model_suffix="restore",
         unique_name=uni_name,
     )
+
+    history_save_path = settings.get_ckpt_path(
+        custom_args.dataset, case, custom_args.model, model_suffix="history", unique_name=uni_name
+    )
     # checkpoint = torch.load(load_model_path)
 
     loaded_model1 = load_custom_model(
@@ -146,16 +151,21 @@ def main():
         % (epoch + 1, custom_args.num_epochs, num_test_images, test_acc)
     )
 
-    acc_list, acc_all_list = [], []
-    best_acc, best_epoch = 0.0, 0
+    best_acc, best_epoch = 0, 0
+    model_history = []
 
     for epoch in range(1, custom_args.num_epochs):
         # train
         model.train(trainloader, epoch)
         # evaluate
-        test_acc, test_acc2 = model.evaluate(testloader)
-        # nni.report_intermediate_result(test_acc)
-        if best_acc < test_acc:
+        # test_acc, test_acc2 = model.evaluate(testloader)
+        eval_result = model_test(
+            testloader, model1, device=device
+        )
+        model_history.append(eval_result)
+        test_acc = eval_result["global"]
+
+        if epoch >= 5 and best_acc < test_acc:
             best_acc, best_epoch = test_acc, epoch
             # save model1
             os.makedirs(os.path.dirname(save_model_path), exist_ok=True)
@@ -167,13 +177,15 @@ def main():
             % (epoch + 1, custom_args.num_epochs, num_test_images, test_acc)
         )
 
-        if epoch >= custom_args.num_epochs - 10:
-            acc_list.extend([test_acc])
-        acc_all_list.extend([test_acc])
+    if best_acc == 0:
+        # save model
+        os.makedirs(os.path.dirname(save_model_path), exist_ok=True)
+        torch.save(model.model_scratch.state_dict(), save_model_path)
+        print("model saved to:", save_model_path)
 
-
-    if config["save_result"]:
-        acc_np = np.array(acc_list)
+    torch.save(model_history, history_save_path)
+    # if config["save_result"]:
+    #     acc_np = np.array(acc_list)
         # nni.report_final_result(acc_np.mean())
         # jsonfile = get_log_name(args.config, config)
         # np.save(jsonfile.replace('.json', '.npy'), np.array(acc_all_list))

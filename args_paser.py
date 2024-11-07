@@ -67,16 +67,16 @@ def make_arg_parser(parser=None):
     parser.add_argument(
         "--model",
         type=str,
-        choices=[
-            "cifar-resnet18",  # default for cifar-10
-            "cifar-wideresnet40",  # default for cifar-100
-            "cifar-resnet50",  # default for cifar-100
-            "wideresnet50",  # default for pet-37
-            "resnet18",
-            "resnet50",
-            "resnet101",
-            "vgg19",
-        ],
+        # choices=[
+        #     "cifar-resnet18",  # default for cifar-10
+        #     "cifar-wideresnet40",  # default for cifar-100
+        #     "cifar-resnet50",  # default for cifar-100
+        #     "wideresnet50",  # default for pet-37
+        #     "resnet18",
+        #     "resnet50",
+        #     "resnet101",
+        #     "vgg19",
+        # ],
         required=True,
         help="Select in (cifar-resnet18, cifar-wideresnet40, cifar-resnet50, resnet18, resnet50, resnet101, vgg19, wideresnet50)",
     )
