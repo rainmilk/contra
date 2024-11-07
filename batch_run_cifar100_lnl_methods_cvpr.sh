@@ -16,12 +16,12 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 
 # 定义要运行的脚本
 declare -a scripts=(
-    "run_cifar100_lnl_coteaching_cvpr.sh" # 1
-    "run_cifar100_lnl_coteaching_plus_cvpr.sh" # 2
-    "run_cifar100_lnl_jocor_cvpr.sh" # 3
-    "run_cifar100_lnl_decoupling_cvpr.sh" # 4
-    "run_cifar100_lnl_negativeLearning_cvpr.sh" # 5
-    "run_cifar100_lnl_pencil_cvpr.sh" # 6
+    # "run_cifar100_lnl_coteaching_cvpr.sh" # 1
+    # "run_cifar100_lnl_coteaching_plus_cvpr.sh" # 2
+    # "run_cifar100_lnl_jocor_cvpr.sh" # 1
+    # "run_cifar100_lnl_decoupling_cvpr.sh" # 2
+    # "run_cifar100_lnl_negativeLearning_cvpr.sh" # 1
+    # "run_cifar100_lnl_pencil_cvpr.sh" # 2
 )
 
 # 检查GPU数量是否足够
