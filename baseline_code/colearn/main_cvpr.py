@@ -180,7 +180,7 @@ def main():
     if best_acc == 0:
         # save model
         os.makedirs(os.path.dirname(save_model_path), exist_ok=True)
-        torch.save(model.model_scratch.state_dict(), save_model_path)
+        torch.save(model.model1.state_dict(), save_model_path)
         print("model saved to:", save_model_path)
 
     torch.save(model_history, history_save_path)
