@@ -219,20 +219,16 @@ def train_model(
     )
 
     # weights = torchvision.models.ResNet18_Weights.DEFAULT
-    transform_train = transforms.Compose(
+    transform_train = None
+    if "cifar-100" == dataset_name or "cifar-10" == dataset_name:
+        transform_train = transforms.Compose(
             [
                 torch.tensor,
+                transforms.RandomCrop(32, padding=4),
                 transforms.RandomHorizontalFlip(),
-            ])
-    # if "cifar-100" == dataset_name:
-    #     transform_train = transforms.Compose(
-    #         [
-    #             torch.tensor,
-    #             transforms.RandomCrop(32, padding=4),
-    #             transforms.RandomHorizontalFlip(),
-    #             transforms.RandomRotation(15),
-    #         ]
-    #     )
+                transforms.RandomRotation(15),
+            ]
+        )
 
     transform_test = transforms.Compose(
         [
@@ -259,8 +255,9 @@ def train_model(
     test_accuracies = []
 
     if data_aug:
-        cutmix_transform = v2.CutMix(alpha=1.0, num_classes=num_classes)
-        mixup_transform = v2.MixUp(alpha=0.5, num_classes=num_classes)
+        alpha = 0.25 if "cifar-10" == dataset_name or "cifar-100" == dataset_name else 0.75
+        cutmix_transform = v2.CutMix(alpha=alpha, num_classes=num_classes)
+        mixup_transform = v2.MixUp(alpha=alpha, num_classes=num_classes)
 
     for epoch in tqdm(range(epochs), desc="Training Progress"):
         running_loss = 0.0
@@ -283,7 +280,7 @@ def train_model(
                 targets = targets.to(torch.long)
                 
                 if data_aug:
-                    transform = np.random.choice([mixup_transform, cutmix_transform])
+                    transform = mixup_transform  # np.random.choice([mixup_transform, cutmix_transform])
                     inputs, targets = transform(inputs, targets)
 
                 inputs, targets = inputs.to(device), targets.to(device)

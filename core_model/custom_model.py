@@ -43,6 +43,12 @@ def load_custom_model(model_name, num_classes, load_pretrained=True, ckpt_path=N
             model = models.efficientnet_v2_m(weights=weights)
         else:
             model = models.efficientnet_v2_m(num_classes=num_classes)
+    elif model_name == "efficientnet_b7":
+        if load_pretrained:
+            weights = models.EfficientNet_B7_Weights.DEFAULT
+            model = models.efficientnet_b7(weights=weights)
+        else:
+            model = models.efficientnet_b7(num_classes=num_classes)
     elif model_name == "vgg19":
         if load_pretrained:
             weights = models.VGG19_BN_Weights.DEFAULT
@@ -71,7 +77,6 @@ class ClassifierWrapper(nn.Module):
     def __init__(self, backbone, num_classes,
                  freeze_weights=False,
                  bypass=False,
-                 batchnorm_blocks=-1,
                  spectral_norm=False):
         super(ClassifierWrapper, self).__init__()
 
@@ -81,23 +86,13 @@ class ClassifierWrapper(nn.Module):
                 param.requires_grad = False
 
         all_modules = list(backbone.children())
+        self.feature_model = nn.Sequential(*all_modules[:-1], nn.Flatten())
 
-        children = list(all_modules[-1].children())
-        while len(children) > 1:
-            last_module = list(children)
-            all_modules.pop()
-            all_modules += last_module
-            children = list(all_modules[-1].children())
+        # if not bypass and batchnorm_blocks >= 0:
+        #     modules += [
+        #         *[nn.ReLU(), nn.BatchNorm1d(features), nn.Linear(features, features)] * batchnorm_blocks,
+        #         nn.ReLU(), nn.BatchNorm1d(features)]
 
-        features = all_modules[-1].in_features
-        modules = [*all_modules[:-1], nn.Flatten()]
-
-        if not bypass and batchnorm_blocks >= 0:
-            modules += [
-                *[nn.ReLU(), nn.BatchNorm1d(features), nn.Linear(features, features)] * batchnorm_blocks,
-                nn.ReLU(), nn.BatchNorm1d(features)]
-
-        self.feature_model = nn.Sequential(*modules)
 
         if spectral_norm:
             self.apply(self._add_spectral_norm)
@@ -105,7 +100,15 @@ class ClassifierWrapper(nn.Module):
         if bypass:
             self.fc = all_modules[-1]
         else:
-            self.fc = nn.Linear(features, num_classes)
+            children = list(all_modules[-1].children())
+            if len(children) > 1:
+                last_modules = list(children)
+                features = last_modules[-1].in_features
+                last_modules[-1] = nn.Linear(features, num_classes)
+                self.fc = nn.Sequential(*last_modules)
+            else:
+                features = all_modules[-1].in_features
+                self.fc = nn.Linear(features, num_classes)
 
     def forward(self, x, output_emb=False):
         emb = self.feature_model(x)

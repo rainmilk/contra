@@ -69,7 +69,7 @@ def main():
     config = config_module.config
     config.update(custom_args.__dict__)
     config["lr"] = config["learning_rate"]
-    config["epoch"] = config["num_epochs"]
+    config["epochs"] = config["num_epochs"]
 
     set_seed(config["seed"])
 
