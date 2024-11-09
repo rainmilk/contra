@@ -152,7 +152,7 @@ def iterate_repair_model(
     if args.num_epochs > 0 and len(disagree_mix_labels) > 0:
         print("Mix up lower confidence for worker model...")
 
-        temperature = 1.0
+        temperature = args.temperature
         mix_lc_data = np.concatenate([disagree_mix_data, agree_mix_data], axis=0)
         mix_lc_label = np.concatenate([disagree_mix_labels, agree_mix_labels], axis=0)
         mix_lc_label = sharpen(mix_lc_label, T=temperature)
