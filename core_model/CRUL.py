@@ -54,7 +54,7 @@ def iterate_repair_model(
     teacher_disagree_probs = teacher_inc_probs[disagree_idx]
     worker_disagree_probs = working_inc_probs[disagree_idx]
     worker_disagree_preds = working_inc_predicts[disagree_idx]
-    teacher_disagree_preds = teacher_inc_predicts[disagree_idx]
+    # teacher_disagree_preds = teacher_inc_predicts[disagree_idx]
     teacher_disagree_model_conf = np.max(teacher_disagree_probs, axis=-1)
     worker_disagree_model_conf = np.max(worker_disagree_probs, axis=-1)
     joint_disagree_model_conf = (tradeoff_alpha * worker_disagree_model_conf
@@ -62,10 +62,11 @@ def iterate_repair_model(
     disagree_conf_idx = joint_disagree_model_conf >= disagree_threshold
 
     mix_data = disagree_data[disagree_conf_idx]
+    gamma = len(mix_data)/len(disagree_data)
 
     ga_loss_alpha = -1.0  # GA
     mix_worker_labels = worker_disagree_preds[disagree_conf_idx]
-    mix_worker_labels = label_smooth(mix_worker_labels, num_classes, gamma=0.4)
+    mix_worker_labels = label_smooth(mix_worker_labels, num_classes, gamma=gamma)
     if args.ul_epochs > 0 and len(mix_worker_labels) > 0:
         print("Unlearning high-confidence for worker model...")
 
@@ -261,7 +262,7 @@ def label_smooth(labels, num_classes, gamma=0.0):
 def execute(args):
     # 1. 获取公共参数
     num_classes = settings.num_classes_dict[args.dataset]
-    kwargs = parse_kwargs(args.kwargs)
+    # kwargs = parse_kwargs(args.kwargs)
     case = settings.get_case(args.noise_ratio, args.noise_type)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -334,9 +335,9 @@ def execute(args):
 
     ul_lr = lr_scale * learning_rate
     ul_worker_opt = optim.SGD(working_model.parameters(), lr=ul_lr)
-    ul_worker_lr_scheduler = optim.lr_scheduler.ConstantLR(ul_worker_opt, factor=0.9, total_iters=args.num_epochs)
+    ul_worker_lr_scheduler = optim.lr_scheduler.StepLR(ul_worker_opt, step_size=1, gamma=0.9)
     ul_teacher_opt = optim.SGD(teacher_model.parameters(), lr=ul_lr)
-    ul_teacher_lr_scheduler = optim.lr_scheduler.ConstantLR(ul_teacher_opt, factor=0.9, total_iters=args.num_epochs)
+    ul_teacher_lr_scheduler = optim.lr_scheduler.StepLR(ul_teacher_opt, step_size=1, gamma=0.9)
 
 
     # aux_data, aux_labels, aux_dataloader = get_dataset_loader(
@@ -389,7 +390,7 @@ def execute(args):
     best_teacher = 0
     for i in range(repair_iter_num):
         print("-----------restore iterate %d ----------------------" % i)
-        ga_loss_alpha = -0.5 * (1 - i/repair_iter_num)
+        # ga_loss_alpha = -0.5 * (1 - i/repair_iter_num)
         iterate_repair_model(
             working_model,
             working_opt,

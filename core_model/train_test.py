@@ -39,7 +39,7 @@ def model_train(
 
         # 更新学习率调度器
         model.train()
-
+        lr_scheduler.step(epoch)
         # 用 tqdm 显示训练进度条
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1} Training") as pbar:
             for i, (inputs, labels) in enumerate(train_loader):
@@ -62,7 +62,6 @@ def model_train(
                 loss = loss_lambda * criterion(outputs, labels)
                 loss.backward()  # 反向传播
                 optimizer.step()  # 更新参数
-                lr_scheduler.step(epoch)
                 running_loss += loss.item()
 
                 # 计算准确率
