@@ -16,7 +16,7 @@ def create_dataset_files(
     dataset_name="cifar-10",
     noise_type="symmetric",
     noise_ratio=0.25,
-    split_ratio=0.6,
+    split_ratio=0.4,
 ):
     rng = np.random.default_rng(42)  # 使用新的随机数生成器并设置种子
 
@@ -43,9 +43,7 @@ def create_dataset_files(
 
     # D_1_plus：添加噪声
     num_noisy_samples = int(len(D_inc_labels) * noise_ratio)
-    noisy_indices = rng.choice(
-        len(D_inc_labels), num_noisy_samples, replace=False
-    )
+    noisy_indices = rng.choice(len(D_inc_labels), num_noisy_samples, replace=False)
     noisy_sel = np.zeros(len(D_inc_labels), dtype=np.bool_)
     noisy_sel[noisy_indices] = True
 
@@ -55,8 +53,30 @@ def create_dataset_files(
     D_normal_data = D_inc_data[~noisy_sel]
     D_normal_labels = D_inc_labels[~noisy_sel]
 
+    # 定义非对称噪声映射
+    asymmetric_mapping = {
+        0: 5,
+        1: 6,
+        2: 7,
+        3: 8,
+        4: 9,
+        5: 0,
+        6: 1,
+        7: 2,
+        8: 3,
+        9: 4,
+    }
+
+    # 根据噪声类型生成噪声标签
     if noise_type == "symmetric":
         D_noisy_labels = rng.choice(num_classes, num_noisy_samples, replace=True)
+    elif noise_type == "asymmetric":
+        D_noisy_labels = np.array(
+            [
+                asymmetric_mapping[label] if label in asymmetric_mapping else label
+                for label in D_noisy_true_labels
+            ]
+        )
     else:
         raise ValueError("Invalid noise type.")
 
@@ -109,14 +129,14 @@ def main():
         help="数据集仅支持：'cifar-10'",
     )
     parser.add_argument(
-        "--split_ratio", type=float, default=0.6, help="训练集划分比例（默认 0.6）"
+        "--split_ratio", type=float, default=0.4, help="训练集划分比例（默认 0.4）"
     )
     parser.add_argument(
         "--noise_type",
         type=str,
-        choices=["symmetric"],
+        choices=["symmetric", "asymmetric"],
         default="symmetric",
-        help="标签噪声类型：目前仅支持 'symmetric'",
+        help="标签噪声类型：'symmetric' 或 'asymmetric'",
     )
     parser.add_argument(
         "--noise_ratio", type=float, default=0.25, help="噪声比例（默认 0.25）"
