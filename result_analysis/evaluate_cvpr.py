@@ -49,11 +49,11 @@ def execute(args):
         print(f"Evaluating test_data:")
         results, embedding = model_test(test_loader, model)
         # print("Results: %.4f" % results)
-        print("Results: " % results)
+        print("Results: ", results)
         print(f"Evaluating train_noisy_data:")
         n_results, n_embedding = model_test(noisy_loader, model)
         # print("Results: %.4f" % results)
-        print("Results: " % results)
+        print("Results: ", n_results)
 
 
 
