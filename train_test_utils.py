@@ -224,9 +224,9 @@ def train_model(
         transform_train = transforms.Compose(
             [
                 torch.tensor,
-                transforms.RandomCrop(32, padding=4),
+                # transforms.RandomCrop(32, padding=4),
                 transforms.RandomHorizontalFlip(),
-                transforms.RandomRotation(15),
+                # transforms.RandomRotation(15),
             ]
         )
 
