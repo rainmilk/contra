@@ -22,7 +22,7 @@ python ./core_model/CRUL.py --uni_name CRUL_full --model wideresnet50 --dataset 
 python ./core_model/CRUL.py --uni_name CRUL_ul --model wideresnet50 --dataset flower-102 --learning_rate 1e-4 --optimizer adam --batch_size 256 --noise_type symmetric --noise_ratio 0.5 --repair_iter_num 3 --ls_gamma 0.3 --num_epochs 3 --ul_epochs 0 --agree_epochs 3
 
 # w/o High-confidence agreement label smoothing
-python ./core_model/CRUL.py --uni_name CRUL_lc --model wideresnet50 --dataset flower-102 --learning_rate 1e-4 --optimizer adam --batch_size 256 --noise_type symmetric --noise_ratio 0.5 --repair_iter_num 3 --ls_gamma 0.3 --num_epochs 3 --ul_epochs 2 --agree_epochs 0
+python ./core_model/CRUL.py --uni_name CRUL_ls --model wideresnet50 --dataset flower-102 --learning_rate 1e-4 --optimizer adam --batch_size 256 --noise_type symmetric --noise_ratio 0.5 --repair_iter_num 3 --ls_gamma 0.3 --num_epochs 3 --ul_epochs 2 --agree_epochs 0
 
 # w/o Unlearning and High-confidence agreement label smoothing
 python ./core_model/CRUL.py --uni_name CRUL_ullc --model wideresnet50 --dataset flower-102 --learning_rate 1e-4 --optimizer adam --batch_size 256 --noise_type symmetric --noise_ratio 0.5 --repair_iter_num 3 --ls_gamma 0.3 --num_epochs 3 --ul_epochs 0 --agree_epochs 0
