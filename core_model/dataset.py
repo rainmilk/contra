@@ -3,6 +3,7 @@ from torch.utils.data import Dataset, DataLoader
 import numpy as np
 import random
 from configs import settings
+import torch
 
 
 class BaseTensorDataset(Dataset):
@@ -121,9 +122,10 @@ class MixupDataset(Dataset):
 
 class NormalizeDataset(BaseTensorDataset):
     def __init__(self, data, labels, transforms=None, output_index=False,
-                 channel_first=True, mean=None, std=None):
+                 channel_first=True, mean=None, std=None, device=None):
         super().__init__(data, labels, transforms, output_index)
         self.data = normalize_dataset(data, channel_first, mean, std)
+        if device is not None: self.data = torch.as_tensor(data, device=device)
 
 
 def get_dataset_loader(
@@ -142,6 +144,7 @@ def get_dataset_loader(
     output_index=False,
     data_name=None,
     label_name=None,
+    device=None,
     num_workers=0,
 ):
     """

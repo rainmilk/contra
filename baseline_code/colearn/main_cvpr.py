@@ -81,7 +81,8 @@ def main():
         case,
         batch_size=custom_args.batch_size,
         shuffle=True,
-        output_index=output_index
+        output_index=output_index,
+        device=device
     )
 
     _, _, testloader = get_dataset_loader(
