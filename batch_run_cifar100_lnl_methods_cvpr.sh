@@ -22,9 +22,9 @@ declare -a scripts=(
     # "run_cifar100_lnl_disc_cvpr.sh" # 4
     # "run_cifar100_lnl_elr_cvpr.sh" # 4
     # "run_cifar100_lnl_gjs_cvpr.sh" # 4
-    # "run_cifar100_lnl_jocor_cvpr.sh" # 1
-    # "run_cifar100_lnl_negativeLearning_cvpr.sh" # 1
-    # "run_cifar100_lnl_pencil_cvpr.sh" # 2
+    # "run_cifar100_lnl_jocor_cvpr.sh" # 4
+    # "run_cifar100_lnl_negativeLearning_cvpr.sh" # 5
+    # "run_cifar100_lnl_pencil_cvpr.sh" # 6
 )
 
 # 检查GPU数量是否足够

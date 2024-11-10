@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # 定义要查找并杀掉的进程关键字列表
-keywords=("baseline_code" "core_model" "run_experiment.py")
+# keywords=("baseline_code" "core_model" "run_experiment.py")
+keywords=("baseline_code")
 
 # 定义监控时长（秒），可以通过第一个参数指定，默认是30秒
-monitor_duration=${1:-30}
+monitor_duration=${1:-60}
 end_time=$((SECONDS + monitor_duration))
 
 # 函数用于杀掉进程并打印结果
