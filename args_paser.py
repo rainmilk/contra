@@ -244,7 +244,7 @@ def make_arg_parser(parser=None):
     parser.add_argument(
         "--agree_epochs",
         type=int,
-        default=3,
+        default=2,
         help="Number of unlearning epochs (default: 3)",
     )
 
