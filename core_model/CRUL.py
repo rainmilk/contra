@@ -17,6 +17,15 @@ from custom_model import load_custom_model, ClassifierWrapper
 from train_test import model_train, model_test, model_forward
 from configs import settings
 
+
+def mixup_data(data_pair, dims, alpha):
+    data_x, data_y = data_pair
+    size = [1] * dims
+    size[0] = len(data_x)
+    a = np.random.beta(alpha, alpha, size)
+    return a * data_x + (1 - a) * data_y
+
+
 def iterate_repair_model(
     working_model,
     working_opt,
@@ -54,7 +63,7 @@ def iterate_repair_model(
     teacher_disagree_probs = teacher_inc_probs[disagree_idx]
     worker_disagree_probs = working_inc_probs[disagree_idx]
     worker_disagree_preds = working_inc_predicts[disagree_idx]
-    teacher_disagree_preds = teacher_inc_predicts[disagree_idx]
+    # teacher_disagree_preds = teacher_inc_predicts[disagree_idx]
     teacher_disagree_model_conf = np.max(teacher_disagree_probs, axis=-1)
     worker_disagree_model_conf = np.max(worker_disagree_probs, axis=-1)
     joint_disagree_model_conf = (tradeoff_alpha * worker_disagree_model_conf
@@ -62,10 +71,11 @@ def iterate_repair_model(
     disagree_conf_idx = joint_disagree_model_conf >= disagree_threshold
 
     mix_data = disagree_data[disagree_conf_idx]
+    gamma = len(mix_data)/len(disagree_data)
 
     ga_loss_alpha = -1.0  # GA
     mix_worker_labels = worker_disagree_preds[disagree_conf_idx]
-    mix_worker_labels = label_smooth(mix_worker_labels, num_classes, gamma=0.4)
+    mix_worker_labels = label_smooth(mix_worker_labels, num_classes, gamma=gamma)
     if args.ul_epochs > 0 and len(mix_worker_labels) > 0:
         print("Unlearning high-confidence for worker model...")
 
@@ -121,7 +131,7 @@ def iterate_repair_model(
     agree_predicts = teacher_inc_predicts[agree_idx]
     teacher_agree_model_conf = np.max(teacher_agree_probs, axis=-1)
     worker_agree_model_conf = np.max(worker_agree_probs, axis=-1)
-    joint_agree_model_conf = tradeoff_alpha * teacher_agree_model_conf + (1 - tradeoff_alpha) * worker_agree_model_conf
+    joint_agree_model_conf = (teacher_agree_model_conf + worker_agree_model_conf)/2
     sample_size = round(len(joint_agree_model_conf) * top_conf)
     sample_idx = np.argpartition(joint_agree_model_conf, -sample_size)[-sample_size:]
     conf_idx = joint_agree_model_conf >= agree_threshold
@@ -130,8 +140,7 @@ def iterate_repair_model(
     conf_agree_data = agree_data[conf_idx]
     conf_agree_labels = agree_predicts[conf_idx]
     # conf_agree_mix_labels = np.eye(num_classes)[conf_agree_labels]
-    conf_agree_mix_labels = (tradeoff_alpha * teacher_agree_probs[conf_idx]
-                                + (1 - tradeoff_alpha) * worker_agree_probs[conf_idx])
+    conf_agree_mix_labels = (teacher_agree_probs[conf_idx] + worker_agree_probs[conf_idx])/2
 
     disagree_mix_data = disagree_data[~disagree_conf_idx]
     agree_mix_data = agree_data[~conf_idx]
@@ -142,21 +151,20 @@ def iterate_repair_model(
     teacher_disagree_lc_probs = teacher_disagree_probs[~disagree_conf_idx]
     teacher_agree_lc_probs = teacher_agree_probs[~conf_idx]
 
-    disagree_mix_labels = (
-        tradeoff_alpha * teacher_disagree_lc_probs + (1 - tradeoff_alpha) * worker_disagree_lc_probs
-    )
-    agree_mix_labels = (
-        tradeoff_alpha * teacher_agree_lc_probs + (1 - tradeoff_alpha) * worker_agree_lc_probs
-    )
-    # agree_mix_labels = sharpen(agree_mix_labels, T=0.8)
-    if args.num_epochs > 0 and len(disagree_mix_labels) > 0:
-        print("Mix up lower confidence for worker model...")
-
+    if args.num_epochs > 0:
         temperature = args.temperature
+        conf_agree_mix_labels = sharpen(conf_agree_mix_labels, T=temperature)
         mix_lc_data = np.concatenate([disagree_mix_data, agree_mix_data], axis=0)
+
+        print("Mix up lower confidence for worker model...")
+        disagree_mix_labels = mixup_data((teacher_disagree_lc_probs, worker_disagree_lc_probs), 2, 1.0)
+        # tradeoff_alpha * teacher_disagree_lc_probs + (1 - tradeoff_alpha) * worker_disagree_lc_probs
+        agree_mix_labels = mixup_data((teacher_agree_lc_probs, worker_agree_lc_probs), 2, 1.0)
+        # tradeoff_alpha * teacher_agree_lc_probs + (1 - tradeoff_alpha) * worker_agree_lc_probs
+        # agree_mix_labels = sharpen(agree_mix_labels, T=0.8)
         mix_lc_label = np.concatenate([disagree_mix_labels, agree_mix_labels], axis=0)
         mix_lc_label = sharpen(mix_lc_label, T=temperature)
-        conf_agree_mix_labels = sharpen(conf_agree_mix_labels, T=temperature)
+
         mix_dataloader_shuffled = mix_up_dataloader(
             mix_lc_data,
             mix_lc_label,
@@ -181,6 +189,26 @@ def iterate_repair_model(
         )
 
         print("Mix up lower confidence for teacher model...")
+
+        disagree_mix_labels = mixup_data((teacher_disagree_lc_probs, worker_disagree_lc_probs), 2, 1.0)
+        # tradeoff_alpha * teacher_disagree_lc_probs + (1 - tradeoff_alpha) * worker_disagree_lc_probs
+        agree_mix_labels = mixup_data((teacher_agree_lc_probs, worker_agree_lc_probs), 2, 1.0)
+        # tradeoff_alpha * teacher_agree_lc_probs + (1 - tradeoff_alpha) * worker_agree_lc_probs
+        # agree_mix_labels = sharpen(agree_mix_labels, T=0.8)
+        mix_lc_label = np.concatenate([disagree_mix_labels, agree_mix_labels], axis=0)
+        mix_lc_label = sharpen(mix_lc_label, T=temperature)
+
+        mix_dataloader_shuffled = mix_up_dataloader(
+            mix_lc_data,
+            mix_lc_label,
+            conf_agree_data,
+            conf_agree_mix_labels,
+            mean,
+            std,
+            batch_size=args.batch_size,
+            alpha=args.mixup_alpha,
+            transforms=None,
+        )
         model_train(
             mix_dataloader_shuffled,
             teacher_model,
@@ -261,7 +289,7 @@ def label_smooth(labels, num_classes, gamma=0.0):
 def execute(args):
     # 1. 获取公共参数
     num_classes = settings.num_classes_dict[args.dataset]
-    kwargs = parse_kwargs(args.kwargs)
+    # kwargs = parse_kwargs(args.kwargs)
     case = settings.get_case(args.noise_ratio, args.noise_type)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -334,9 +362,9 @@ def execute(args):
 
     ul_lr = lr_scale * learning_rate
     ul_worker_opt = optim.SGD(working_model.parameters(), lr=ul_lr)
-    ul_worker_lr_scheduler = optim.lr_scheduler.ConstantLR(ul_worker_opt, factor=0.9, total_iters=args.num_epochs)
+    ul_worker_lr_scheduler = optim.lr_scheduler.StepLR(ul_worker_opt, step_size=1, gamma=0.9)
     ul_teacher_opt = optim.SGD(teacher_model.parameters(), lr=ul_lr)
-    ul_teacher_lr_scheduler = optim.lr_scheduler.ConstantLR(ul_teacher_opt, factor=0.9, total_iters=args.num_epochs)
+    ul_teacher_lr_scheduler = optim.lr_scheduler.StepLR(ul_teacher_opt, step_size=1, gamma=0.9)
 
 
     # aux_data, aux_labels, aux_dataloader = get_dataset_loader(
@@ -389,7 +417,7 @@ def execute(args):
     best_teacher = 0
     for i in range(repair_iter_num):
         print("-----------restore iterate %d ----------------------" % i)
-        ga_loss_alpha = -0.5 * (1 - i/repair_iter_num)
+        # ga_loss_alpha = -0.5 * (1 - i/repair_iter_num)
         iterate_repair_model(
             working_model,
             working_opt,

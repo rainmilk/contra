@@ -223,7 +223,7 @@ def train_model(
     if "cifar-100" == dataset_name or "cifar-10" == dataset_name:
         transform_train = transforms.Compose(
             [
-                torch.tensor,
+                torch.as_tensor,
                 # transforms.RandomCrop(32, padding=4),
                 transforms.RandomHorizontalFlip(),
                 # transforms.RandomRotation(15),
@@ -266,6 +266,8 @@ def train_model(
 
         # 更新学习率调度器
         scheduler.step(epoch)
+        lr = scheduler.get_lr()
+        print("Current LR:", lr)
 
         # tqdm 进度条显示
         with tqdm(total=len(dataloader), desc=f"Epoch {epoch + 1} Training") as pbar:
