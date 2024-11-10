@@ -16,18 +16,20 @@ export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "PYTHONPATH is set to: $PYTHONPATH"
 
 # Full model
-python ./core_model/CRUL.py --uni_name CRUL_full --model wideresnet50 --dataset pet-37 --learning_rate 2e-4 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.25 --repair_iter_num 10 --ls_gamma 0.3 --num_epochs 3 --ul_epochs 2 --agree_epochs 3 --mixup_alpha 0.5
+python ./core_model/CRUL.py --uni_name CRUL_full --model wideresnet50 --dataset pet-37 --learning_rate 2e-4 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.5 --repair_iter_num 5 --num_epochs 5 --ul_epochs 3 --agree_epochs 3 --mixup_alpha 0.75 --ls_gamma=0.2 --temperature=0.8
 
 # w/o Unlearning
-python ./core_model/CRUL.py --uni_name CRUL_ul --model wideresnet50 --dataset pet-37 --learning_rate 2e-4 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.25 --repair_iter_num 10 --ls_gamma 0.3 --num_epochs 3 --ul_epochs 0 --agree_epochs 3 --mixup_alpha 0.5
+python ./core_model/CRUL.py --uni_name CRUL_ul --model wideresnet50 --dataset pet-37 --learning_rate 2e-4 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.5 --repair_iter_num 5 --num_epochs 5 --ul_epochs 0 --agree_epochs 3 --mixup_alpha 0.75 --ls_gamma=0.2 --temperature=0.8
 
 # w/o High-confidence agreement label smoothing
-python ./core_model/CRUL.py --uni_name CRUL_lc --model wideresnet50 --dataset pet-37 --learning_rate 2e-4 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.25 --repair_iter_num 10 --ls_gamma 0.3 --num_epochs 3 --ul_epochs 2 --agree_epochs 0 --mixup_alpha 0.5
+python ./core_model/CRUL.py --uni_name CRUL_lc --model wideresnet50 --dataset pet-37 --learning_rate 2e-4 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.5 --repair_iter_num 5 --num_epochs 5 --ul_epochs 3 --agree_epochs 0 --mixup_alpha 0.75 --ls_gamma=0.2 --temperature=0.8
 
 # w/o Unlearning and High-confidence agreement label smoothing
-python ./core_model/CRUL.py --uni_name CRUL_ullc --model wideresnet50 --dataset pet-37 --learning_rate 2e-4 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.25 --repair_iter_num 10 --ls_gamma 0.3 --num_epochs 3 --ul_epochs 0 --agree_epochs 0 --mixup_alpha 0.5
+python ./core_model/CRUL.py --uni_name CRUL_ullc --model wideresnet50 --dataset pet-37 --learning_rate 2e-4 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.5 --repair_iter_num 5 --num_epochs 5 --ul_epochs 0 --agree_epochs 0 --mixup_alpha 0.75 --ls_gamma=0.2 --temperature=0.8
 
 # w/o mixup
-python ./core_model/CRUL.py --uni_name CRUL_full --model wideresnet50 --dataset pet-37 --learning_rate 2e-4 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.25 --repair_iter_num 10 --ls_gamma 0.3 --num_epochs 3 --ul_epochs 2 --agree_epochs 3 --mixup_alpha 0.000001
+python ./core_model/CRUL.py --uni_name CRUL_full --model wideresnet50 --dataset pet-37 --learning_rate 2e-4 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.5 --repair_iter_num 5 --num_epochs 5 --ul_epochs 3 --agree_epochs 3 --mixup_alpha 0.001 --ls_gamma=0.2 --temperature=0.8
 
-python ./core_model/CRUL.py --uni_name CRUL_full --model wideresnet50 --dataset pet-37 --learning_rate 2e-4 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.65 --repair_iter_num 10 --ls_gamma 0.3 --num_epochs 3 --ul_epochs 2 --agree_epochs 3 --mixup_alpha 0.000001
+# python ./core_model/CRUL.py --uni_name CRUL_full --model wideresnet50 --dataset pet-37 --learning_rate 2e-4 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.65 --repair_iter_num 10 --ls_gamma 0.3 --num_epochs 3 --ul_epochs 2 --agree_epochs 3 --mixup_alpha 0.25 --ls_gamma=0.2 --temperature=0.8
+
+#--mixup_alpha=0.25 --ls_gamma=0.2 --temperature=0.8
