@@ -523,12 +523,12 @@ from torchvision.transforms import v2
 class TransformFixMatchForAll(object):
     def __init__(self):
         self.weak = transforms.Compose([
-            torch.from_numpy,
+            torch.as_tensor,
             transforms.RandomHorizontalFlip(),
             ]
         )
         self.strong = transforms.Compose([
-            torch.from_numpy,
+            torch.as_tensor,
             v2.RandAugment()
         ])
 

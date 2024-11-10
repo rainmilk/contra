@@ -78,6 +78,7 @@ def main():
         shuffle=True,
         transforms=TransformFixMatchForAll(),
         output_index=True,
+        device=device
     )
 
     _, _, testloader = get_dataset_loader(
