@@ -5,7 +5,7 @@
 keywords=("baseline_code")
 
 # 定义监控时长（秒），可以通过第一个参数指定，默认是30秒
-monitor_duration=${1:-60}
+monitor_duration=${1:-150}
 end_time=$((SECONDS + monitor_duration))
 
 # 函数用于杀掉进程并打印结果
