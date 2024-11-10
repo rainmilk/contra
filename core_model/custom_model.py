@@ -43,6 +43,18 @@ def load_custom_model(model_name, num_classes, load_pretrained=True, ckpt_path=N
             model = models.efficientnet_v2_m(weights=weights)
         else:
             model = models.efficientnet_v2_m(num_classes=num_classes)
+    elif model_name == "efficientnet_l":
+        if load_pretrained:
+            weights = models.EfficientNet_V2_L_Weights.DEFAULT
+            model = models.efficientnet_v2_l(weights=weights)
+        else:
+            model = models.efficientnet_v2_l(num_classes=num_classes)
+    elif model_name == "efficientnet_b3":
+        if load_pretrained:
+            weights = models.EfficientNet_B3_Weights.DEFAULT
+            model = models.efficientnet_b3(weights=weights)
+        else:
+            model = models.efficientnet_b3(num_classes=num_classes)
     elif model_name == "efficientnet_b7":
         if load_pretrained:
             weights = models.EfficientNet_B7_Weights.DEFAULT

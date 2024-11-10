@@ -28,8 +28,8 @@ def model_train(
     model = model.to(device)  # 确保模型移动到正确的设备
 
     if mix_classes > 0:
-        alpha = 0.25 if "cifar-10" == args.dataset or "cifar-100" == args.dataset else 0.75
-        # cutmix_transform = v2.CutMix(alpha=alpha, num_classes=mix_classes)
+        alpha = 0.65
+        cutmix_transform = v2.CutMix(alpha=alpha, num_classes=mix_classes)
         mixup_transform = v2.MixUp(alpha=alpha, num_classes=mix_classes)
 
     for epoch in tqdm(range(epochs), desc="Training Progress"):
@@ -50,7 +50,7 @@ def model_train(
                     inputs, labels = last_input, last_labels
 
                 if mix_classes > 0:
-                    transform = mixup_transform  # np.random.choice([cutmix_transform, mixup_transform])
+                    transform = np.random.choice([cutmix_transform, mixup_transform])
                     labels = labels.to(torch.long)
                     inputs, labels = transform(inputs, labels)
 

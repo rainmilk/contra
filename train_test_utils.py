@@ -220,15 +220,15 @@ def train_model(
 
     # weights = torchvision.models.ResNet18_Weights.DEFAULT
     transform_train = None
-    if "cifar-100" == dataset_name or "cifar-10" == dataset_name:
-        transform_train = transforms.Compose(
-            [
-                torch.as_tensor,
-                # transforms.RandomCrop(32, padding=4),
-                transforms.RandomHorizontalFlip(),
-                # transforms.RandomRotation(15),
-            ]
-        )
+    # if "cifar-100" == dataset_name or "cifar-10" == dataset_name:
+    #     transform_train = transforms.Compose(
+    #         [
+    #             torch.as_tensor,
+    #             # transforms.RandomCrop(32, padding=4),
+    #             transforms.RandomHorizontalFlip(),
+    #             # transforms.RandomRotation(15),
+    #         ]
+    #     )
 
     transform_test = transforms.Compose(
         [
@@ -255,7 +255,7 @@ def train_model(
     test_accuracies = []
 
     if data_aug:
-        alpha = 0.25 if "cifar-10" == dataset_name or "cifar-100" == dataset_name else 0.75
+        alpha = 0.65
         cutmix_transform = v2.CutMix(alpha=alpha, num_classes=num_classes)
         mixup_transform = v2.MixUp(alpha=alpha, num_classes=num_classes)
 
@@ -266,7 +266,7 @@ def train_model(
 
         # 更新学习率调度器
         scheduler.step(epoch)
-        lr = scheduler.get_lr()
+        lr = optimizer.state_dict()['param_groups'][0]['lr']
         print("Current LR:", lr)
 
         # tqdm 进度条显示
@@ -282,7 +282,7 @@ def train_model(
                 targets = targets.to(torch.long)
                 
                 if data_aug:
-                    transform = mixup_transform  # np.random.choice([mixup_transform, cutmix_transform])
+                    transform = np.random.choice([mixup_transform, cutmix_transform])
                     inputs, targets = transform(inputs, targets)
 
                 inputs, targets = inputs.to(device), targets.to(device)
