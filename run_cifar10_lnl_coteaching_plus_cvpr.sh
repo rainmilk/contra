@@ -15,4 +15,8 @@ echo "CUDA_VISIBLE_DEVICES is set to: $CUDA_VISIBLE_DEVICES"
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "PYTHONPATH is set to: $PYTHONPATH"
 
-python ./baseline_code/colearn/main_cvpr.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 10 --batch_size 256 --uni_name Coteachingplus --learning_rate 1e-3 --noise_ratio 0.25
+python ./baseline_code/colearn/main_cvpr.py --model efficientnet_s --dataset cifar-10 --num_epochs 10 --batch_size 256 --uni_name Coteachingplus --learning_rate 1e-3 --noise_ratio 0.1
+python ./baseline_code/colearn/main_cvpr.py --model efficientnet_s --dataset cifar-10 --num_epochs 10 --batch_size 256 --uni_name Coteachingplus --learning_rate 1e-3 --noise_ratio 0.25
+python ./baseline_code/colearn/main_cvpr.py --model efficientnet_s --dataset cifar-10 --num_epochs 10 --batch_size 256 --uni_name Coteachingplus --learning_rate 1e-3 --noise_ratio 0.5
+python ./baseline_code/colearn/main_cvpr.py --model efficientnet_s --dataset cifar-10 --num_epochs 10 --batch_size 256 --uni_name Coteachingplus --learning_rate 1e-3 --noise_ratio 0.75
+python ./baseline_code/colearn/main_cvpr.py --model efficientnet_s --dataset cifar-10 --num_epochs 10 --batch_size 256 --uni_name Coteachingplus --learning_rate 1e-3 --noise_ratio 0.9

@@ -18,8 +18,11 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 declare -a scripts=(
     "run_flower102_lnl_coteaching_cvpr.sh" # 1
     "run_flower102_lnl_coteaching_plus_cvpr.sh" # 2
-    "run_flower102_lnl_jocor_cvpr.sh" # 3
     "run_flower102_lnl_decoupling_cvpr.sh" # 4
+    "run_flower102_lnl_disc_cvpr.sh" # 4
+    "run_flower102_lnl_elr_cvpr.sh" # 4
+    "run_flower102_lnl_gjs_cvpr.sh" # 4
+    "run_flower102_lnl_jocor_cvpr.sh" # 3
     "run_flower102_lnl_negativeLearning_cvpr.sh" # 5
     "run_flower102_lnl_pencil_cvpr.sh" # 6
 )

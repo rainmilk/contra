@@ -2,7 +2,7 @@
 
 # 检查是否传递了GPU的参数
 if [ -z "$1" ]; then
-    echo "使用方法: ./run_cifar_replay.sh <GPU_ID>"
+    echo "使用方法: ./this_script.sh <GPU_ID>"
     exit 1
 fi
 
@@ -15,4 +15,4 @@ echo "CUDA_VISIBLE_DEVICES is set to: $CUDA_VISIBLE_DEVICES"
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "PYTHONPATH is set to: $PYTHONPATH"
 
-python ./baseline_code/colearn/main_cvpr.py --model wideresnet50 --dataset pet-37 --num_epochs 5 --uni_name Colearning --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.25
+python ./baseline_code/lips-mu/main_mu_cvpr.py --model efficientnet_s --dataset cifar-10 --num_epochs 10 --batch_size 256 --uni_name FT_prune --unlearn_lr 1e-3 --noise_ratio 0.25 --alpha 1e-3

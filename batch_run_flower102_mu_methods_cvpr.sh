@@ -16,17 +16,17 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 
 # 定义要运行的脚本
 declare -a scripts=(
-    "run_flower102_mu_raw_cvpr.sh" # 1
-    "run_flower102_mu_wfisher_cvpr.sh" # 2
-    "run_flower102_mu_ga_cvpr.sh" # 1
-    "run_flower102_mu_gal1_cvpr.sh" # 2
-    "run_flower102_mu_ft_cvpr.sh" # 1
-    "run_flower102_mu_ftl1_cvpr.sh" # 2
-    "run_flower102_mu_ftprune_cvpr.sh" # 1
-    "run_flower102_mu_ftprunebi_cvpr.sh" # 2
-    "run_flower102_mu_retrain_cvpr.sh" # 1
-    "run_flower102_mu_retrainls_cvpr.sh" # 2
-    "run_flower102_mu_retrainsam_cvpr.sh" # 3
+    # "run_flower102_mu_ft_cvpr.sh" # 1
+    # "run_flower102_mu_ga_cvpr.sh" # 2
+    "run_flower102_mu_gal1_cvpr.sh" # 3
+    "run_flower102_mu_wfisher_cvpr.sh" # 4
+    # # "run_flower102_mu_raw_cvpr.sh" # 1
+    # # "run_flower102_mu_ftl1_cvpr.sh" # 2
+    # # "run_flower102_mu_ftprune_cvpr.sh" # 1
+    # # "run_flower102_mu_ftprunebi_cvpr.sh" # 2
+    # # "run_flower102_mu_retrain_cvpr.sh" # 1
+    # # "run_flower102_mu_retrainls_cvpr.sh" # 2
+    # # "run_flower102_mu_retrainsam_cvpr.sh" # 3
     # # "run_flower102_mu_fisher_new_cvpr.sh" # 6
 )
 

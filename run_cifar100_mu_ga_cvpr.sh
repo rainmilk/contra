@@ -15,4 +15,8 @@ echo "CUDA_VISIBLE_DEVICES is set to: $CUDA_VISIBLE_DEVICES"
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "PYTHONPATH is set to: $PYTHONPATH"
 
+python ./baseline_code/lips-mu/main_mu_cvpr.py --model efficientnet_s --dataset cifar-100 --num_epochs 10 --batch_size 256 --uni_name GA --unlearn_lr 1e-3 --noise_type asymmetric --noise_ratio 0.1 --alpha 1e-3
 python ./baseline_code/lips-mu/main_mu_cvpr.py --model efficientnet_s --dataset cifar-100 --num_epochs 10 --batch_size 256 --uni_name GA --unlearn_lr 1e-3 --noise_type asymmetric --noise_ratio 0.25 --alpha 1e-3
+python ./baseline_code/lips-mu/main_mu_cvpr.py --model efficientnet_s --dataset cifar-100 --num_epochs 10 --batch_size 256 --uni_name GA --unlearn_lr 1e-3 --noise_type asymmetric --noise_ratio 0.5 --alpha 1e-3
+python ./baseline_code/lips-mu/main_mu_cvpr.py --model efficientnet_s --dataset cifar-100 --num_epochs 10 --batch_size 256 --uni_name GA --unlearn_lr 1e-3 --noise_type asymmetric --noise_ratio 0.75 --alpha 1e-3
+python ./baseline_code/lips-mu/main_mu_cvpr.py --model efficientnet_s --dataset cifar-100 --num_epochs 10 --batch_size 256 --uni_name GA --unlearn_lr 1e-3 --noise_type asymmetric --noise_ratio 0.9 --alpha 1e-3

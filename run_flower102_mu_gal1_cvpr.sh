@@ -15,4 +15,9 @@ echo "CUDA_VISIBLE_DEVICES is set to: $CUDA_VISIBLE_DEVICES"
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 echo "PYTHONPATH is set to: $PYTHONPATH"
 
+
+python ./baseline_code/lips-mu/main_mu_cvpr.py --model wideresnet50 --dataset flower-102 --num_epochs 5 --uni_name GA_l1 --unlearn_lr 1e-4 --optimizer adam --batch_size 64 --noise_type symmetric --noise_ratio 0.1 --alpha 1e-4
+python ./baseline_code/lips-mu/main_mu_cvpr.py --model wideresnet50 --dataset flower-102 --num_epochs 5 --uni_name GA_l1 --unlearn_lr 1e-4 --optimizer adam --batch_size 64 --noise_type symmetric --noise_ratio 0.25 --alpha 1e-4
 python ./baseline_code/lips-mu/main_mu_cvpr.py --model wideresnet50 --dataset flower-102 --num_epochs 5 --uni_name GA_l1 --unlearn_lr 1e-4 --optimizer adam --batch_size 64 --noise_type symmetric --noise_ratio 0.5 --alpha 1e-4
+python ./baseline_code/lips-mu/main_mu_cvpr.py --model wideresnet50 --dataset flower-102 --num_epochs 5 --uni_name GA_l1 --unlearn_lr 1e-4 --optimizer adam --batch_size 64 --noise_type symmetric --noise_ratio 0.75 --alpha 1e-4
+python ./baseline_code/lips-mu/main_mu_cvpr.py --model wideresnet50 --dataset flower-102 --num_epochs 5 --uni_name GA_l1 --unlearn_lr 1e-4 --optimizer adam --batch_size 64 --noise_type symmetric --noise_ratio 0.9 --alpha 1e-4
