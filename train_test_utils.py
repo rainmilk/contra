@@ -282,7 +282,7 @@ def train_model(
                 targets = targets.to(torch.long)
                 
                 if data_aug:
-                    transform = np.random.choice([mixup_transform, cutmix_transform])
+                    transform = mixup_transform  # np.random.choice([mixup_transform, cutmix_transform])
                     inputs, targets = transform(inputs, targets)
 
                 inputs, targets = inputs.to(device), targets.to(device)
