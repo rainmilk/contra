@@ -23,6 +23,7 @@ def mixup_data(data_pair, dims, alpha):
     size = [1] * dims
     size[0] = len(data_x)
     a = np.random.beta(alpha, alpha, size)
+    a = np.maximum(a, 1-a)
     return a * data_x + (1 - a) * data_y
 
 
@@ -157,7 +158,7 @@ def iterate_repair_model(
         mix_lc_data = np.concatenate([disagree_mix_data, agree_mix_data], axis=0)
 
         print("Mix up lower confidence for worker model...")
-        alpha = 2
+        alpha = 0.65
         disagree_mix_labels = mixup_data((teacher_disagree_lc_probs, worker_disagree_lc_probs), 2, alpha)
         # tradeoff_alpha * teacher_disagree_lc_probs + (1 - tradeoff_alpha) * worker_disagree_lc_probs
         agree_mix_labels = mixup_data((teacher_agree_lc_probs, worker_agree_lc_probs), 2, alpha)
@@ -190,9 +191,9 @@ def iterate_repair_model(
 
         print("Mix up lower confidence for teacher model...")
 
-        disagree_mix_labels = mixup_data((teacher_disagree_lc_probs, worker_disagree_lc_probs), 2, 1.0)
+        disagree_mix_labels = mixup_data((teacher_disagree_lc_probs, worker_disagree_lc_probs), 2, alpha)
         # tradeoff_alpha * teacher_disagree_lc_probs + (1 - tradeoff_alpha) * worker_disagree_lc_probs
-        agree_mix_labels = mixup_data((teacher_agree_lc_probs, worker_agree_lc_probs), 2, 1.0)
+        agree_mix_labels = mixup_data((teacher_agree_lc_probs, worker_agree_lc_probs), 2, alpha)
         # tradeoff_alpha * teacher_agree_lc_probs + (1 - tradeoff_alpha) * worker_agree_lc_probs
         # agree_mix_labels = sharpen(agree_mix_labels, T=0.8)
         mix_lc_label = np.concatenate([disagree_mix_labels, agree_mix_labels], axis=0)

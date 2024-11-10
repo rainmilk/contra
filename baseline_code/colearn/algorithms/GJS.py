@@ -33,6 +33,7 @@ class GJS:
         self.scheduler = optim.lr_scheduler.ConstantLR(
             self.optimizer, factor=0.95, total_iters=config['epochs']
         )
+        self.epochs = config['epochs']
 
         # loss function
         # if config['dataset'] == 'cifar-10':

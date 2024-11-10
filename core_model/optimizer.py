@@ -8,8 +8,8 @@ def create_optimizer_scheduler(
     learning_rate=1e-3,
     weight_decay=5e-4,
     eta_min=None,
-    min_epochs_for_decay=50,
-    factor=0.95
+    min_epochs_for_decay=20,
+    factor=0.9
 ):
     # 根据用户选择的优化器初始化
     if optimizer_type == "adam":
@@ -21,12 +21,12 @@ def create_optimizer_scheduler(
 
     if eta_min is None: eta_min = 0.01 * learning_rate
     if epochs >= min_epochs_for_decay:
-        # lr_scheduler = optim.lr_scheduler.CosineAnnealingLR(
-        #     optimizer, T_max=epochs, eta_min=eta_min
-        # )
-        lr_scheduler = optim.lr_scheduler.StepLR(
-            optimizer, max(1, epochs // 50), gamma=factor
+        lr_scheduler = optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=epochs, eta_min=eta_min
         )
+        # lr_scheduler = optim.lr_scheduler.StepLR(
+        #     optimizer, max(1, epochs // 50), gamma=factor
+        # )
     else:
         lr_scheduler = optim.lr_scheduler.StepLR(
             optimizer, 1, gamma=factor
