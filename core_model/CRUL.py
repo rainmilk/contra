@@ -57,7 +57,7 @@ def iterate_repair_model(
     )
 
     """1. Unlearning confident disagreement data"""
-    disagree_threshold = 0.6
+    disagree_threshold = 0.75
     tradeoff_alpha = 2/3
     disagree_idx = working_inc_predicts != teacher_inc_predicts
     disagree_data = inc_data[disagree_idx]
@@ -124,7 +124,7 @@ def iterate_repair_model(
 
     """2. Refine low-confidence agreement and disagreement data"""
     top_conf = 0.3
-    agree_threshold = 0.6
+    agree_threshold = 0.75
     agree_idx = working_inc_predicts == teacher_inc_predicts
     agree_data = inc_data[agree_idx]
     teacher_agree_probs = teacher_inc_probs[agree_idx]

@@ -304,7 +304,7 @@ def make_arg_parser(parser=None):
     parser.add_argument(
         "--ls_gamma",
         type=float,
-        default=0.3,
+        default=0.25,
         help="Label smoothing factor",
     )
 
