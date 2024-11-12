@@ -525,11 +525,14 @@ class TransformFixMatchForAll(object):
         self.weak = transforms.Compose([
             torch.as_tensor,
             transforms.RandomHorizontalFlip(),
+            # transforms.RandomRotation(15),
             ]
         )
         self.strong = transforms.Compose([
             torch.as_tensor,
-            v2.RandAugment()
+            # transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomRotation(15),
         ])
 
     def __call__(self, x):
