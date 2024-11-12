@@ -141,7 +141,7 @@ def main():
         )
         model_history.append(eval_result)
         test_acc = eval_result["global"]
-        if epoch >= 2 and best_acc < test_acc:
+        if epoch >= 8 and best_acc < test_acc:
             best_acc, best_epoch = test_acc, epoch
             # save model
             os.makedirs(os.path.dirname(save_model_path), exist_ok=True)

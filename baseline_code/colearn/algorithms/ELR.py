@@ -149,7 +149,7 @@ class ELR:
 
         self.model_scratch.train()
         
-        if epoch <= self.warmup_epoch:                                
+        if epoch <= self.warmup_epoch:
             pbar = tqdm(train_loader)
             for (images, labels, indexes) in pbar:
                 x = Variable(images[0]).to(self.device, non_blocking=True)
