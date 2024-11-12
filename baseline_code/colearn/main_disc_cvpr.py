@@ -92,7 +92,7 @@ def main():
     num_test_images = len(testloader.dataset)
 
     load_model_path = settings.get_ckpt_path(
-        custom_args.dataset, case, custom_args.model, model_suffix="inc_train"
+        custom_args.dataset, case, custom_args.model, model_suffix="pretrain"
     )
 
     save_model_path = settings.get_ckpt_path(
@@ -141,11 +141,11 @@ def main():
         )
         model_history.append(eval_result)
         test_acc = eval_result["global"]
-        if epoch >= 5 and best_acc < test_acc:
+        if epoch >= 2 and best_acc < test_acc:
             best_acc, best_epoch = test_acc, epoch
             # save model
             os.makedirs(os.path.dirname(save_model_path), exist_ok=True)
-            torch.save(model.model_scratch.state_dict(), save_model_path)
+            torch.save(model_scratch.state_dict(), save_model_path)
             print("model saved to:", save_model_path)
 
         print(
@@ -156,7 +156,7 @@ def main():
     if best_acc == 0:
         # save model
         os.makedirs(os.path.dirname(save_model_path), exist_ok=True)
-        torch.save(model.model_scratch.state_dict(), save_model_path)
+        torch.save(model_scratch.state_dict(), save_model_path)
         print("model saved to:", save_model_path)
 
     torch.save(model_history, history_save_path)
