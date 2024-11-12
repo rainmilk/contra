@@ -92,7 +92,7 @@ def main():
     num_test_images = len(testloader.dataset)
 
     load_model_path = settings.get_ckpt_path(
-        custom_args.dataset, case, custom_args.model, model_suffix="pretrain"
+        custom_args.dataset, "pretrain", custom_args.model, model_suffix="pretrain"
     )
 
     save_model_path = settings.get_ckpt_path(
