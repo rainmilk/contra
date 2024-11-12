@@ -311,7 +311,7 @@ def make_arg_parser(parser=None):
     parser.add_argument(
         "--temperature",
         type=float,
-        default=1.0,
+        default=0.75,
         help="Sharpen factor",
     )
 

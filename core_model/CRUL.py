@@ -23,7 +23,7 @@ def mixup_data(data_pair, dims, alpha):
     size = [1] * dims
     size[0] = len(data_x)
     a = np.random.beta(alpha, alpha, size)
-    a = np.maximum(a, 1-a)
+    # a = np.maximum(a, 1-a)
     return a * data_x + (1 - a) * data_y
 
 
@@ -57,7 +57,7 @@ def iterate_repair_model(
     )
 
     """1. Unlearning confident disagreement data"""
-    disagree_threshold = 0.65
+    disagree_threshold = 0.6
     tradeoff_alpha = 2/3
     disagree_idx = working_inc_predicts != teacher_inc_predicts
     disagree_data = inc_data[disagree_idx]
@@ -67,12 +67,12 @@ def iterate_repair_model(
     # teacher_disagree_preds = teacher_inc_predicts[disagree_idx]
     teacher_disagree_model_conf = np.max(teacher_disagree_probs, axis=-1)
     worker_disagree_model_conf = np.max(worker_disagree_probs, axis=-1)
-    joint_disagree_model_conf = (tradeoff_alpha * worker_disagree_model_conf
-                                + (1 - tradeoff_alpha) * teacher_disagree_model_conf)
+    joint_disagree_model_conf = np.sqrt(teacher_disagree_model_conf * worker_disagree_model_conf)
+        # (tradeoff_alpha * worker_disagree_model_conf + (1 - tradeoff_alpha) * teacher_disagree_model_conf)
     disagree_conf_idx = joint_disagree_model_conf >= disagree_threshold
 
     mix_data = disagree_data[disagree_conf_idx]
-    gamma = len(mix_data)/len(disagree_data)
+    gamma = len(mix_data)/(len(disagree_data) + 1e-6)
 
     ga_loss_alpha = -1.0  # GA
     mix_worker_labels = worker_disagree_preds[disagree_conf_idx]
@@ -123,8 +123,8 @@ def iterate_repair_model(
     #     )
 
     """2. Refine low-confidence agreement and disagreement data"""
-    top_conf = 0.25
-    agree_threshold = 0.65
+    top_conf = 0.3
+    agree_threshold = 0.6
     agree_idx = working_inc_predicts == teacher_inc_predicts
     agree_data = inc_data[agree_idx]
     teacher_agree_probs = teacher_inc_probs[agree_idx]
@@ -132,7 +132,7 @@ def iterate_repair_model(
     agree_predicts = teacher_inc_predicts[agree_idx]
     teacher_agree_model_conf = np.max(teacher_agree_probs, axis=-1)
     worker_agree_model_conf = np.max(worker_agree_probs, axis=-1)
-    joint_agree_model_conf = (teacher_agree_model_conf + worker_agree_model_conf)/2
+    joint_agree_model_conf = np.sqrt(teacher_agree_model_conf * worker_agree_model_conf)
     sample_size = round(len(joint_agree_model_conf) * top_conf)
     sample_idx = np.argpartition(joint_agree_model_conf, -sample_size)[-sample_size:]
     conf_idx = joint_agree_model_conf >= agree_threshold
@@ -158,7 +158,7 @@ def iterate_repair_model(
         mix_lc_data = np.concatenate([disagree_mix_data, agree_mix_data], axis=0)
 
         print("Mix up lower confidence for worker model...")
-        alpha = 0.65
+        alpha = 1.2
         disagree_mix_labels = mixup_data((teacher_disagree_lc_probs, worker_disagree_lc_probs), 2, alpha)
         # tradeoff_alpha * teacher_disagree_lc_probs + (1 - tradeoff_alpha) * worker_disagree_lc_probs
         agree_mix_labels = mixup_data((teacher_agree_lc_probs, worker_agree_lc_probs), 2, alpha)
@@ -176,6 +176,7 @@ def iterate_repair_model(
             batch_size=args.batch_size,
             alpha=args.mixup_alpha,
             transforms=None,
+            first_max=False
         )
 
         model_train(
@@ -209,6 +210,7 @@ def iterate_repair_model(
             batch_size=args.batch_size,
             alpha=args.mixup_alpha,
             transforms=None,
+            first_max=False
         )
         model_train(
             mix_dataloader_shuffled,
@@ -266,6 +268,7 @@ def mix_up_dataloader(
     alpha=1.0,
     transforms=None,
     shuffle=True,
+    first_max=True
 ):
     mixed_dataset = MixupDataset(
         data_pair=(inc_data, aug_data),
@@ -274,6 +277,7 @@ def mix_up_dataloader(
         transforms=transforms,
         mean=mean,
         std=std,
+        first_max=first_max
     )
     return DataLoader(mixed_dataset, batch_size, drop_last=False, shuffle=shuffle)
 
