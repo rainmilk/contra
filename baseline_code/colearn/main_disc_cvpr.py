@@ -92,7 +92,7 @@ def main():
     num_test_images = len(testloader.dataset)
 
     load_model_path = settings.get_ckpt_path(
-        custom_args.dataset, "pretrain", custom_args.model, model_suffix="pretrain"
+        custom_args.dataset, case, custom_args.model, model_suffix="inc_train"
     )
 
     save_model_path = settings.get_ckpt_path(
@@ -150,7 +150,7 @@ def main():
 
         print(
             "Epoch [%d/%d] Test Accuracy on the %s test images: %.4f %%"
-            % (epoch + 1, custom_args.num_epochs, num_test_images, test_acc)
+            % (epoch + 1, custom_args.num_epochs, num_test_images, test_acc * 100)
         )
 
     if best_acc == 0:
