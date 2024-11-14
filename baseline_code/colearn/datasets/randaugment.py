@@ -533,7 +533,8 @@ class TransformFixMatchForAll(object):
             torch.as_tensor,
             transforms.RandomHorizontalFlip(),
             # transforms.RandomCrop(32, padding=4),
-            transforms.RandAugment()
+            transforms.RandomRotation(20),
+            transforms.RandomAffine(20),
         ])
 
     def __call__(self, x):
