@@ -238,7 +238,7 @@ def make_arg_parser(parser=None):
         "--ul_epochs",
         type=int,
         default=3,
-        help="Number of unlearning epochs (default: 2)",
+        help="Number of unlearning epochs",
     )
 
     parser.add_argument(
@@ -297,7 +297,7 @@ def make_arg_parser(parser=None):
     parser.add_argument(
         "--lr_scale",
         type=float,
-        default=1.0,
+        default=0.5,
         help="Scale the working model lr",
     )
 
@@ -318,7 +318,7 @@ def make_arg_parser(parser=None):
     parser.add_argument(
         "--mixup_alpha",
         type=float,
-        default=1.0,
+        default=0.75,
         help="Mixup factor",
     )
 
