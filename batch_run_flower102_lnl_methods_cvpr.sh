@@ -16,8 +16,8 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 
 # 定义要运行的脚本
 declare -a scripts=(
-    # "run_flower102_lnl_coteaching_cvpr.sh" # 1
-    # "run_flower102_lnl_coteaching_plus_cvpr.sh" # 2
+    "run_flower102_lnl_coteaching_cvpr.sh"      # 1
+    "run_flower102_lnl_coteaching_plus_cvpr.sh" # 2
     # "run_flower102_lnl_decoupling_cvpr.sh" # 1
     # "run_flower102_lnl_jocor_cvpr.sh" # 2
     # "run_flower102_lnl_negativeLearning_cvpr.sh" # 1
