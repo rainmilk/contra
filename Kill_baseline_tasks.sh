@@ -2,7 +2,7 @@
 
 # 定义要查找并杀掉的进程关键字列表
 # keywords=("baseline_code" "core_model" "run_experiment.py")
-keywords=("baseline_code")
+keywords=("baseline_code", "CRUL", "colearn")
 
 # 定义监控时长（秒），可以通过第一个参数指定，默认是30秒
 monitor_duration=${1:-150}
