@@ -201,6 +201,13 @@ def make_arg_parser(parser=None):
         help="Learning rate for the optimizer (default: 0.001)",
     )
 
+    parser.add_argument(
+        "--teacher_lr_scale",
+        type=check_positive,  # 使用自定义函数
+        default=0.2,
+        help="Teacher learning rate scale",
+    )
+
     # 添加 optimizer 参数
     parser.add_argument(
         "--optimizer",

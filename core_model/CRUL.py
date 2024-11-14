@@ -306,6 +306,8 @@ def execute(args):
     learning_rate = getattr(args, "learning_rate", 0.001)
     lr_scale = getattr(args, "lr_scale", 1.0)
     working_lr = learning_rate
+    teacher_lr = args.teacher_lr_scale * working_lr
+    ul_lr = lr_scale * learning_rate
     weight_decay = getattr(args, "weight_decay", 5e-4)
     repair_iter_num = getattr(args, "repair_iter_num", 10)
     optimizer_type = getattr(args, "optimizer", "adam")
@@ -360,12 +362,11 @@ def execute(args):
         optimizer_type,
         teacher_model.parameters(),
         num_epochs,
-        learning_rate,
+        teacher_lr,
         weight_decay,
     )
     teacher_criterion = nn.CrossEntropyLoss()
 
-    ul_lr = lr_scale * learning_rate
     ul_worker_opt = optim.SGD(working_model.parameters(), lr=ul_lr)
     ul_worker_lr_scheduler = optim.lr_scheduler.StepLR(ul_worker_opt, step_size=1, gamma=0.9)
     ul_teacher_opt = optim.SGD(teacher_model.parameters(), lr=ul_lr)
