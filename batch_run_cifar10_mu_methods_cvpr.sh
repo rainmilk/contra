@@ -16,10 +16,10 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 
 # 定义要运行的脚本
 declare -a scripts=(
-    "run_cifar10_mu_ft_cvpr.sh" # 3
-    "run_cifar10_mu_ga_cvpr.sh" # 4
-    # "run_cifar10_mu_gal1_cvpr.sh" # 3
-    # "run_cifar10_mu_wfisher_cvpr.sh" # 4
+    # "run_cifar10_mu_ft_cvpr.sh" # 3
+    # "run_cifar10_mu_ga_cvpr.sh" # 4
+    "run_cifar10_mu_gal1_cvpr.sh" # 3
+    "run_cifar10_mu_wfisher_cvpr.sh" # 4
     # # "run_cifar10_mu_ftl1_cvpr.sh" # 5
     # # "run_cifar10_mu_ftprune_cvpr.sh" # 8
     # # "run_cifar10_mu_ftprunebi_cvpr.sh" # 9

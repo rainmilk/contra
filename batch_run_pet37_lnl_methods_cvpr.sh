@@ -16,12 +16,12 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 
 # 定义要运行的脚本
 declare -a scripts=(
-    "run_pet37_lnl_coteaching_cvpr.sh"      # 1
-    "run_pet37_lnl_coteaching_plus_cvpr.sh" # 2
+    # "run_pet37_lnl_coteaching_cvpr.sh"      # 1
+    # "run_pet37_lnl_coteaching_plus_cvpr.sh" # 2
     # "run_pet37_lnl_decoupling_cvpr.sh" # 1
     # "run_pet37_lnl_jocor_cvpr.sh" # 2
-    # "run_pet37_lnl_negativeLearning_cvpr.sh" # 1
-    # "run_pet37_lnl_pencil_cvpr.sh" # 2
+    "run_pet37_lnl_negativeLearning_cvpr.sh" # 1
+    "run_pet37_lnl_pencil_cvpr.sh" # 2
     # # "run_pet37_lnl_disc_cvpr.sh" # 4
     # # "run_pet37_lnl_elr_cvpr.sh" # 4
     # # "run_pet37_lnl_gjs_cvpr.sh" # 4
