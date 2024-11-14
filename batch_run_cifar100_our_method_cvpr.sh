@@ -22,7 +22,7 @@ python ./core_model/CRUL.py --model efficientnet_s --dataset cifar-100 --num_epo
 python ./core_model/CRUL.py --model efficientnet_s --dataset cifar-100 --num_epochs 4 --repair_iter_num 10 --uni_name CRUL --learning_rate 5e-5 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.25 --mixup_alpha 0.75
 python ./core_model/CRUL.py --model efficientnet_s --dataset cifar-100 --num_epochs 4 --repair_iter_num 10 --uni_name CRUL --learning_rate 5e-5 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.5 --mixup_alpha 0.75
 python ./core_model/CRUL.py --model efficientnet_s --dataset cifar-100 --num_epochs 4 --repair_iter_num 10 --uni_name CRUL --learning_rate 6e-5 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.75 --mixup_alpha 0.75
-python ./core_model/CRUL.py --model efficientnet_s --dataset cifar-100 --num_epochs 5 --repair_iter_num 10 --uni_name CRUL --learning_rate 1.1e-4 --optimizer adam --batch_size 256 --noise_type asymmetric --noise_ratio 0.9 --mixup_alpha 0.75
+python ./core_model/CRUL.py --model efficientnet_s --dataset cifar-100 --num_epochs 4 --repair_iter_num 10 --uni_name CRUL --learning_rate 5e-4 --optimizer adam --batch_size 128 --noise_type asymmetric --noise_ratio 0.9 --mixup_alpha 0.75
 
 # # run_cifar10_crul_cvpr.sh
 # python ./core_model/CRUL.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 1e-3 --optimizer adam --batch_size 256 --noise_ratio 0.25
