@@ -17,10 +17,10 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 
 # run_pet37_crul_cvpr.sh
 python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 2e-5 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.1 --mixup_alpha 0.5
-python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 2e-5 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.25 --mixup_alpha 0.5
-python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 2e-5 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.5 --mixup_alpha 0.5
-python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 2e-5 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.75 --mixup_alpha 0.5
-python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 2e-5 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.9 --mixup_alpha 0.5
+python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 5e-5 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.25 --mixup_alpha 0.5
+python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 5e-5 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.5 --mixup_alpha 0.5
+python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.75 --mixup_alpha 0.5
+python ./core_model/CRUL.py --model wideresnet50 --dataset pet-37 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 1e-4 --optimizer adam --batch_size 64 --noise_type asymmetric --noise_ratio 0.9 --mixup_alpha 0.5
 
 # # run_cifar10_crul_cvpr.sh
 # python ./core_model/CRUL.py --model cifar-resnet18 --dataset cifar-10 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 1e-3 --optimizer adam --batch_size 256 --noise_ratio 0.25
