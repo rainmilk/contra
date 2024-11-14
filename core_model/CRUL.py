@@ -165,12 +165,12 @@ def iterate_repair_model(
         # tradeoff_alpha * teacher_agree_lc_probs + (1 - tradeoff_alpha) * worker_agree_lc_probs
         mix_lc_label = np.concatenate([disagree_mix_labels, agree_mix_labels], axis=0)
         mix_lc_label = sharpen(mix_lc_label, T=temperature)
+        mix_train = (mix_lc_data, mix_lc_label, conf_agree_data, conf_agree_mix_labels) \
+            if len(mix_lc_label) > len(conf_agree_mix_labels) \
+            else (conf_agree_data, conf_agree_mix_labels, mix_lc_data, mix_lc_label)
 
         mix_dataloader_shuffled = mix_up_dataloader(
-            mix_lc_data,
-            mix_lc_label,
-            conf_agree_data,
-            conf_agree_mix_labels,
+            *mix_train,
             mean,
             std,
             batch_size=args.batch_size,
@@ -199,12 +199,12 @@ def iterate_repair_model(
         # agree_mix_labels = sharpen(agree_mix_labels, T=0.8)
         mix_lc_label = np.concatenate([disagree_mix_labels, agree_mix_labels], axis=0)
         mix_lc_label = sharpen(mix_lc_label, T=temperature)
+        mix_train = (mix_lc_data, mix_lc_label, conf_agree_data, conf_agree_mix_labels) \
+            if len(mix_lc_label) > len(conf_agree_mix_labels) \
+            else (conf_agree_data, conf_agree_mix_labels, mix_lc_data, mix_lc_label)
 
         mix_dataloader_shuffled = mix_up_dataloader(
-            mix_lc_data,
-            mix_lc_label,
-            conf_agree_data,
-            conf_agree_mix_labels,
+            *mix_train,
             mean,
             std,
             batch_size=args.batch_size,
