@@ -1,0 +1,17 @@
+,accuracy
+pretrain,65.16
+inc_train,17.37
+Coteaching,40.45
+Coteachingplus,52.78
+Decoupling,56.75
+DISC,57.02
+ELR,54.72
+GJS,56.89
+JoCoR,36.44
+NegativeLearning,55.99
+PENCIL,39.84
+FT,35.53
+GA,17.72
+GA_l1,19.92
+wfisher,17.42
+CRUL,60.95

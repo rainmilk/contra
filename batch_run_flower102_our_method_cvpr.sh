@@ -17,8 +17,8 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 
 
 # run_flower102_crul_cvpr.sh
-python ./core_model/CRUL.py --model wideresnet50 --dataset flower-102 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 1e-4 --optimizer adam --batch_size 256 --noise_type symmetric --noise_ratio 0.1
-python ./core_model/CRUL.py --model wideresnet50 --dataset flower-102 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 1e-4 --optimizer adam --batch_size 256 --noise_type symmetric --noise_ratio 0.25
-python ./core_model/CRUL.py --model wideresnet50 --dataset flower-102 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 1e-4 --optimizer adam --batch_size 256 --noise_type symmetric --noise_ratio 0.5
-python ./core_model/CRUL.py --model wideresnet50 --dataset flower-102 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 1e-4 --optimizer adam --batch_size 256 --noise_type symmetric --noise_ratio 0.75
-python ./core_model/CRUL.py --model wideresnet50 --dataset flower-102 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 1e-4 --optimizer adam --batch_size 256 --noise_type symmetric --noise_ratio 0.9
+python ./core_model/CRUL.py --model wideresnet50 --dataset flower-102 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 1e-4 --optimizer adam --batch_size 32 --noise_type symmetric --noise_ratio 0.1
+python ./core_model/CRUL.py --model wideresnet50 --dataset flower-102 --num_epochs 3 --repair_iter_num 5 --uni_name CRUL --learning_rate 1e-4 --optimizer adam --batch_size 32 --noise_type symmetric --noise_ratio 0.25
+python ./core_model/CRUL.py --model wideresnet50 --dataset flower-102 --num_epochs 5 --repair_iter_num 5 --uni_name CRUL --learning_rate 5e-4 --optimizer adam --batch_size 16 --noise_type symmetric --noise_ratio 0.5
+python ./core_model/CRUL.py --model wideresnet50 --dataset flower-102 --num_epochs 5 --repair_iter_num 10 --uni_name CRUL --learning_rate 8e-4 --optimizer adam --batch_size 16 --noise_type symmetric --noise_ratio 0.75
+python ./core_model/CRUL.py --model wideresnet50 --dataset flower-102 --num_epochs 5 --repair_iter_num 10 --uni_name CRUL --learning_rate 1e-3 --optimizer adam --batch_size 16 --noise_type symmetric --noise_ratio 0.9

@@ -18,5 +18,5 @@ echo "PYTHONPATH is set to: $PYTHONPATH"
 python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name JoCoR --learning_rate 1e-4 --noise_type symmetric --noise_ratio 0.1
 python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name JoCoR --learning_rate 1e-4 --noise_type symmetric --noise_ratio 0.25
 python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name JoCoR --learning_rate 1e-4 --noise_type symmetric --noise_ratio 0.5
-python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name JoCoR --learning_rate 1e-4 --noise_type symmetric --noise_ratio 0.75
-python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name JoCoR --learning_rate 1e-4 --noise_type symmetric --noise_ratio 0.9
+python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name JoCoR --learning_rate 3e-5 --noise_type symmetric --noise_ratio 0.75
+python ./baseline_code/colearn/main_cvpr.py --model wideresnet50  --dataset flower-102 --num_epochs 10 --batch_size 64 --uni_name JoCoR --learning_rate 2e-5 --noise_type symmetric --noise_ratio 0.9
