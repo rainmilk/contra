@@ -7,7 +7,10 @@ python ./result_analysis/gen_result_visualize_to_csv.py --noise_rate 0.9 --noise
 
 # FLOWER-102
 python ./result_analysis/gen_result_visualize_to_csv.py --noise_rate 0.1 --noise_type symmetric --dataset flower-102
+
+# rerun
 python ./result_analysis/gen_result_visualize_to_csv.py --noise_rate 0.25 --noise_type symmetric --dataset flower-102
+
 python ./result_analysis/gen_result_visualize_to_csv.py --noise_rate 0.5 --noise_type symmetric --dataset flower-102
 python ./result_analysis/gen_result_visualize_to_csv.py --noise_rate 0.75 --noise_type symmetric --dataset flower-102
 python ./result_analysis/gen_result_visualize_to_csv.py --noise_rate 0.9 --noise_type symmetric --dataset flower-102
