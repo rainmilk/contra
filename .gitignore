@@ -17,6 +17,7 @@ data/
 !data/cifar-10/noise/reconstruct_D_tr.py
 dataset/
 *.npy
+*.npz
 
 # model
 models/
