@@ -5,7 +5,7 @@ from core import train_teacher_model
 from torch import nn
 from configs import settings
 
-from args_paser import parse_args, parse_kwargs
+from args_parser import parse_args, parse_kwargs
 from lip_teacher import SimpleLipNet
 from optimizer import create_optimizer_scheduler
 from custom_model import load_custom_model, ClassifierWrapper

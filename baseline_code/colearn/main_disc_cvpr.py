@@ -21,7 +21,7 @@ from torch import optim
 
 from core_model.dataset import get_dataset_loader
 from core_model.train_test import model_test
-from args_paser import parse_args
+from args_parser import parse_args
 from configs import settings
 from core_model.custom_model import load_custom_model, ClassifierWrapper
 

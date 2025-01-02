@@ -1,5 +1,5 @@
 import argparse
-from args_paser import make_arg_parser
+from args_parser import make_arg_parser
 
 
 def parse_args():

@@ -2,7 +2,7 @@ import argparse
 
 import torch
 import numpy as np
-from args_paser import parse_args
+from args_parser import parse_args
 from configs import settings
 from core_model.custom_model import ClassifierWrapper, load_custom_model
 from core_model.dataset import get_dataset_loader

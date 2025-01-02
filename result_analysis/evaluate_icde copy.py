@@ -1,7 +1,7 @@
 import warnings
 warnings.filterwarnings("ignore")
 import argparse
-from args_paser import parse_args
+from args_parser import parse_args
 import os
 import sys
 

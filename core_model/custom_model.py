@@ -1,8 +1,6 @@
 import torch.nn as nn
 import torch
 from torchvision import models
-from core_model.wideresidual import wideresnet
-from core_model.resnet import resnet18, resnet34, resnet50, resnet101
 
 
 def load_custom_model(model_name, num_classes, load_pretrained=True, ckpt_path=None):
@@ -61,22 +59,45 @@ def load_custom_model(model_name, num_classes, load_pretrained=True, ckpt_path=N
             model = models.efficientnet_b7(weights=weights)
         else:
             model = models.efficientnet_b7(num_classes=num_classes)
-    elif model_name == "vgg19":
+    elif model_name == "vit_b_16":
         if load_pretrained:
-            weights = models.VGG19_BN_Weights.DEFAULT
-            model = models.vgg19_bn(weights=weights)
+            weights = models.ViT_B_16_Weights.DEFAULT
+            model = models.vit_b_16(weights=weights)
         else:
-            model = models.vgg19_bn(num_classes=num_classes)
-    elif model_name == "cifar-resnet18":
-        model = resnet18(num_classes=num_classes)
-    elif model_name == "cifar-resnet50":
-        model = resnet50(num_classes=num_classes)
-    elif model_name == "cifar-resnet101":
-        model = resnet101(num_classes=num_classes)
-    elif model_name == "cifar-wideresnet40":
-        model = wideresnet(num_classes=num_classes, widen_factor=2)
+            model = models.vit_b_16(num_classes=num_classes)
+    elif model_name == "vit_b_32":
+        if load_pretrained:
+            weights = models.ViT_B_32_Weights.DEFAULT
+            model = models.vit_b_32(weights=weights)
+        else:
+            model = models.vit_b_32(num_classes=num_classes)
+    elif model_name == "swin_t":
+        if load_pretrained:
+            weights = models.Swin_V2_T_Weights.DEFAULT
+            model = models.swin_v2_t(weights=weights)
+        else:
+            model = models.swin_v2_t(num_classes=num_classes)
+    elif model_name == "swin_s":
+        if load_pretrained:
+            weights = models.Swin_V2_S_Weights.DEFAULT
+            model = models.swin_v2_s(weights=weights)
+        else:
+            model = models.swin_v2_s(num_classes=num_classes)
+    elif model_name == "maxvit_t":
+        if load_pretrained:
+            weights = models.MaxVit_T_Weights.DEFAULT
+            model = models.maxvit_t(weights=weights)
+        else:
+            model = models.maxvit_t(num_classes=num_classes)
+    elif model_name == "vgg16":
+        if load_pretrained:
+            weights = models.VGG16_Weights.DEFAULT
+            model = models.vgg16(weights=weights)
+        else:
+            model = models.vgg16(num_classes=num_classes)
     else:
-        model = None
+        raise Exception(f"{model_name} is not supported")
+
 
     if model and ckpt_path:
         checkpoint = torch.load(ckpt_path)
@@ -88,7 +109,6 @@ def load_custom_model(model_name, num_classes, load_pretrained=True, ckpt_path=N
 class ClassifierWrapper(nn.Module):
     def __init__(self, backbone, num_classes,
                  freeze_weights=False,
-                 bypass=False,
                  spectral_norm=False):
         super(ClassifierWrapper, self).__init__()
 
@@ -98,29 +118,22 @@ class ClassifierWrapper(nn.Module):
                 param.requires_grad = False
 
         all_modules = list(backbone.children())
+        for i, module in enumerate(all_modules):
+            if isinstance(module, nn.ModuleList):
+                all_modules[i] = nn.Sequential(*module)
+
         self.feature_model = nn.Sequential(*all_modules[:-1], nn.Flatten())
 
-        # if not bypass and batchnorm_blocks >= 0:
-        #     modules += [
-        #         *[nn.ReLU(), nn.BatchNorm1d(features), nn.Linear(features, features)] * batchnorm_blocks,
-        #         nn.ReLU(), nn.BatchNorm1d(features)]
-
+        children = list(all_modules[-1].children())
+        if len(children) > 1:
+            feature_size = children[-1].in_features
+            self.fc = nn.Sequential(*children[:-1], nn.Linear(feature_size, num_classes))
+        else:
+            feature_size = all_modules[-1].in_features
+            self.fc = nn.Linear(feature_size, num_classes)
 
         if spectral_norm:
             self.apply(self._add_spectral_norm)
-
-        if bypass:
-            self.fc = all_modules[-1]
-        else:
-            children = list(all_modules[-1].children())
-            if len(children) > 1:
-                last_modules = list(children)
-                features = last_modules[-1].in_features
-                last_modules[-1] = nn.Linear(features, num_classes)
-                self.fc = nn.Sequential(*last_modules)
-            else:
-                features = all_modules[-1].in_features
-                self.fc = nn.Linear(features, num_classes)
 
     def forward(self, x, output_emb=False):
         emb = self.feature_model(x)

@@ -17,7 +17,7 @@ import plf
 
 from conf import cfg, load_cfg_fom_args
 from core_model.dataset import get_dataset_loader
-from args_paser import parse_args
+from args_parser import parse_args
 from configs import settings
 from core_model.custom_model import load_custom_model, ClassifierWrapper
 

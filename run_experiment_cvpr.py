@@ -2,7 +2,7 @@ import os
 import shutil
 import warnings
 import numpy as np
-from args_paser import parse_args
+from args_parser import parse_args
 
 import torch
 from core_model.custom_model import ClassifierWrapper, load_custom_model

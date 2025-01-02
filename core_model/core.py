@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import sys
 
-from args_paser import parse_args, parse_kwargs
+from args_parser import parse_args, parse_kwargs
 from lip_teacher import SimpleLipNet
 from dataset import MixupDataset, get_dataset_loader
 from optimizer import create_optimizer_scheduler
