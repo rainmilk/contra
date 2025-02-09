@@ -3,8 +3,6 @@ import argparse
 
 # from run_experiment import run_experiment
 
-
-# 自定义检查函数
 def check_positive(value):
     ivalue = float(value)
     if ivalue <= 0:

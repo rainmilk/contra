@@ -5,9 +5,9 @@ from tqdm import tqdm
 import torch
 import torch.nn as nn
 from torchvision import transforms
-from core_model.optimizer import create_optimizer_scheduler
+from core.optimizer import create_optimizer_scheduler
 import json
-from core_model.dataset import BaseTensorDataset
+from core.dataset import BaseTensorDataset
 
 from torch.utils.data import DataLoader
 

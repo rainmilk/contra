@@ -8,8 +8,8 @@ from tqdm import tqdm
 import torch
 import torch.nn as nn
 from torchvision import transforms
-from core_model.optimizer import create_optimizer_scheduler
-from core_model.custom_model import ClassifierWrapper, load_custom_model
+from core.optimizer import create_optimizer_scheduler
+from core.custom_model import ClassifierWrapper, load_custom_model
 from configs import settings
 
 from torch.utils.data import DataLoader, Dataset
